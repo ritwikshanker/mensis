@@ -198,4 +198,10 @@ object PredictionConstants {
 
     /** Days before the next period that count as "late luteal" for symptom patterns. */
     const val SYMPTOM_LATE_LUTEAL_DAYS: Int = 7
+
+    /**
+     * The doctor report names the phase a symptom usually falls in ("Headache (pre-menstrual)") only
+     * when at least this fraction of the cycles with the symptom had it in that phase.
+     */
+    const val SYMPTOM_TYPICAL_PHASE_MIN_FRACTION: Double = 0.5
 }

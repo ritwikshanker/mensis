@@ -36,6 +36,7 @@ import com.deutschdreamers.mensis.ui.navigation.Import
 import com.deutschdreamers.mensis.ui.navigation.LaterScreen
 import com.deutschdreamers.mensis.ui.navigation.MensisNavKey
 import com.deutschdreamers.mensis.ui.navigation.Reminders
+import com.deutschdreamers.mensis.ui.navigation.Report
 import com.deutschdreamers.mensis.ui.navigation.TrackLevel
 
 @Composable
@@ -148,7 +149,7 @@ fun SettingsScreenContent(
                 stringResource(R.string.settings_report),
                 stringResource(R.string.settings_report_supporting),
             ) {
-                onNavigate(ComingSoon(LaterScreen.REPORT))
+                onNavigate(Report)
             }
             SettingsRow(
                 icon = R.drawable.ms_delete_forever,

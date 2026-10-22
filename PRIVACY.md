@@ -62,6 +62,13 @@ An export is written only where you choose in the system file picker. A JSON or 
 password is plain text that anyone with the file can read; the export screen says so. With a password,
 the file is sealed in the same container as Drive backups (below).
 
+### Doctor report
+
+The PDF report is drawn on the phone and kept in memory until you save it with the system file picker
+or hand it to an app through the share sheet. It is not encrypted. Free-text notes are left out unless
+you tick them. A shared copy sits in the app's private cache, readable only by the app you shared it
+with, until Mensis next starts.
+
 ### Google Drive backup (optional)
 
 When you turn on Drive backup:
@@ -135,6 +142,6 @@ Mensis writes no health data to logs. Release builds strip all `android.util.Log
   hidden on the lock screen.
 - **Your Google account.** Someone with access to your Google account can download or delete the
   encrypted backups, but cannot read them without the backup password.
-- **Exports without a password**, once they are outside the app.
+- **Exports without a password and doctor reports**, once they are outside the app.
 
 Mensis is not a medical device and does not provide medical advice or contraception.

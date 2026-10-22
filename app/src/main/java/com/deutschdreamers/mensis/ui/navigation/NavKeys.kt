@@ -34,6 +34,10 @@ data object Export : MensisNavKey
 @Serializable
 data object Import : MensisNavKey
 
+/** Settings → Report for a doctor (design §15). */
+@Serializable
+data object Report : MensisNavKey
+
 /** Settings → Backup (design §11); [reconnect] opens Google's reconnect screen at once (Today's banner). */
 @Serializable
 data class Backup(
@@ -48,7 +52,7 @@ data class Restore(
 
 /** Screens that arrive in later build steps; their Settings rows already navigate somewhere. */
 @Serializable
-enum class LaterScreen { MODE, UNITS, REPORT, DELETE_ALL, THEME, ABOUT }
+enum class LaterScreen { MODE, UNITS, DELETE_ALL, THEME, ABOUT }
 
 @Serializable
 data class ComingSoon(

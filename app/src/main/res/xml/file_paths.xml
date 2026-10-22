@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- "Share file" after an export: a copy in the app's private cache, readable only through a granted content URI. -->
+<!-- "Share" after an export or a doctor report: a copy in the app's private cache, readable only through a granted content URI. -->
 <paths>
     <cache-path name="shared" path="shared/" />
 </paths>

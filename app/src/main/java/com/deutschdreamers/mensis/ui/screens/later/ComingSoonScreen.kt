@@ -36,7 +36,6 @@ val LaterScreen.titleRes: Int
         when (this) {
             LaterScreen.MODE -> R.string.settings_mode
             LaterScreen.UNITS -> R.string.settings_units
-            LaterScreen.REPORT -> R.string.settings_report
             LaterScreen.DELETE_ALL -> R.string.settings_delete_all
             LaterScreen.THEME -> R.string.settings_theme
             LaterScreen.ABOUT -> R.string.settings_about

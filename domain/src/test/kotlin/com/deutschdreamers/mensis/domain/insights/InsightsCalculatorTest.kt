@@ -137,4 +137,42 @@ class InsightsCalculatorTest {
         assertEquals(CyclePhaseBucket.LATE_LUTEAL, patterns[2].phase)
         assertTrue(patterns.all { it.fraction >= 0.5 })
     }
+
+    @Test
+    fun `symptom frequencies count every symptom and name the phase it usually falls in`() {
+        val starts = CycleDeriver.periodStarts(entries)
+        val symptoms =
+            starts.dropLast(1).flatMapIndexed { index, start ->
+                val next = starts[index + 1]
+                buildList {
+                    add(DayEntry(start.plusDays(1), symptoms = setOf(Symptom.CRAMPS)))
+                    if (index % 4 != 0) add(DayEntry(next.minusDays(1), symptoms = setOf(Symptom.HEADACHE)))
+                    // Bloating once in each phase bucket and once outside all of them: no typical phase.
+                    when (index) {
+                        0 -> add(DayEntry(start, symptoms = setOf(Symptom.BLOATING)))
+                        1 -> add(DayEntry(next.minusDays(2), symptoms = setOf(Symptom.BLOATING)))
+                        2 -> add(DayEntry(next.minusDays(5), symptoms = setOf(Symptom.BLOATING)))
+                        3 -> add(DayEntry(start.plusDays(5), symptoms = setOf(Symptom.BLOATING)))
+                    }
+                }
+            }
+        val frequencies = InsightsCalculator.symptomFrequencies(cycles, Synthetic.merge(entries, symptoms))
+        assertEquals(listOf(Symptom.CRAMPS, Symptom.HEADACHE, Symptom.BLOATING), frequencies.map { it.symptom })
+        assertEquals(listOf(8, 6, 4), frequencies.map { it.cyclesWith })
+        assertTrue(frequencies.all { it.cyclesConsidered == 8 })
+        assertEquals(
+            listOf(CyclePhaseBucket.PERIOD_START, CyclePhaseBucket.PRE_PERIOD, null),
+            frequencies.map { it.typicalPhase },
+        )
+    }
+
+    @Test
+    fun `symptom frequencies need a complete cycle`() {
+        val open =
+            Synthetic.merge(
+                Synthetic.period(Synthetic.day1),
+                listOf(DayEntry(Synthetic.day1.plusDays(1), symptoms = setOf(Symptom.CRAMPS))),
+            )
+        assertTrue(InsightsCalculator.symptomFrequencies(CycleDeriver.derive(open), open).isEmpty())
+    }
 }

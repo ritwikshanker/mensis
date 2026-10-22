@@ -70,6 +70,18 @@ data class SymptomPattern(
     val fraction: Double get() = cyclesWith.toDouble() / cyclesConsidered
 }
 
+/**
+ * How many of the considered cycles had [symptom] logged at least once, and the phase it usually fell
+ * in: the phase holding it in at least [PredictionConstants.SYMPTOM_TYPICAL_PHASE_MIN_FRACTION] of
+ * those cycles, or null when it is spread across the cycle.
+ */
+data class SymptomFrequency(
+    val symptom: Symptom,
+    val cyclesWith: Int,
+    val cyclesConsidered: Int,
+    val typicalPhase: CyclePhaseBucket?,
+)
+
 object InsightsCalculator {
     /** The complete cycles Insights describes: the last [window], oldest first. */
     fun windowCycles(
@@ -150,6 +162,38 @@ object InsightsCalculator {
             .take(limit)
     }
 
+    /**
+     * Every symptom logged in the complete [cycles], most frequent first (the doctor report's
+     * "Symptoms, by frequency"). Unlike [symptomPatterns] nothing is filtered out.
+     */
+    fun symptomFrequencies(
+        cycles: List<Cycle>,
+        entries: List<DayEntry>,
+    ): List<SymptomFrequency> {
+        val complete = cycles.filter { it.isComplete }
+        if (complete.isEmpty()) return emptyList()
+        val byDate = entries.associateBy { it.date }
+
+        fun loggedOn(
+            dates: Iterable<LocalDate>,
+            symptom: Symptom,
+        ) = dates.any { byDate[it]?.symptoms?.contains(symptom) == true }
+        return Symptom.entries
+            .mapNotNull { symptom ->
+                val withSymptom = complete.filter { cycle -> loggedOn(cycleDays(cycle), symptom) }
+                if (withSymptom.isEmpty()) return@mapNotNull null
+                val typical =
+                    CyclePhaseBucket.entries
+                        .map { phase -> phase to withSymptom.count { loggedOn(bucketRange(it, phase), symptom) } }
+                        .maxBy { it.second }
+                        .takeIf {
+                            it.second > 0 &&
+                                it.second >= withSymptom.size * PredictionConstants.SYMPTOM_TYPICAL_PHASE_MIN_FRACTION
+                        }?.first
+                SymptomFrequency(symptom, withSymptom.size, complete.size, typical)
+            }.sortedWith(compareByDescending<SymptomFrequency> { it.cyclesWith }.thenBy { it.symptom })
+    }
+
     /** The readings of [cycle] and its shift, found the same way the prediction engine finds it. */
     fun temperatures(
         cycle: Cycle,
@@ -168,6 +212,11 @@ object InsightsCalculator {
                 found.firstElevatedDate.daysUntil(run.last().date) + 1
             } ?: 0
         return CycleTemperatures(cycle, readings, shift, held)
+    }
+
+    private fun cycleDays(cycle: Cycle): Iterable<LocalDate> {
+        val end = requireNotNull(cycle.endDate)
+        return generateSequence(cycle.startDate) { it.plusDays(1) }.takeWhile { !it.isAfter(end) }.asIterable()
     }
 
     private fun bucketRange(

@@ -66,9 +66,17 @@ object InsightsUiBuilder {
         hormonal: Boolean,
     ): Boolean = settings.trackingLevel.showsTemperature && settings.mode == TrackerMode.CYCLE && !hormonal
 
+    /** The bar chart's day axis for cycles from [min] to [max] days; the doctor report uses the same scale. */
+    fun cycleAxis(
+        min: Int,
+        max: Int,
+    ): IntRange {
+        val axisMin = min - AXIS_DAYS_BELOW_MIN
+        return axisMin..maxOf(max + AXIS_DAYS_ABOVE_MAX, axisMin + AXIS_MIN_SPAN_DAYS)
+    }
+
     private fun cycleLength(stats: CycleLengthStats): CycleLengthCardUi {
-        val axisMin = stats.min - AXIS_DAYS_BELOW_MIN
-        val axisMax = maxOf(stats.max + AXIS_DAYS_ABOVE_MAX, axisMin + AXIS_MIN_SPAN_DAYS)
+        val axis = cycleAxis(stats.min, stats.max)
         val bars =
             stats.startDates.zip(stats.lengths).mapIndexed { index, (start, days) ->
                 CycleBarUi(days, start.format(barMonth), latest = index == stats.count - 1)
@@ -81,8 +89,8 @@ object InsightsUiBuilder {
                 CycleLengthChartUi(
                     bars = bars,
                     slots = PredictionConstants.INSIGHTS_WINDOW_CYCLES,
-                    axisMin = axisMin,
-                    axisMax = axisMax,
+                    axisMin = axis.first,
+                    axisMax = axis.last,
                     mean = stats.mean,
                     description = cycleChartDescription(stats),
                 ),
@@ -157,23 +165,51 @@ object InsightsUiBuilder {
         if (temps.readings.isEmpty()) {
             return TemperatureCardUi(symbol, chart = null, caption = "No waking temperature logged this cycle yet.")
         }
+        val dayCount = maxOf(PredictionConstants.STRIP_MIN_DAYS, lengths?.mean?.roundToInt() ?: 0)
+        return TemperatureCardUi(symbol, temperatureChart(temps, dayCount, unit), temperatureCaption(temps, unit))
+    }
+
+    /**
+     * The readings of [temps] (at least one) on a day axis from 1 to [minDays], or to the last reading
+     * when that is later. Also drawn on the doctor report's temperature page.
+     */
+    fun temperatureChart(
+        temps: CycleTemperatures,
+        minDays: Int,
+        unit: TemperatureUnit,
+    ): TemperatureChartUi {
         val cycle = temps.cycle
         val points = temps.readings.map { TemperaturePointUi(cycle.dayOf(it.date), it.temperatureC, it.isLate) }
-        val dayCount =
-            maxOf(
-                PredictionConstants.STRIP_MIN_DAYS,
-                lengths?.mean?.roundToInt() ?: 0,
-                points.maxOf { it.day },
-            )
+        val dayCount = maxOf(minDays, points.maxOf { it.day })
         val shift = temps.shift
         val values = points.map { it.celsius } + listOfNotNull(shift?.coverlineC)
         val minC = floor((values.min() - SCALE_MARGIN_C) * TENTHS + EPSILON) / TENTHS
         val maxC = maxOf(minC + SCALE_MIN_SPAN_C, ceil((values.max() + SCALE_MARGIN_C) * TENTHS - EPSILON) / TENTHS)
-        val firstShiftDay = shift?.let { cycle.dayOf(it.firstElevatedDate) }
-        val shiftDays = firstShiftDay?.let { it until it + temps.heldDays }
-        val lateCount = points.count { it.late }
+        val shiftDays = shift?.let { cycle.dayOf(it.firstElevatedDate) }?.let { it until it + temps.heldDays }
+        return TemperatureChartUi(
+            points = points,
+            dayCount = dayCount,
+            minC = minC,
+            maxC = maxC,
+            coverlineC = shift?.coverlineC,
+            coverlineLabel = shift?.let { "coverline ${display(it.coverlineC, unit)}" },
+            shiftDays = shiftDays,
+            startLabel = "day 1",
+            endLabel = "day $dayCount",
+            description = temperatureDescription(points, dayCount, shift?.coverlineC, shiftDays, unit),
+        )
+    }
+
+    /** "Rise of 0.3 °C held for 7 days from day 15. Ovulation estimated day 14 (20 Oct)." and the late note. */
+    fun temperatureCaption(
+        temps: CycleTemperatures,
+        unit: TemperatureUnit,
+        noShift: String = "No temperature shift found this cycle yet.",
+    ): String {
+        val cycle = temps.cycle
+        val shift = temps.shift
         val lateNote =
-            if (lateCount == 0) {
+            if (temps.readings.none { it.isLate }) {
                 ""
             } else {
                 " Readings in grey were taken at ${Formats.time(
@@ -181,29 +217,17 @@ object InsightsUiBuilder {
                 )} or later and are not used."
             }
         val caption =
-            if (shift != null && firstShiftDay != null) {
+            if (shift != null) {
                 val rise = Formats.oneDecimal(Units.toDisplayTemperatureDelta(shift.riseC, unit))
-                "Rise of $rise $symbol held for ${Formats.days(temps.heldDays)} from day $firstShiftDay. " +
+                "Rise of $rise ${Units.temperatureSymbol(unit)} held for ${Formats.days(temps.heldDays)} from day " +
+                    "${cycle.dayOf(shift.firstElevatedDate)}. " +
                     "Ovulation estimated day ${cycle.dayOf(
                         shift.ovulationDate,
                     )} (${Formats.dayMonth(shift.ovulationDate)})."
             } else {
-                "No temperature shift found this cycle yet."
+                noShift
             }
-        val chart =
-            TemperatureChartUi(
-                points = points,
-                dayCount = dayCount,
-                minC = minC,
-                maxC = maxC,
-                coverlineC = shift?.coverlineC,
-                coverlineLabel = shift?.let { "coverline ${display(it.coverlineC, unit)}" },
-                shiftDays = shiftDays,
-                startLabel = "day 1",
-                endLabel = "day $dayCount",
-                description = temperatureDescription(points, dayCount, shift?.coverlineC, shiftDays, unit),
-            )
-        return TemperatureCardUi(symbol, chart, caption + lateNote)
+        return caption + lateNote
     }
 
     private fun temperatureDescription(

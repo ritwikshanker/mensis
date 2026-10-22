@@ -397,4 +397,26 @@
     <string name="restore_error_network">Couldn\'t reach Google Drive. Check the connection and try again.</string>
     <string name="restore_error_reconnect">Google needs you to sign in again.</string>
     <string name="restore_try_again">Try again</string>
+    <!-- Report for a doctor (design §15) -->
+    <string name="report_range">Period covered</string>
+    <string name="report_range_6_cycles">Last 6 cycles</string>
+    <string name="report_range_12_months">12 months</string>
+    <string name="report_range_all">All</string>
+    <string name="report_sections">Sections</string>
+    <string name="report_section_summary">Cycle summary</string>
+    <string name="report_section_lengths">Cycle and period lengths</string>
+    <string name="report_section_symptoms">Symptoms</string>
+    <string name="report_section_bbt">BBT chart</string>
+    <string name="report_section_medication">Medication</string>
+    <string name="report_section_notes">Notes</string>
+    <string name="report_info">The PDF is built on the phone and only leaves it when you share it. Free-text notes are left out unless you tick them.</string>
+    <string name="report_nothing_logged">Nothing is logged yet, so there is nothing to report.</string>
+    <string name="report_preview">Preview</string>
+    <string name="report_building">Building the report…</string>
+    <string name="report_create">Create PDF</string>
+    <string name="report_ready">PDF ready</string>
+    <string name="report_share">Share</string>
+    <string name="report_save">Save to Files</string>
+    <string name="report_discard">Discard</string>
+    <string name="report_saved">Saved as %1$s.</string>
 </resources>
