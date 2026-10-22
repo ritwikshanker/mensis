@@ -1,6 +1,22 @@
 <resources>
     <string name="app_name">Mensis</string>
 
+    <!-- Shared actions -->
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_ok">OK</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_pick_date">Pick a date</string>
+    <string name="coming_soon_body">This screen arrives in a later build step.</string>
+
+    <!-- Bottom navigation -->
+    <string name="tab_today">Today</string>
+    <string name="tab_calendar">Calendar</string>
+    <string name="tab_insights">Insights</string>
+    <string name="tab_settings">Settings</string>
+
     <!-- Locked screen (design §2) -->
     <string name="locked_title">Mensis is locked</string>
     <string name="locked_body">Unlock with your phone\'s fingerprint or PIN.</string>
@@ -8,4 +24,191 @@
     <string name="locked_use_pin">Use PIN</string>
     <string name="unlock_prompt_title">Unlock Mensis</string>
     <string name="unlock_prompt_subtitle">Touch the fingerprint sensor</string>
+
+    <!-- Onboarding (design §1); licence line says MIT per the engineering decisions -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_not_now">Not now</string>
+    <string name="onboarding_get_started">Get started</string>
+    <string name="onboarding_allow_notifications">Allow notifications</string>
+    <string name="onboarding_restore">Restore from backup</string>
+    <string name="onboarding_welcome_subtitle">A cycle tracker that keeps your data on your phone.</string>
+    <string name="onboarding_feature_private">No account, no analytics</string>
+    <string name="onboarding_feature_private_body">The app never contacts a server unless you turn on Drive backup.</string>
+    <string name="onboarding_feature_ranges">Ranges, not guesses</string>
+    <string name="onboarding_feature_ranges_body">Predictions show a date range and how many cycles they rest on.</string>
+    <string name="onboarding_feature_open">Open source</string>
+    <string name="onboarding_feature_open_body">MIT. The code is public and auditable.</string>
+    <string name="onboarding_how_title">How predictions work</string>
+    <string name="onboarding_how_body">Only the first day of each period is needed. Temperature, symptoms and everything else are optional.</string>
+    <string name="onboarding_how_one">After one complete cycle</string>
+    <string name="onboarding_how_one_body">Mensis estimates when your next period starts.</string>
+    <string name="onboarding_how_three">After three cycles</string>
+    <string name="onboarding_how_three_body">It adds a fertile window and shows how much your cycles vary.</string>
+    <string name="onboarding_how_temperature">Temperature confirms ovulation</string>
+    <string name="onboarding_how_temperature_body">Log a waking temperature and the app marks the shift when it sees one.</string>
+    <string name="onboarding_not_contraception">Predictions are statistics about your own history. They are not contraception.</string>
+    <string name="onboarding_last_period_title">When did your last period start?</string>
+    <string name="onboarding_last_period_label">First day of last period</string>
+    <string name="onboarding_today">Today</string>
+    <string name="onboarding_yesterday">Yesterday</string>
+    <string name="onboarding_dont_remember">I don\'t remember</string>
+    <string name="onboarding_last_period_helper">Optional. If you skip this, the first cycle begins when you log your next period.</string>
+    <string name="onboarding_lengths_title">Typical lengths</string>
+    <string name="onboarding_lengths_helper">Used only until Mensis has your own cycles to work from. Keep the defaults if you\'re not sure.</string>
+    <string name="onboarding_cycle_length">Cycle length</string>
+    <string name="onboarding_cycle_length_body">First day of period to the next</string>
+    <string name="onboarding_period_length">Period length</string>
+    <string name="onboarding_period_length_body">Days of bleeding</string>
+    <string name="onboarding_decrease">Decrease</string>
+    <string name="onboarding_increase">Increase</string>
+    <string name="onboarding_goal_title">What do you want from Mensis?</string>
+    <string name="onboarding_goal_body">Changes what the Today screen puts first. You can change it later.</string>
+    <string name="goal_track">Track my cycle</string>
+    <string name="goal_track_body">Period and phase first</string>
+    <string name="goal_conceive">Trying to conceive</string>
+    <string name="goal_conceive_body">Fertile window and temperature first</string>
+    <string name="goal_avoid">Avoiding pregnancy</string>
+    <string name="goal_avoid_body">Shows uncertainty prominently; not a contraceptive method</string>
+    <string name="goal_symptoms">Understand symptoms</string>
+    <string name="goal_symptoms_body">Symptom patterns by phase first</string>
+    <string name="onboarding_lock_title">Lock the app?</string>
+    <string name="onboarding_lock_body">Uses the fingerprint or PIN already set on this phone. Mensis never stores a password of its own for this.</string>
+    <string name="onboarding_require_unlock">Require unlock</string>
+    <string name="onboarding_require_unlock_body">When the app opens or returns from the background</string>
+    <string name="onboarding_hide_recents_body">Blank preview in the app switcher; no screenshots</string>
+    <string name="onboarding_backup_title">Back up to Google Drive?</string>
+    <string name="onboarding_backup_body">The backup is encrypted on this phone with a password only you know, then stored in your Drive\'s hidden app folder. Google cannot read it, and neither can we.</string>
+    <string name="onboarding_backup_switch">Encrypted Drive backup</string>
+    <string name="onboarding_backup_switch_body">Weekly, on Wi-Fi</string>
+    <string name="onboarding_backup_warning">Without a backup, losing the phone means losing the data. You can also export a file manually at any time.</string>
+    <string name="onboarding_password_title">Choose a backup password</string>
+    <string name="onboarding_password_label">Backup password</string>
+    <string name="onboarding_password_hint">At least 12 characters; a sentence works well.</string>
+    <string name="onboarding_show_password">Show password</string>
+    <string name="onboarding_hide_password">Hide password</string>
+    <string name="onboarding_password_warning">Write this down somewhere safe. It cannot be reset or recovered. Without it the backup is unreadable, by design.</string>
+    <string name="password_weak">Weak</string>
+    <string name="password_fair">Fair</string>
+    <string name="password_good">Good</string>
+    <string name="password_strong">Strong</string>
+    <string name="onboarding_reminders_title">Reminders</string>
+    <string name="onboarding_reminders_body">Mensis can remind you before your period is expected and to log your temperature. Reminders are scheduled on the phone; nothing is sent anywhere. The wording is discreet by default.</string>
+    <string name="onboarding_notification_app">Mensis · 09:00</string>
+    <string name="onboarding_notification_title">Reminder</string>
+    <string name="onboarding_notification_body">Tap to open</string>
+    <string name="onboarding_reminders_footer">Android will ask for notification permission next.</string>
+
+    <!-- Today (design §3) -->
+    <string name="today_log_today">Log today</string>
+    <string name="today_logged_today">Logged today</string>
+    <string name="today_nothing_logged">Nothing logged yet. A typical entry takes about ten seconds.</string>
+    <string name="today_late_title">Period not logged yet</string>
+    <string name="today_log_pregnancy_test">Log a pregnancy test</string>
+    <string name="today_period_started">Period started</string>
+    <string name="today_first_title">No cycle history yet</string>
+    <string name="today_first_body">Log the first day of your period when it starts. After one complete cycle Mensis estimates your next period; after three, the fertile window.</string>
+    <string name="today_period_started_today">Period started today</string>
+    <string name="today_import_history">Import history</string>
+    <string name="today_log_bleeding">Log bleeding</string>
+    <string name="today_method_settings">Method settings</string>
+    <string name="today_due_date">Estimated due date</string>
+    <string name="today_trimester">Trimester</string>
+    <string name="today_pregnancy_banner">Period and fertility predictions are paused. Switch back to cycle mode in Settings at any time.</string>
+
+    <!-- Daily log (design §4) -->
+    <string name="log_nothing_required">Nothing here is required. Save with as many or as few fields as you like.</string>
+    <string name="log_expand">Expand to full screen</string>
+    <string name="log_collapse">Back to the sheet</string>
+    <string name="log_flow">Flow</string>
+    <string name="log_temperature">Waking temperature</string>
+    <string name="log_time">Time</string>
+    <string name="log_pick_time">Pick a time</string>
+    <string name="log_temperature_helper">Two decimals. Entries after 09:00 are flagged in the chart.</string>
+    <string name="log_symptoms">Symptoms</string>
+    <string name="log_mood">Mood</string>
+    <string name="log_cervical_mucus">Cervical mucus</string>
+    <string name="log_lh_test">LH test</string>
+    <string name="log_pregnancy_test">Pregnancy test</string>
+    <string name="log_pregnancy_test_note">A positive result pauses predictions and offers pregnancy mode.</string>
+    <string name="log_sex">Sex</string>
+    <string name="log_patch_changed">Patch changed today</string>
+    <string name="log_injection_given">Injection given today</string>
+    <string name="log_emergency_contraception">Emergency contraception</string>
+    <string name="log_emergency_contraception_helper">Marks this cycle as possibly shifted; the bleed range widens</string>
+    <string name="log_sleep">Sleep</string>
+    <string name="log_sleep_placeholder">h:mm</string>
+    <string name="log_weight">Weight</string>
+    <string name="log_notes">Notes</string>
+    <string name="log_notes_placeholder">Private, never included in reports unless you tick them</string>
+    <string name="log_more_mucus">mucus</string>
+    <string name="log_more_tests">tests</string>
+    <string name="log_more_sex">sex</string>
+    <string name="log_more_method">method</string>
+    <string name="log_more_sleep">sleep</string>
+    <string name="log_more_notes">notes</string>
+
+    <!-- Calendar (design §5) -->
+    <string name="calendar_edit_period_dates">Edit period dates</string>
+    <string name="calendar_edit_title">Edit period</string>
+    <string name="calendar_edit_hint">Tap days to mark or unmark bleeding. Predictions recalculate when you save.</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_weekday_letters">M T W T F S S</string>
+    <string name="calendar_nothing_logged">Nothing logged on this day.</string>
+    <string name="legend_period">Period</string>
+    <string name="legend_fertile">Fertile</string>
+    <string name="legend_ovulation">Ovulation</string>
+    <string name="legend_predicted">Predicted</string>
+    <string name="legend_logged">Logged</string>
+
+    <!-- Settings (design §7) -->
+    <string name="settings_section_cycle">Cycle</string>
+    <string name="settings_section_privacy">Privacy</string>
+    <string name="settings_section_data">Data</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_mode">Mode</string>
+    <string name="settings_track">What to track</string>
+    <string name="settings_contraception">Contraception</string>
+    <string name="settings_units">Units</string>
+    <string name="settings_reminders">Reminders</string>
+    <string name="settings_reminders_off">Off</string>
+    <string name="settings_app_lock">App lock</string>
+    <string name="settings_app_lock_supporting">Phone fingerprint or PIN</string>
+    <string name="settings_app_lock_unavailable">Set up a screen lock on this phone first</string>
+    <string name="settings_relock">Lock again</string>
+    <string name="settings_hide_recents">Hide in recent apps</string>
+    <string name="settings_hide_recents_supporting">Blank app-switcher preview, no screenshots</string>
+    <string name="settings_backup">Backup</string>
+    <string name="settings_export">Export data</string>
+    <string name="settings_export_supporting">JSON or CSV file</string>
+    <string name="settings_import">Import data</string>
+    <string name="settings_import_supporting">From a file or another app</string>
+    <string name="settings_report">Report for a doctor</string>
+    <string name="settings_report_supporting">PDF summary of your cycles</string>
+    <string name="settings_delete_all">Delete all data</string>
+    <string name="settings_delete_all_supporting">On this phone, optionally in Drive</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_about">About and privacy</string>
+    <string name="settings_about_supporting">Version %1$s · MIT</string>
+
+    <!-- What to track (design §8) -->
+    <string name="track_intro">Decides which fields the daily log shows. Nothing is ever required; the log saves with any fields empty.</string>
+    <string name="track_period">Period only</string>
+    <string name="track_period_desc">Bleeding days and flow. Enough for period predictions.</string>
+    <string name="track_symptoms">Period and symptoms</string>
+    <string name="track_symptoms_desc">Adds symptoms, mood, sleep and notes.</string>
+    <string name="track_full">Everything, including temperature</string>
+    <string name="track_full_desc">Adds waking temperature, cervical mucus and LH tests (sympto-thermal method). Lets Mensis confirm ovulation.</string>
+    <string name="track_info">Period predictions need only the first day of each period. Temperature adds ovulation confirmation; without it, ovulation is estimated from cycle lengths and marked as such.</string>
+    <string name="track_footer">Hidden fields keep any data already logged. Reminders for temperature appear only with the full set.</string>
+
+    <!-- Contraception (design §9) -->
+    <string name="contraception_method">Method</string>
+    <string name="contraception_regimen">Regimen</string>
+    <string name="contraception_effect_title">What this changes</string>
+    <string name="contraception_reminder">Reminder</string>
+    <string name="contraception_checkup">Check-up</string>
+    <string name="contraception_checkup_none">Not recorded</string>
+    <string name="contraception_larc_note">A reminder fires 3 months before the date above. Change it under Reminders.</string>
+    <string name="contraception_footer">The method is saved with its start date, so earlier cycles keep the method that applied then. Emergency contraception is logged per day in the daily log.</string>
 </resources>

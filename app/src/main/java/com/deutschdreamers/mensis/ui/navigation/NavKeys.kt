@@ -6,6 +6,27 @@ import kotlinx.serialization.Serializable
 /** Navigation 3 keys. Every key is serializable so the back stack survives process death. */
 sealed interface MensisNavKey : NavKey
 
-/** Placeholder root entry until the Today screen lands in build step 4. */
+/** First-run flow (design §1). */
 @Serializable
-data object Home : MensisNavKey
+data object Onboarding : MensisNavKey
+
+/** The tabbed root: Today, Calendar, Insights, Settings. */
+@Serializable
+data object Main : MensisNavKey
+
+/** Settings → What to track (design §8). */
+@Serializable
+data object TrackLevel : MensisNavKey
+
+/** Settings → Contraception (design §9). */
+@Serializable
+data object Contraception : MensisNavKey
+
+/** Screens that arrive in later build steps; their Settings rows already navigate somewhere. */
+@Serializable
+enum class LaterScreen { MODE, UNITS, REMINDERS, BACKUP, RESTORE, EXPORT, IMPORT, REPORT, DELETE_ALL, THEME, ABOUT }
+
+@Serializable
+data class ComingSoon(
+    val screen: LaterScreen,
+) : MensisNavKey

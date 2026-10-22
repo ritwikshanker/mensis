@@ -1,19 +1,25 @@
 package com.deutschdreamers.mensis.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.deutschdreamers.mensis.ui.screens.home.HomeScreen
+import com.deutschdreamers.mensis.ui.screens.contraception.ContraceptionScreen
+import com.deutschdreamers.mensis.ui.screens.later.ComingSoonScreen
+import com.deutschdreamers.mensis.ui.screens.main.MainScreen
+import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingScreen
+import com.deutschdreamers.mensis.ui.screens.track.TrackLevelScreen
 
 @Composable
-fun MensisNavDisplay() {
-    val backStack = rememberNavBackStack(Home)
+fun MensisNavDisplay(startAtOnboarding: Boolean) {
+    val backStack = rememberNavBackStack(if (startAtOnboarding) Onboarding else Main)
+    val navigator = remember(backStack) { Navigator(backStack) }
     NavDisplay(
         backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
+        onBack = { navigator.pop() },
         entryDecorators =
             listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
@@ -21,7 +27,21 @@ fun MensisNavDisplay() {
             ),
         entryProvider =
             entryProvider {
-                entry<Home> { HomeScreen() }
+                entry<Onboarding> {
+                    OnboardingScreen(
+                        onFinished = { navigator.replaceAll(Main) },
+                        onRestore = { navigator.push(ComingSoon(LaterScreen.RESTORE)) },
+                    )
+                }
+                entry<Main> { MainScreen(onNavigate = navigator::push) }
+                entry<TrackLevel> { TrackLevelScreen(onBack = navigator::pop) }
+                entry<Contraception> {
+                    ContraceptionScreen(
+                        onBack = navigator::pop,
+                        onReminders = { navigator.push(ComingSoon(LaterScreen.REMINDERS)) },
+                    )
+                }
+                entry<ComingSoon> { key -> ComingSoonScreen(screen = key.screen, onBack = navigator::pop) }
             },
     )
 }

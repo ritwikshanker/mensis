@@ -50,8 +50,12 @@ class MainActivity : FragmentActivity() {
             val current = prefs ?: return@setContent
             val lockState by appLockManager.state.collectAsStateWithLifecycle()
             MensisTheme(scheme = current.theme, appearance = current.appearance) {
-                LockGate(locked = lockState == LockState.LOCKED, onUnlocked = appLockManager::unlock) {
-                    MensisNavDisplay()
+                // The lock is a gate for existing data: a fresh install walks through onboarding first.
+                LockGate(
+                    locked = lockState == LockState.LOCKED && current.onboardingCompleted,
+                    onUnlocked = appLockManager::unlock,
+                ) {
+                    MensisNavDisplay(startAtOnboarding = !current.onboardingCompleted)
                 }
             }
         }

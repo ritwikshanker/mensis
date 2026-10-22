@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Reminders (build step 7) post local notifications; onboarding step 9 asks for this on Android 13+. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!--
       Privacy rule 4: no Android auto-backup or device-to-device transfer of app data. The SQLCipher
       database is useless without the device-bound Keystore key; the encrypted Drive backup replaces it.

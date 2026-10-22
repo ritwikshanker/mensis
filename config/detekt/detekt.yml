@@ -14,13 +14,13 @@ style:
       - 'androidx.credentials.*'
     excludes: ['**/backup-drive/**']
   MagicNumber:
-    ignoreAnnotated: ['Composable', 'Preview']
+    ignoreAnnotated: ['Composable', 'Preview', 'PreviewLightDark']
     ignorePropertyDeclaration: true
     ignoreEnums: true
   MaxLineLength:
     maxLineLength: 120
   UnusedPrivateMember:
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: ['Preview', 'PreviewLightDark']
   ReturnCount:
     max: 3
   WildcardImport:
@@ -34,6 +34,8 @@ naming:
 
 complexity:
   LongMethod:
+    ignoreAnnotated: ['Composable']
+  CyclomaticComplexMethod:
     ignoreAnnotated: ['Composable']
   LongParameterList:
     ignoreAnnotated: ['Composable']

@@ -1,6 +1,8 @@
 package com.deutschdreamers.mensis.data
 
 import android.content.Context
+import com.deutschdreamers.mensis.data.backup.BackupStatusSource
+import com.deutschdreamers.mensis.data.backup.NoBackupStatusSource
 import com.deutschdreamers.mensis.data.settings.UiPrefsStore
 import dagger.Module
 import dagger.Provides
@@ -22,4 +24,9 @@ object DataModule {
     fun uiPrefsStore(
         @ApplicationContext context: Context,
     ): UiPrefsStore = UiPrefsStore(context)
+
+    /** Replaced by the backup module's real source when Drive backup lands; until then backup is reported as off. */
+    @Provides
+    @Singleton
+    fun backupStatusSource(): BackupStatusSource = NoBackupStatusSource
 }

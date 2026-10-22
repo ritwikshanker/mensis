@@ -72,12 +72,14 @@ class AppLockManager
             backgroundMillis: Long?,
         ) {
             val available = credentials.canAuthenticate()
+            // Before onboarding finishes there is nothing to protect and no way to turn the lock off.
+            val enabled = prefs.lockEnabled && prefs.onboardingCompleted
             val lock =
                 if (backgroundMillis == null) {
-                    AppLockPolicy.lockOnStart(prefs.lockEnabled, available)
+                    AppLockPolicy.lockOnStart(enabled, available)
                 } else {
                     AppLockPolicy.lockOnReturn(
-                        prefs.lockEnabled,
+                        enabled,
                         available,
                         prefs.relockTimeoutMinutes,
                         backgroundMillis,
