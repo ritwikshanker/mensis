@@ -5,8 +5,8 @@ What to enter in Play Console for Mensis, and why. Based on Google's help pages 
 the console wins and this file should be updated. Items marked **check** could not be confirmed from an
 official page.
 
-Before the first upload, set up app signing as described in RELEASING.md: the choice is final once a
-bundle has been uploaded.
+On the first upload, keep Play App Signing's default (Google-generated app signing key, `keystore.jks`
+as upload key; RELEASING.md): the choice is final once a bundle has been uploaded.
 
 ## Create the app
 
@@ -127,9 +127,9 @@ manage treatment beyond reminders the user sets. Mensis does not use Health Conn
 
 - targetSdk 37, minSdk 26.
 - 16 KB page size: AGP 9.4.1 keeps native libraries uncompressed and 16 KB-aligned, and SQLCipher for
-  Android supports 16 KB pages since 4.6.1 (Mensis uses 4.19.1). `scripts/sign-release-apk.sh` checks
-  the APK's alignment with `zipalign -c -P 16`.
-- Release notes per version: `changelogs/<versionCode>.txt`, checked by the release workflow.
+  Android supports 16 KB pages since 4.6.1 (Mensis uses 4.19.1), so nothing extra is needed;
+  `zipalign -c -P 16 4 <apk>` checks an APK's alignment.
+- Release notes per version: `changelogs/<versionCode>.txt`, at most 500 characters.
 
 ## Testing tracks
 

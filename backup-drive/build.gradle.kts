@@ -20,6 +20,15 @@ val googleWebClientId: String =
         .getOrElse("")
         .trim()
 
+// Android Studio's Generate Signed Bundle passes the keystore as android.injected.signing.store.file. A signed
+// build without the client ID would reach Play with Drive backup unavailable, so it stops here (RELEASING.md).
+if (googleWebClientId.isEmpty() && providers.gradleProperty("android.injected.signing.store.file").isPresent) {
+    throw GradleException(
+        "Set mensis.googleWebClientId in ~/.gradle/gradle.properties before building a signed release " +
+            "(GOOGLE_CLOUD_SETUP.md)",
+    )
+}
+
 android {
     namespace = "com.deutschdreamers.mensis.backup"
     compileSdk {

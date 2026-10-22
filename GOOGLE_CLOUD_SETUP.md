@@ -42,7 +42,7 @@ Credentials → Create credentials → OAuth client ID, three times at most:
 | Client type | For | Values |
 |---|---|---|
 | Android | debug builds | package `com.deutschdreamers.mensis`, SHA-1 of the debug keystore |
-| Android | Play and GitHub-release builds | package `com.deutschdreamers.mensis`, SHA-1 of the **app signing key** |
+| Android | builds installed from Google Play | package `com.deutschdreamers.mensis`, SHA-1 of the **app signing key** |
 | Web application | the build | name e.g. "Mensis sign-in"; no origins or redirect URIs |
 
 - Debug SHA-1, from the standard debug keystore:
@@ -54,10 +54,8 @@ Credentials → Create credentials → OAuth client ID, three times at most:
   or `./gradlew :app:signingReport`. Every machine that builds debug APKs for testing has its own
   debug keystore unless you share one; add one Android client per debug keystore you use.
 - Release SHA-1: Google Play re-signs uploads with the **app signing key**, so use that certificate's
-  SHA-1 from Play Console (Test and release → App integrity → App signing), not the upload key's.
-  GitHub-release APKs are signed locally with the same app signing key (RELEASING.md), so the one
-  Android client covers both. If Google generated the app signing key, GitHub APKs carry a different
-  certificate and need an Android client of their own.
+  SHA-1 from Play Console (Test and release → App integrity → App signing, available after the first
+  upload), not the upload key's (RELEASING.md).
 - Android clients have no secret. They tie the package name and signing certificate to the project;
   a build signed with any other key cannot get a token.
 - The **web client ID** is what the build needs: Credential Manager's "Sign in with Google" asks for a
@@ -75,11 +73,11 @@ The ID looks like `123456789012-abc123def456.apps.googleusercontent.com`. It is 
   mensis.googleWebClientId=123456789012-abc123def456.apps.googleusercontent.com
   ```
 
-  or pass `-Pmensis.googleWebClientId=…` on the command line.
-- In CI: the release workflow reads the repository variable `MENSIS_GOOGLE_WEB_CLIENT_ID`
-  (`gh variable set MENSIS_GOOGLE_WEB_CLIENT_ID`, RELEASING.md) and fails a tag build without it.
+  or pass `-Pmensis.googleWebClientId=…` on the command line (the environment variable
+  `MENSIS_GOOGLE_WEB_CLIENT_ID` works too).
 
-Builds without it report Drive backup as "not configured in this build".
+Builds without it report Drive backup as "not configured in this build"; a signed release build without
+it stops with an error.
 
 ## 5. Publish
 

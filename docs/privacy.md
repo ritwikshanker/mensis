@@ -8,8 +8,8 @@ permalink: /privacy/
 Effective 22 October 2026.
 
 Mensis is a menstrual cycle tracker for Android, developed by Ritwik Shanker and published as open
-source at <https://github.com/ritwikshanker/mensis>. This policy covers the Mensis app from Google
-Play and from the project's GitHub releases.
+source at <https://github.com/ritwikshanker/mensis>. This policy covers the Mensis app published on
+Google Play.
 
 ## In short
 

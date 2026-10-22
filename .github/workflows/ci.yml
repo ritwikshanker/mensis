@@ -29,6 +29,26 @@ jobs:
         run: ./gradlew lintDebug --stacktrace
       - name: Release build (unsigned)
         run: ./gradlew assembleRelease --stacktrace
+      - name: Release permissions
+        # Privacy: the release build may ask only for these permissions. A new one, for example merged in
+        # by a library, fails the build until it has been reviewed and added here.
+        shell: bash
+        run: |
+          aapt2=$(find "$ANDROID_HOME/build-tools" -name aapt2 -type f | sort -V | tail -n 1)
+          "$aapt2" dump permissions app/build/outputs/apk/release/app-release-unsigned.apk \
+            | sed -n "s/^uses-permission: name='\([^']*\)'.*/\1/p" | LC_ALL=C sort > "$RUNNER_TEMP/actual"
+          cat > "$RUNNER_TEMP/expected" <<'EOF'
+          android.permission.ACCESS_NETWORK_STATE
+          android.permission.INTERNET
+          android.permission.POST_NOTIFICATIONS
+          android.permission.RECEIVE_BOOT_COMPLETED
+          android.permission.SCHEDULE_EXACT_ALARM
+          android.permission.USE_BIOMETRIC
+          android.permission.USE_FINGERPRINT
+          android.permission.WAKE_LOCK
+          com.deutschdreamers.mensis.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+          EOF
+          diff "$RUNNER_TEMP/expected" "$RUNNER_TEMP/actual"
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v7

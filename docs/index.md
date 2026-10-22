@@ -12,7 +12,6 @@ encrypted on the phone with a password only you know. The code is open source un
 
 - [Privacy policy](privacy/)
 - [Source code](https://github.com/ritwikshanker/mensis)
-- [Releases](https://github.com/ritwikshanker/mensis/releases)
 - [Export file format](export-format.html)
 
 Predictions are statistics about your own history. Mensis is not a medical device and is not a method of

@@ -5,16 +5,8 @@ no analytics, no ads. Optional encrypted backup to your own Google Drive.
 
 ## Download
 
-APKs are attached to the [GitHub releases](https://github.com/ritwikshanker/mensis/releases), each with a
-`SHA256SUMS` file. They are built by the release workflow from the tagged commit and signed locally with
-the app signing key, which never enters CI. To check a download:
-
-```
-sha256sum -c SHA256SUMS
-apksigner verify --print-certs mensis-X.Y.Z.apk
-```
-
-The privacy policy is at <https://ritwikshanker.github.io/mensis/privacy/>.
+Mensis is distributed through Google Play (first release in preparation). The privacy policy is at
+<https://ritwikshanker.github.io/mensis/privacy/>.
 
 ## Privacy model
 
@@ -58,9 +50,9 @@ build needs network access.
 
 ## Releases
 
-Version numbers come from git tags (`vX.Y.Z`). [`RELEASING.md`](RELEASING.md) covers signing keys, the
-release workflow and the checklist; [`PLAY_CONSOLE.md`](PLAY_CONSOLE.md) lists the Play Console
-declarations. Store texts and graphics live in `fastlane/metadata/android/en-US/`.
+Release bundles are built and signed locally and uploaded to Google Play. [`RELEASING.md`](RELEASING.md)
+has the checklist, [`PLAY_CONSOLE.md`](PLAY_CONSOLE.md) the Play Console declarations. Store texts and
+graphics live in `fastlane/metadata/android/en-US/`.
 
 ## Project layout
 

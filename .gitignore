@@ -16,6 +16,11 @@ captures/
 .DS_Store
 Thumbs.db
 
+# Release outputs from Android Studio's Generate Signed App Bundle (app/release/)
+/app/release/
+*.aab
+*.apk
+
 # Signing keys and secrets must never be committed
 *.jks
 *.keystore
