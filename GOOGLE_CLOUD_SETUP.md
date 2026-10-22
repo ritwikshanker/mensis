@@ -26,14 +26,15 @@ In APIs & Services → OAuth consent screen (shown as "Google Auth Platform" in 
 
 1. **Branding**: app name `Mensis`, a user-support e-mail, a developer contact e-mail, the home page
    (the GitHub repository or the GitHub Pages site) and the **privacy policy URL**
-   <https://ritwikshanker.github.io/mensis/privacy/> (`docs/privacy.md`). Leave the logo empty unless
+   <https://ritwikshanker.github.io/mensis/privacy/> (`docs/privacy.md`). The console saves these links
+   only after `ritwikshanker.github.io` is added under Authorized domains. Leave the logo empty unless
    you want to go through brand review for it.
 2. **Audience**: user type **External**. While the app is in *Testing*, add the Google accounts that
    may sign in as test users.
 3. **Data access**: add the scope `.../auth/drive.appdata` ("See, create, and delete its own
    configuration data in your Google Drive"). No other scope is needed. Google lists `drive.appdata`
-   as a non-sensitive scope (Drive API guide "Choose Google Drive API scopes"), so the app needs no
-   scope verification; check the classification the page shows, in case it changes.
+   as a non-sensitive scope (Drive API guide "Choose Google Drive API scopes"), and the Data Access page
+   shows it under "Your non-sensitive scopes" (22 October 2026), so the app needs no scope verification.
 
 ## 3. OAuth clients
 
