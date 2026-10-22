@@ -9,6 +9,12 @@ import com.deutschdreamers.mensis.data.settings.UiPrefs
 object AppLockPolicy {
     private const val MILLIS_PER_MINUTE = 60_000L
 
+    /**
+     * A trip to a system file picker or share sheet that the app started itself does not count as
+     * leaving the app, as long as it returns within this time.
+     */
+    const val EXTERNAL_TRIP_LIMIT_MILLIS: Long = 5 * MILLIS_PER_MINUTE
+
     /** A cold start locks whenever the lock is enabled and the phone has a credential to unlock with. */
     fun lockOnStart(
         lockEnabled: Boolean,
@@ -29,4 +35,7 @@ object AppLockPolicy {
         if (relockTimeoutMinutes < 0) return false
         return backgroundMillis >= relockTimeoutMinutes * MILLIS_PER_MINUTE
     }
+
+    /** True when the round trip to a picker the app opened was short enough to skip the re-lock. */
+    fun externalTripExempt(backgroundMillis: Long): Boolean = backgroundMillis < EXTERNAL_TRIP_LIMIT_MILLIS
 }

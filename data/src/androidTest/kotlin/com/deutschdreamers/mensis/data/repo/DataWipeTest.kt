@@ -3,6 +3,7 @@ package com.deutschdreamers.mensis.data.repo
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.deutschdreamers.mensis.data.TestPrefs
 import com.deutschdreamers.mensis.data.db.DatabaseFactory
 import com.deutschdreamers.mensis.data.db.DatabaseHolder
 import com.deutschdreamers.mensis.data.db.DayEntryEntity
@@ -53,8 +54,5 @@ class DataWipeTest {
 
     private fun keyStore(): KeyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
 
-    private companion object {
-        /** DataStore allows one instance per file and process, so the store is shared by the whole test run. */
-        val prefsStore: UiPrefsStore by lazy { UiPrefsStore(ApplicationProvider.getApplicationContext<Context>()) }
-    }
+    private val prefsStore: UiPrefsStore get() = TestPrefs.store
 }

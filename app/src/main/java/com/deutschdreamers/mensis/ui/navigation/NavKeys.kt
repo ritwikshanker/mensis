@@ -22,9 +22,17 @@ data object TrackLevel : MensisNavKey
 @Serializable
 data object Contraception : MensisNavKey
 
+/** Settings → Export data (design §13). */
+@Serializable
+data object Export : MensisNavKey
+
+/** Settings → Import data and Today's "Import history" (design §14). */
+@Serializable
+data object Import : MensisNavKey
+
 /** Screens that arrive in later build steps; their Settings rows already navigate somewhere. */
 @Serializable
-enum class LaterScreen { MODE, UNITS, REMINDERS, BACKUP, RESTORE, EXPORT, IMPORT, REPORT, DELETE_ALL, THEME, ABOUT }
+enum class LaterScreen { MODE, UNITS, REMINDERS, BACKUP, RESTORE, REPORT, DELETE_ALL, THEME, ABOUT }
 
 @Serializable
 data class ComingSoon(

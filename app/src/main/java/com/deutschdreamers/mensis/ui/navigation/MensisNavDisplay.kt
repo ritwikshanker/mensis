@@ -8,6 +8,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.deutschdreamers.mensis.ui.screens.contraception.ContraceptionScreen
+import com.deutschdreamers.mensis.ui.screens.export.ExportScreen
+import com.deutschdreamers.mensis.ui.screens.importer.ImportScreen
 import com.deutschdreamers.mensis.ui.screens.later.ComingSoonScreen
 import com.deutschdreamers.mensis.ui.screens.main.MainScreen
 import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingScreen
@@ -41,6 +43,8 @@ fun MensisNavDisplay(startAtOnboarding: Boolean) {
                         onReminders = { navigator.push(ComingSoon(LaterScreen.REMINDERS)) },
                     )
                 }
+                entry<Export> { ExportScreen(onBack = navigator::pop) }
+                entry<Import> { ImportScreen(onBack = navigator::pop) }
                 entry<ComingSoon> { key -> ComingSoonScreen(screen = key.screen, onBack = navigator::pop) }
             },
     )

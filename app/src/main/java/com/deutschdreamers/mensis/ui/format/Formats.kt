@@ -45,6 +45,17 @@ object Formats {
     /** "06:40" */
     fun time(value: LocalTime): String = value.format(time)
 
+    /** "6 Mar – 21 Oct 2026", "6 Mar 2025 – 21 Oct 2026", "21 Oct 2026" for a single day. */
+    fun rangeWithYear(
+        start: LocalDate,
+        end: LocalDate,
+    ): String =
+        when {
+            start == end -> dayMonthYear(end)
+            start.year == end.year -> "${dayMonth(start)} $EN_DASH ${dayMonthYear(end)}"
+            else -> "${dayMonthYear(start)} $EN_DASH ${dayMonthYear(end)}"
+        }
+
     /** "2–5 Nov", "30 Oct – 4 Nov", "21 Oct" for a single day. */
     fun range(range: DateRange): String = range(range.start, range.end)
 

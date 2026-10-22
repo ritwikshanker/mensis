@@ -64,4 +64,11 @@ class AppLockPolicyTest {
         assertFalse(AppLockPolicy.lockOnReturn(true, true, UiPrefs.DEFAULT_RELOCK_MINUTES, 30_000))
         assertTrue(AppLockPolicy.lockOnReturn(true, true, UiPrefs.DEFAULT_RELOCK_MINUTES, 60_000))
     }
+
+    @Test
+    fun `a short trip to a picker the app opened does not re-lock, a long one does`() {
+        assertTrue(AppLockPolicy.externalTripExempt(0))
+        assertTrue(AppLockPolicy.externalTripExempt(AppLockPolicy.EXTERNAL_TRIP_LIMIT_MILLIS - 1))
+        assertFalse(AppLockPolicy.externalTripExempt(AppLockPolicy.EXTERNAL_TRIP_LIMIT_MILLIS))
+    }
 }

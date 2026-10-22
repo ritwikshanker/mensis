@@ -58,7 +58,6 @@ import com.deutschdreamers.mensis.ui.components.StepProgressBar
 import com.deutschdreamers.mensis.ui.components.StepperCard
 import com.deutschdreamers.mensis.ui.components.SwitchRow
 import com.deutschdreamers.mensis.ui.format.Formats
-import com.deutschdreamers.mensis.ui.theme.MensisTheme
 import com.deutschdreamers.mensis.ui.theme.SerifStyles
 import java.time.LocalDate
 
@@ -472,7 +471,7 @@ private fun PasswordStep(
         },
         modifier = Modifier.fillMaxWidth(),
     )
-    PasswordStrength(draft.backupPassword)
+    PasswordStrengthBar(draft.backupPassword)
     InfoBanner(
         text = stringResource(R.string.onboarding_password_warning),
         icon = R.drawable.ms_key_off,
@@ -480,43 +479,6 @@ private fun PasswordStep(
         contentColor = MaterialTheme.colorScheme.onErrorContainer,
         iconTint = MaterialTheme.colorScheme.onErrorContainer,
     )
-}
-
-@Composable
-private fun PasswordStrength(password: String) {
-    val score = PasswordStrength.score(password)
-    val teal = MensisTheme.colors.fertile
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            repeat(PasswordStrength.SEGMENTS) { index ->
-                Box(
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .height(4.dp)
-                            .background(
-                                if (index <
-                                    score
-                                ) {
-                                    teal
-                                } else {
-                                    MaterialTheme.colorScheme.surfaceContainerHighest
-                                },
-                                CircleShape,
-                            ),
-                )
-            }
-        }
-        Supporting(
-            if (password.isEmpty()) {
-                stringResource(R.string.onboarding_password_hint)
-            } else {
-                "${stringResource(
-                    PasswordStrength.labelRes(score),
-                )} ${Formats.MIDDLE_DOT} ${password.length} characters"
-            },
-        )
-    }
 }
 
 @Composable

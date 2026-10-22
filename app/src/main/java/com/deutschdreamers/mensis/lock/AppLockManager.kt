@@ -38,6 +38,7 @@ class AppLockManager
         private var latestPrefs: UiPrefs? = null
         private var backgroundedAt: Long? = null
         private var pendingDecision: Job? = null
+        private var externalTrip = false
 
         /** Called once from the Application on the main thread. */
         fun start() {
@@ -49,9 +50,27 @@ class AppLockManager
             mutableState.value = LockState.UNLOCKED
         }
 
+        /** Call right before opening a system file picker or share sheet: that round trip does not re-lock. */
+        fun allowExternalTrip() {
+            externalTrip = true
+        }
+
+        /** Call when the picker's result arrives, in case the app never went to the background at all. */
+        fun endExternalTrip() {
+            externalTrip = false
+        }
+
         override fun onStart(owner: LifecycleOwner) {
             val backgroundMillis = backgroundedAt?.let { SystemClock.elapsedRealtime() - it }
             backgroundedAt = null
+            val wasExternalTrip = externalTrip
+            externalTrip = false
+            if (wasExternalTrip &&
+                backgroundMillis != null &&
+                AppLockPolicy.externalTripExempt(backgroundMillis)
+            ) {
+                return
+            }
             val cached = latestPrefs
             if (cached != null) {
                 decide(cached, backgroundMillis)
@@ -63,8 +82,9 @@ class AppLockManager
 
         override fun onStop(owner: LifecycleOwner) {
             backgroundedAt = SystemClock.elapsedRealtime()
-            // "Immediately" takes effect on the way out, so nothing shows on the way back in.
-            latestPrefs?.let { decide(it, backgroundMillis = 0) }
+            // "Immediately" takes effect on the way out, so nothing shows on the way back in, except
+            // when the app itself opened a picker; onStart then decides by the length of the trip.
+            if (!externalTrip) latestPrefs?.let { decide(it, backgroundMillis = 0) }
         }
 
         private fun decide(

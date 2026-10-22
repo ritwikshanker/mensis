@@ -3,6 +3,9 @@ package com.deutschdreamers.mensis.data
 import android.content.Context
 import com.deutschdreamers.mensis.data.backup.BackupStatusSource
 import com.deutschdreamers.mensis.data.backup.NoBackupStatusSource
+import com.deutschdreamers.mensis.data.db.DatabaseHolder
+import com.deutschdreamers.mensis.data.importer.ImportStore
+import com.deutschdreamers.mensis.data.importer.RoomImportStore
 import com.deutschdreamers.mensis.data.settings.UiPrefsStore
 import dagger.Module
 import dagger.Provides
@@ -29,4 +32,8 @@ object DataModule {
     @Provides
     @Singleton
     fun backupStatusSource(): BackupStatusSource = NoBackupStatusSource
+
+    @Provides
+    @Singleton
+    fun importStore(database: DatabaseHolder): ImportStore = RoomImportStore(database)
 }

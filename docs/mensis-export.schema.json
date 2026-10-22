@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ritwikshanker/mensis/blob/main/docs/mensis-export.schema.json",
+  "title": "Mensis export",
+  "description": "Mensis JSON export, formatVersion 1. Temperatures in °C, weights in kg, sleep in minutes. Readers must ignore properties they do not know. See export-format.md.",
+  "type": "object",
+  "required": ["format", "formatVersion", "schemaVersion", "exportedAt", "app"],
+  "properties": {
+    "format": { "const": "mensis-export" },
+    "formatVersion": { "const": 1 },
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "exportedAt": { "$ref": "#/$defs/instant" },
+    "app": {
+      "type": "object",
+      "required": ["versionName", "versionCode"],
+      "properties": {
+        "versionName": { "type": "string" },
+        "versionCode": { "type": "integer" }
+      }
+    },
+    "settings": { "$ref": "#/$defs/settings" },
+    "uiPrefs": { "$ref": "#/$defs/uiPrefs" },
+    "contraceptionPeriods": { "type": "array", "items": { "$ref": "#/$defs/contraceptionPeriod" } },
+    "dayEntries": { "type": "array", "items": { "$ref": "#/$defs/dayEntry" } }
+  },
+  "$defs": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "time": { "type": "string", "pattern": "^\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?$" },
+    "instant": { "type": "string", "format": "date-time" },
+    "settings": {
+      "type": "object",
+      "required": [
+        "trackingLevel", "goal", "mode", "typicalCycleLength", "typicalPeriodLength",
+        "temperatureUnit", "weightUnit", "createdAt", "updatedAt"
+      ],
+      "properties": {
+        "trackingLevel": { "enum": ["period", "symptoms", "full"] },
+        "goal": { "enum": ["track_cycle", "trying_to_conceive", "avoiding_pregnancy", "understand_symptoms"] },
+        "mode": { "enum": ["cycle", "pregnancy"] },
+        "pregnancyLmp": { "$ref": "#/$defs/date" },
+        "typicalCycleLength": { "type": "integer", "minimum": 1 },
+        "typicalPeriodLength": { "type": "integer", "minimum": 1 },
+        "temperatureUnit": { "enum": ["celsius", "fahrenheit"] },
+        "weightUnit": { "enum": ["kilogram", "pound"] },
+        "reminders": { "type": "object" },
+        "discreetWording": { "type": "boolean" },
+        "createdAt": { "$ref": "#/$defs/instant" },
+        "updatedAt": { "$ref": "#/$defs/instant" }
+      }
+    },
+    "uiPrefs": {
+      "type": "object",
+      "required": ["theme", "appearance", "lockEnabled", "hideInRecents", "relockTimeoutMinutes"],
+      "properties": {
+        "theme": { "enum": ["rose", "sage", "dynamic"] },
+        "appearance": { "enum": ["light", "dark", "system"] },
+        "lockEnabled": { "type": "boolean" },
+        "hideInRecents": { "type": "boolean" },
+        "relockTimeoutMinutes": { "type": "integer", "description": "0 = immediately, -1 = never" }
+      }
+    },
+    "contraceptionPeriod": {
+      "type": "object",
+      "required": ["id", "method", "startDate", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string" },
+        "method": {
+          "enum": [
+            "none", "combined_pill", "progestin_only_pill", "patch", "ring", "injection", "implant",
+            "hormonal_iud", "copper_iud"
+          ]
+        },
+        "regimen": { "enum": ["cyclic", "continuous"] },
+        "startDate": { "$ref": "#/$defs/date" },
+        "endDate": { "$ref": "#/$defs/date" },
+        "dailyTime": { "$ref": "#/$defs/time" },
+        "replaceByDate": { "$ref": "#/$defs/date" },
+        "checkupDate": { "$ref": "#/$defs/date" },
+        "createdAt": { "$ref": "#/$defs/instant" },
+        "updatedAt": { "$ref": "#/$defs/instant" },
+        "deletedAt": { "$ref": "#/$defs/instant" }
+      }
+    },
+    "dayEntry": {
+      "type": "object",
+      "required": ["id", "date", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "$ref": "#/$defs/date" },
+        "flow": { "enum": ["none", "spotting", "light", "medium", "heavy"] },
+        "temperatureC": { "type": "number" },
+        "temperatureTime": { "$ref": "#/$defs/time" },
+        "symptoms": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": ["cramps", "headache", "bloating", "tender_breasts", "fatigue", "back_pain", "acne", "nausea"]
+          }
+        },
+        "moods": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["calm", "happy", "irritable", "anxious", "low", "energetic"] }
+        },
+        "cervicalMucus": { "enum": ["dry", "sticky", "creamy", "watery", "egg_white"] },
+        "lhTest": { "enum": ["negative", "positive"] },
+        "pregnancyTest": { "enum": ["negative", "positive"] },
+        "sex": { "enum": ["none", "protected", "unprotected"] },
+        "pillState": { "enum": ["taken", "late", "missed"] },
+        "patchChanged": { "type": "boolean" },
+        "ringState": { "enum": ["in", "out"] },
+        "injectionGiven": { "type": "boolean" },
+        "emergencyContraception": { "type": "boolean" },
+        "sleepMinutes": { "type": "integer", "minimum": 0 },
+        "weightKg": { "type": "number" },
+        "notes": { "type": "string" },
+        "createdAt": { "$ref": "#/$defs/instant" },
+        "updatedAt": { "$ref": "#/$defs/instant" },
+        "deletedAt": { "$ref": "#/$defs/instant" }
+      }
+    }
+  }
+}

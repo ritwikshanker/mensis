@@ -20,8 +20,9 @@ no analytics, no ads. Optional encrypted backup to your own Google Drive.
 - Predictions are statistics about your own history. Mensis is not a medical device and is not a method
   of contraception.
 
-The threat model is described in `PRIVACY.md` (written in build step 3). The export format is documented
-in `docs/export-format.md` (step 5).
+The threat model is described in `PRIVACY.md` (written in build step 3). The export and import formats
+are documented in [`docs/export-format.md`](docs/export-format.md), with a JSON Schema in
+[`docs/mensis-export.schema.json`](docs/mensis-export.schema.json).
 
 ## Building
 

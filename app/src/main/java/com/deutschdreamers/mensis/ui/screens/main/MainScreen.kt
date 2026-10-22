@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.deutschdreamers.mensis.ui.components.MsIcon
 import com.deutschdreamers.mensis.ui.navigation.ComingSoon
+import com.deutschdreamers.mensis.ui.navigation.Import
 import com.deutschdreamers.mensis.ui.navigation.LaterScreen
 import com.deutschdreamers.mensis.ui.navigation.MensisNavKey
 import com.deutschdreamers.mensis.ui.screens.calendar.CalendarScreen
@@ -73,7 +74,7 @@ fun MainScreen(
                         TodayScreen(
                             viewModel = hiltViewModel(),
                             onLog = { request -> logRequest = request },
-                            onImport = { onNavigate(ComingSoon(LaterScreen.IMPORT)) },
+                            onImport = { onNavigate(Import) },
                             onBackupAction = { onNavigate(ComingSoon(LaterScreen.BACKUP)) },
                             onMethodSettings = { onNavigate(com.deutschdreamers.mensis.ui.navigation.Contraception) },
                         )

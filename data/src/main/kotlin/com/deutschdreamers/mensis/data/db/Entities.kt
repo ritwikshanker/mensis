@@ -4,12 +4,15 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 /**
  * Raw facts for one calendar day. Dates and times are ISO-8601 strings, enums are stored by name,
  * lists as JSON arrays. Every row carries created/updated timestamps and a soft-delete tombstone so
- * the schema is ready for sync. Temperatures are °C, weights kg.
+ * the schema is ready for sync. Temperatures are °C, weights kg. Serializable so an import can keep the
+ * previous row for undo.
  */
+@Serializable
 @Entity(tableName = "day_entries", indices = [Index(value = ["date"], unique = true)])
 data class DayEntryEntity(
     @PrimaryKey val id: String,
@@ -38,6 +41,7 @@ data class DayEntryEntity(
 )
 
 /** A contraception method in effect from start to end (null end = current). */
+@Serializable
 @Entity(tableName = "contraception_periods")
 data class ContraceptionPeriodEntity(
     @PrimaryKey val id: String,
@@ -54,6 +58,7 @@ data class ContraceptionPeriodEntity(
 )
 
 /** Single-row table of the health-relevant settings. UI preferences live in DataStore instead. */
+@Serializable
 @Entity(tableName = "tracker_settings")
 data class TrackerSettingsEntity(
     @PrimaryKey val id: String = SINGLETON_ID,

@@ -93,7 +93,8 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
-# Crypto — Argon2id for the backup password (pure JVM, unit-testable)
+# Crypto — Argon2id for the export and backup passwords (pure JVM, so the KDF runs in unit tests; Android has no
+# Argon2 in the platform and the JNI alternatives cannot run on the JVM)
 bouncycastle-bcprov = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
 # Tests — JUnit 5 (JVM modules), property tests, mocking, Android instrumentation
 junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit5" }

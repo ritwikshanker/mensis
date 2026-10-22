@@ -27,6 +27,10 @@ interface DayEntryDao {
 
     @Upsert
     suspend fun upsertAll(entities: List<DayEntryEntity>)
+
+    /** Only for undoing an import: rows the import created are removed outright, not tombstoned. */
+    @Query("DELETE FROM day_entries WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
 }
 
 @Dao
@@ -48,6 +52,10 @@ interface ContraceptionDao {
 
     @Upsert
     suspend fun upsertAll(entities: List<ContraceptionPeriodEntity>)
+
+    /** Only for undoing an import. */
+    @Query("DELETE FROM contraception_periods WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
 }
 
 @Dao
@@ -60,6 +68,10 @@ interface TrackerSettingsDao {
 
     @Upsert
     suspend fun upsert(entity: TrackerSettingsEntity)
+
+    /** Only for undoing an import that created the settings row. */
+    @Query("DELETE FROM tracker_settings")
+    suspend fun delete()
 }
 
 @Dao

@@ -30,6 +30,8 @@ import com.deutschdreamers.mensis.ui.components.SettingsRow
 import com.deutschdreamers.mensis.ui.components.SwitchRow
 import com.deutschdreamers.mensis.ui.navigation.ComingSoon
 import com.deutschdreamers.mensis.ui.navigation.Contraception
+import com.deutschdreamers.mensis.ui.navigation.Export
+import com.deutschdreamers.mensis.ui.navigation.Import
 import com.deutschdreamers.mensis.ui.navigation.LaterScreen
 import com.deutschdreamers.mensis.ui.navigation.MensisNavKey
 import com.deutschdreamers.mensis.ui.navigation.TrackLevel
@@ -130,14 +132,14 @@ fun SettingsScreenContent(
                 stringResource(R.string.settings_export),
                 stringResource(R.string.settings_export_supporting),
             ) {
-                onNavigate(ComingSoon(LaterScreen.EXPORT))
+                onNavigate(Export)
             }
             SettingsRow(
                 R.drawable.ms_upload,
                 stringResource(R.string.settings_import),
                 stringResource(R.string.settings_import_supporting),
             ) {
-                onNavigate(ComingSoon(LaterScreen.IMPORT))
+                onNavigate(Import)
             }
             SettingsRow(
                 R.drawable.ms_description,
