@@ -3,4 +3,8 @@
     <!-- Window background before Compose draws; matches surface in the warm-neutral palette. -->
     <color name="mensis_surface_light">#FBF7F3</color>
     <color name="mensis_surface_dark">#141211</color>
+
+    <!-- Launcher icon: the app tile in Rose, primaryContainer with onPrimaryContainer (light scheme). -->
+    <color name="launcher_background">#FFD9DF</color>
+    <color name="launcher_foreground">#3A0818</color>
 </resources>

@@ -469,6 +469,8 @@
     <string name="about_licence_desc">MIT License</string>
     <string name="about_libraries">Open-source libraries</string>
     <string name="about_libraries_desc">Jetpack Compose, Room, SQLCipher</string>
+    <string name="about_privacy_policy">Privacy policy</string>
+    <string name="about_privacy_policy_desc">Opens the policy on the project website.</string>
     <string name="about_report">Report a problem</string>
     <string name="about_report_desc">Opens the issue tracker. No data is attached.</string>
     <string name="about_disclaimer">Mensis is not a medical device and does not provide medical advice or contraception.</string>

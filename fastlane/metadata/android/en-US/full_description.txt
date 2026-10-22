@@ -1,0 +1,32 @@
+Mensis is a menstrual cycle tracker that keeps your data on your phone. No account, no analytics, no ads, no tracking. The code is open source under the MIT licence.
+
+What you can log
+• Period days and flow, from spotting to heavy
+• Symptoms, mood, sleep and notes
+• Waking temperature, cervical mucus and LH tests, if you want the full sympto-thermal set
+• Pregnancy tests, and pregnancy mode with the estimated due date
+• Contraception: combined or progestin-only pill, patch, vaginal ring, injection, implant, hormonal or copper IUD
+Nothing is ever required: you decide how much the daily log shows.
+
+Ranges, not guesses
+• After one complete cycle, Mensis estimates when your next period starts, as a date range with how many cycles it rests on.
+• After three cycles it adds an estimated fertile window and shows how much your cycles vary.
+• A waking temperature shift marks ovulation after the fact; without temperatures, ovulation is estimated from cycle lengths and labelled as such.
+• With a hormonal method, Mensis predicts the withdrawal bleed or pauses predictions, depending on the method.
+• Insights: cycle and period lengths, luteal phase, temperature charts and symptoms that come back in the same phase.
+• A PDF report for your doctor, created on the phone.
+
+Private by design
+• Everything is stored in an encrypted database whose key is protected by the phone's Android Keystore.
+• Optional app lock with the phone's fingerprint, face or screen lock. Screenshots and the preview in recent apps are blocked by default.
+• Reminders are scheduled on the phone. Notifications say only "Reminder" unless you choose other wording.
+• The app never contacts a server unless you turn on Google Drive backup.
+• Optional backup to your own Google Drive: the data is encrypted on the phone with a password only you know, then stored in Drive's hidden app folder. Google cannot read it, and neither can the developer. There is no password reset.
+• Export to JSON or CSV, with optional password encryption. Import from a Mensis export, from drip. or from any CSV file; Clue import is experimental.
+• Works without Google Play services; only Drive backup is then unavailable.
+
+Important
+Predictions are statistics about your own history. Mensis is not a medical device and does not diagnose, treat, cure or prevent any medical condition. It is not a method of contraception. Please consult a healthcare professional about any question concerning your health.
+
+Source code: https://github.com/ritwikshanker/mensis
+Privacy policy: https://ritwikshanker.github.io/mensis/privacy/

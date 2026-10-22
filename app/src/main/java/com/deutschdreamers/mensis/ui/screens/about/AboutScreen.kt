@@ -110,6 +110,14 @@ fun AboutContent(
                     onClick = { onNotices(NoticeDocument.LIBRARIES) },
                 )
                 SettingsRow(
+                    icon = R.drawable.ms_policy,
+                    title = stringResource(R.string.about_privacy_policy),
+                    supporting = stringResource(R.string.about_privacy_policy_desc),
+                    horizontalPadding = 0.dp,
+                    trailingIcon = R.drawable.ms_open_in_new,
+                    onClick = { onOpenLink(AboutLinks.PRIVACY_POLICY) },
+                )
+                SettingsRow(
                     icon = R.drawable.ms_bug_report,
                     title = stringResource(R.string.about_report),
                     supporting = stringResource(R.string.about_report_desc),

@@ -25,15 +25,15 @@ Console menu names change from time to time; the steps below name what to look f
 In APIs & Services → OAuth consent screen (shown as "Google Auth Platform" in newer consoles):
 
 1. **Branding**: app name `Mensis`, a user-support e-mail, a developer contact e-mail, the home page
-   (the GitHub repository or the GitHub Pages site) and the **privacy policy URL** (the GitHub Pages
-   privacy policy, build step 11). Leave the logo empty unless you want to go through brand review
-   for it.
+   (the GitHub repository or the GitHub Pages site) and the **privacy policy URL**
+   <https://ritwikshanker.github.io/mensis/privacy/> (`docs/privacy.md`). Leave the logo empty unless
+   you want to go through brand review for it.
 2. **Audience**: user type **External**. While the app is in *Testing*, add the Google accounts that
    may sign in as test users.
 3. **Data access**: add the scope `.../auth/drive.appdata` ("See, create, and delete its own
-   configuration data in your Google Drive"). No other scope is needed. The page shows how Google
-   classifies each scope (non-sensitive, sensitive, restricted); check it there, because that decides
-   what review publishing needs.
+   configuration data in your Google Drive"). No other scope is needed. Google lists `drive.appdata`
+   as a non-sensitive scope (Drive API guide "Choose Google Drive API scopes"), so the app needs no
+   scope verification; check the classification the page shows, in case it changes.
 
 ## 3. OAuth clients
 
@@ -55,8 +55,9 @@ Credentials → Create credentials → OAuth client ID, three times at most:
   debug keystore unless you share one; add one Android client per debug keystore you use.
 - Release SHA-1: Google Play re-signs uploads with the **app signing key**, so use that certificate's
   SHA-1 from Play Console (Test and release → App integrity → App signing), not the upload key's.
-  GitHub-release APKs are signed locally with the same app signing key (RELEASING.md, build step 11),
-  so the one Android client covers both.
+  GitHub-release APKs are signed locally with the same app signing key (RELEASING.md), so the one
+  Android client covers both. If Google generated the app signing key, GitHub APKs carry a different
+  certificate and need an Android client of their own.
 - Android clients have no secret. They tie the package name and signing certificate to the project;
   a build signed with any other key cannot get a token.
 - The **web client ID** is what the build needs: Credential Manager's "Sign in with Google" asks for a
@@ -75,19 +76,22 @@ The ID looks like `123456789012-abc123def456.apps.googleusercontent.com`. It is 
   ```
 
   or pass `-Pmensis.googleWebClientId=…` on the command line.
-- In CI: set the environment variable `MENSIS_GOOGLE_WEB_CLIENT_ID` for the release workflow (build
-  step 11 wires it to a repository variable).
+- In CI: the release workflow reads the repository variable `MENSIS_GOOGLE_WEB_CLIENT_ID`
+  (`gh variable set MENSIS_GOOGLE_WEB_CLIENT_ID`, RELEASING.md) and fails a tag build without it.
 
 Builds without it report Drive backup as "not configured in this build".
 
 ## 5. Publish
 
-While the consent screen is in *Testing*, only the listed test users can sign in, Google shows an
-"unverified app" notice, and Google may limit how long a grant lasts, so test devices may be asked to
-reconnect (Mensis then shows "Google account needs reconnecting" and posts a notification). Before
-release, publish the app (Audience → Publish app). Whether Google requires verification depends on the
-scope classification shown on the Data access page and on the branding you set; follow the
-console's prompts and Google's current OAuth verification help pages.
+While the consent screen is in *Testing*, only the listed test users (at most 100) can sign in and
+Google shows an "unverified app" notice. Grants made by test users expire seven days after consent for
+scopes beyond name, e-mail and profile, so `drive.appdata` is affected: test devices are asked to
+reconnect after a week (Mensis then shows "Google account needs reconnecting" and posts a
+notification). Before release, publish the app (Audience → Publish app, status "In production").
+With only non-sensitive scopes, Google does not require app verification; showing the app name and
+logo on the consent screen goes through the lighter brand verification, for which the home page and
+privacy policy URL must be on a domain you have verified. Follow the console's prompts, which reflect
+Google's current rules.
 
 ## 6. Check it works
 

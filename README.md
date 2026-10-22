@@ -3,7 +3,18 @@
 A private menstrual cycle tracker for Android. Your data stays on your phone, encrypted. No account,
 no analytics, no ads. Optional encrypted backup to your own Google Drive.
 
-**Status: under construction.** Nothing is released yet.
+## Download
+
+APKs are attached to the [GitHub releases](https://github.com/ritwikshanker/mensis/releases), each with a
+`SHA256SUMS` file. They are built by the release workflow from the tagged commit and signed locally with
+the app signing key, which never enters CI. To check a download:
+
+```
+sha256sum -c SHA256SUMS
+apksigner verify --print-certs mensis-X.Y.Z.apk
+```
+
+The privacy policy is at <https://ritwikshanker.github.io/mensis/privacy/>.
 
 ## Privacy model
 
@@ -44,6 +55,12 @@ The bundled fonts and Material Symbols icons are not kept in the repository: the
 them from Google Fonts and google/material-design-icons, together with the Apache License 2.0 text shown
 in the app, into `app/build/generated/designAssets` (the `fetchDesignAssets` Gradle task), so the first
 build needs network access.
+
+## Releases
+
+Version numbers come from git tags (`vX.Y.Z`). [`RELEASING.md`](RELEASING.md) covers signing keys, the
+release workflow and the checklist; [`PLAY_CONSOLE.md`](PLAY_CONSOLE.md) lists the Play Console
+declarations. Store texts and graphics live in `fastlane/metadata/android/en-US/`.
 
 ## Project layout
 

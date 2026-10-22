@@ -45,6 +45,7 @@ info
 code
 gavel
 library_books
+policy
 bug_report
 open_in_new
 chevron_right

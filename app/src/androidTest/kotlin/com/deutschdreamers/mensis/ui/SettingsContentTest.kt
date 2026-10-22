@@ -194,13 +194,14 @@ class SettingsContentTest {
         compose.onNodeWithText("github.com/ritwikshanker/mensis").performScrollTo().performClick()
         compose.onNodeWithText("Licence").performScrollTo().performClick()
         compose.onNodeWithText("Open-source libraries").performScrollTo().performClick()
+        compose.onNodeWithText("Privacy policy").performScrollTo().performClick()
         compose.onNodeWithText("Report a problem").performScrollTo().performClick()
         compose
             .onNodeWithText("Mensis is not a medical device and does not provide medical advice or contraception.")
             .performScrollTo()
             .assertExists()
 
-        assertEquals(listOf(AboutLinks.SOURCE, AboutLinks.ISSUES), links)
+        assertEquals(listOf(AboutLinks.SOURCE, AboutLinks.PRIVACY_POLICY, AboutLinks.ISSUES), links)
         assertEquals(listOf(NoticeDocument.LICENCE, NoticeDocument.LIBRARIES), notices)
     }
 

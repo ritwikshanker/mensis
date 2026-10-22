@@ -21,3 +21,5 @@ Thanks for your interest. A few rules keep the app trustworthy:
 - One-line commit messages in Conventional Commits form: `feat:`, `fix:`, `chore:`, `docs:`, `build:`,
   `test:`, `refactor:`.
 - Report security issues privately via the GitHub security advisory form rather than a public issue.
+- Releases are cut by the maintainer from tags (`RELEASING.md`); pull requests do not change version
+  numbers or store texts unless asked to.

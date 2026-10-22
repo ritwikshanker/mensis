@@ -2,7 +2,8 @@
 
 This document describes what Mensis stores, what can leave the phone, how the data is protected and
 what that protection does not cover. It describes the code in this repository; if the two disagree,
-the code is wrong and an issue is welcome.
+the code is wrong and an issue is welcome. The shorter privacy policy for users is `docs/privacy.md`,
+published at <https://ritwikshanker.github.io/mensis/privacy/> and linked from About in the app.
 
 ## What is stored, and where
 

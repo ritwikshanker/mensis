@@ -18,6 +18,14 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!--
+      WorkManager declares this for foreground workers. Mensis never runs one (no setForeground, no
+      expedited work), so the permission is removed from the merged manifest.
+    -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
+
+    <!--
       Privacy rule 4: no Android auto-backup or device-to-device transfer of app data. The SQLCipher
       database is useless without the device-bound Keystore key; the encrypted Drive backup replaces it.
       Privacy rule 2: cleartext traffic disabled via network_security_config.
