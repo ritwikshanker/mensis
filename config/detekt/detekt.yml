@@ -1,0 +1,49 @@
+# detekt configuration for Mensis (on top of the defaults: buildUponDefaultConfig = true).
+build:
+  maxIssues: 0
+
+style:
+  ForbiddenImport:
+    active: true
+    # Privacy rule 2: network code lives only in :backup-drive.
+    imports:
+      - 'okhttp3.*'
+      - 'java.net.*'
+      - 'javax.net.*'
+      - 'com.google.android.gms.*'
+      - 'androidx.credentials.*'
+    excludes: ['**/backup-drive/**']
+  MagicNumber:
+    ignoreAnnotated: ['Composable', 'Preview']
+    ignorePropertyDeclaration: true
+    ignoreEnums: true
+  MaxLineLength:
+    maxLineLength: 120
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+  ReturnCount:
+    max: 3
+  WildcardImport:
+    active: true
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9]*|[A-Z][_A-Z0-9]*'
+
+complexity:
+  LongMethod:
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+    constructorThreshold: 12
+  TooManyFunctions:
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInObjects: 20
+    ignorePrivate: true
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false

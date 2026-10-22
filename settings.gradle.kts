@@ -24,3 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Mensis"
 include(":app")
+include(":domain")
+include(":data")
+include(":backup-drive")

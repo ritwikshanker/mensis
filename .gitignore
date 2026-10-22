@@ -1,16 +1,25 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Gradle
+.gradle/
+build/
+.kotlin/
 local.properties
-.idea
+
+# IDE
+.idea/
+*.iml
+.externalNativeBuild/
+.cxx/
+captures/
+*.hprof
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Signing keys and secrets must never be committed
+*.jks
+*.keystore
+*.p12
+*.pem
+keystore/
+secrets.properties
