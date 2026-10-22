@@ -21,14 +21,19 @@ object MethodSchedule {
         return period.startDate.plusYears(years.toLong())
     }
 
-    /** Last injection (logged or the method start) plus the injection interval. */
+    /**
+     * The user's own next-injection date while it is after the last injection, else the last injection
+     * (logged or the method start) plus [intervalWeeks].
+     */
     fun nextInjectionDate(
         period: ContraceptionPeriod,
         entries: List<DayEntry>,
+        intervalWeeks: Int = PredictionConstants.INJECTION_INTERVAL_WEEKS,
     ): LocalDate? {
         if (period.method != ContraceptionMethod.INJECTION) return null
         val last = lastInjectionDate(period, entries)
-        return last.plusWeeks(PredictionConstants.INJECTION_INTERVAL_WEEKS.toLong())
+        period.replaceByDate?.takeIf { it.isAfter(last) }?.let { return it }
+        return last.plusWeeks(intervalWeeks.toLong())
     }
 
     fun lastInjectionDate(

@@ -10,6 +10,7 @@ import com.deutschdreamers.mensis.data.repo.SettingsRepository
 import com.deutschdreamers.mensis.domain.model.Flow
 import com.deutschdreamers.mensis.domain.model.Goal
 import com.deutschdreamers.mensis.domain.model.TrackerSettings
+import com.deutschdreamers.mensis.domain.reminders.ReminderType
 import com.deutschdreamers.mensis.lock.AppLockManager
 import com.deutschdreamers.mensis.ui.screens.backup.ConnectProblem
 import com.deutschdreamers.mensis.ui.screens.backup.ConnectResult
@@ -104,7 +105,8 @@ class OnboardingViewModel
         fun next() {
             val current = state.value
             when {
-                current.isLast -> finish()
+                // "Not now" on the last step.
+                current.isLast -> finish(remindersAllowed = false)
                 !current.canContinue -> Unit
                 // Without backup there is no password to choose.
                 current.step == OnboardingDraft.BACKUP_STEP && !current.backupReadyToAsk() ->
@@ -149,9 +151,10 @@ class OnboardingViewModel
 
         /**
          * Writes the draft, turns backup on when it was set up, marks onboarding complete and reports
-         * back through [OnboardingDraft.finished].
+         * back through [OnboardingDraft.finished]. When notifications were allowed on the last step, the
+         * period reminder is switched on with its defaults (2 days before, 09:00).
          */
-        fun finish() {
+        fun finish(remindersAllowed: Boolean) {
             val current = state.value
             if (current.finishing) return
             state.update { it.copy(finishing = true) }
@@ -172,6 +175,9 @@ class OnboardingViewModel
                     } finally {
                         password.fill('\u0000')
                     }
+                }
+                if (remindersAllowed) {
+                    settings.updateReminders { it.update(ReminderType.PERIOD) { s -> s.copy(enabled = true) } }
                 }
                 settings.updateUiPrefs {
                     it.copy(

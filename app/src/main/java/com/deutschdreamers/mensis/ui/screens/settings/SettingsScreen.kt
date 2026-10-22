@@ -35,6 +35,7 @@ import com.deutschdreamers.mensis.ui.navigation.Export
 import com.deutschdreamers.mensis.ui.navigation.Import
 import com.deutschdreamers.mensis.ui.navigation.LaterScreen
 import com.deutschdreamers.mensis.ui.navigation.MensisNavKey
+import com.deutschdreamers.mensis.ui.navigation.Reminders
 import com.deutschdreamers.mensis.ui.navigation.TrackLevel
 
 @Composable
@@ -90,9 +91,9 @@ fun SettingsScreenContent(
             SettingsRow(
                 R.drawable.ms_notifications,
                 stringResource(R.string.settings_reminders),
-                stringResource(R.string.settings_reminders_off),
+                state.remindersSummary,
             ) {
-                onNavigate(ComingSoon(LaterScreen.REMINDERS))
+                onNavigate(Reminders)
             }
             SectionHeader(stringResource(R.string.settings_section_privacy))
             SwitchRow(

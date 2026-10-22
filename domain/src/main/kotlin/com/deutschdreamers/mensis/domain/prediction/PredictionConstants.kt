@@ -150,6 +150,12 @@ object PredictionConstants {
     /** Injection interval (weeks). */
     const val INJECTION_INTERVAL_WEEKS: Int = 12
 
+    /** Upper end of the injection interval ("every 12 to 13 weeks"); the injection reminder can use it. */
+    const val INJECTION_INTERVAL_MAX_WEEKS: Int = 13
+
+    /** A progestin-only pill counts as late after this many hours past its usual time (reminder wording). */
+    const val POP_WINDOW_HOURS: Int = 3
+
     /** Default implant replacement interval (years); editable per method period. */
     const val IMPLANT_YEARS: Int = 3
 

@@ -39,6 +39,17 @@ Cycles, phases and predictions are never stored; they are computed from the dail
 - "Hide in recent apps" (on by default) sets `FLAG_SECURE`: no screenshots, screen recordings or
   Recents thumbnails of the app.
 
+### Reminders
+
+- Reminders are alarms on the phone (`AlarmManager`); no push service is involved. Each alarm carries
+  only the reminder type and its time. When it goes off, the app reads the database and decides what
+  to show, so no health data sits in the system's alarm queue.
+- Notification text is generic by default ("Reminder" / "Tap to open", or the user's own text). With
+  "Discreet wording" off it names the reminder, for example "Period expected in 2 days".
+- Notifications are private on the lock screen: a secure lock screen shows only the generic title.
+- Exact alarms are used only when the user allows them; otherwise a reminder arrives within 15
+  minutes of its time.
+
 ## What leaves the phone
 
 **Nothing, by default.** Mensis has no analytics, crash reporting, ads, remote configuration or

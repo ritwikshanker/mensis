@@ -58,9 +58,28 @@ do not know.
 | `typicalCycleLength`, `typicalPeriodLength` | Days, from onboarding; used until real cycles exist |
 | `temperatureUnit` | `celsius`, `fahrenheit` (display only) |
 | `weightUnit` | `kilogram`, `pound` (display only) |
-| `reminders` | Reminder configuration object (empty until reminders exist) |
-| `discreetWording` | Notifications say only "Reminder" |
+| `reminders` | Reminder settings, see below |
+| `discreetWording` | Notifications show only the generic text ("Reminder" unless changed) |
 | `createdAt`, `updatedAt` | ISO-8601 instants |
+
+#### `settings.reminders`
+
+One entry per reminder the user has changed; a missing entry or field means the default. Which reminders
+apply depends on the contraception method and tracking level; entries that do not apply are kept but unused.
+When each reminder fires next is derived on the phone and never stored.
+
+| Key | Reminder |
+|---|---|
+| `period` | Period expected, or withdrawal bleed expected on a cyclic method |
+| `fertile` | Fertile window (no hormonal method) |
+| `pill`, `patch`, `ring`, `injection`, `replacement` | The current method's reminder (`replacement`: implant and IUDs) |
+| `temperature` | Morning temperature (tracking level `full`) |
+| `discreetTitle`, `discreetBody` | The user's own generic notification text |
+
+Each reminder entry has `enabled` (boolean), `time` (`HH:mm`, local time) and `option`: `same_day`,
+`one_day_before`, `two_days_before`, `daily`, `active_days_only`, `weekly`, `three_weeks_in_one_out`,
+`four_weekly`, `twelve_weeks`, `thirteen_weeks`, `one_month_before`, `three_months_before`,
+`follicular_only`. Unknown values are ignored on import.
 
 ### `contraceptionPeriods[]`
 

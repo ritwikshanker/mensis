@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.deutschdreamers.mensis.files.DocumentFiles
 import com.deutschdreamers.mensis.lock.AppLockManager
+import com.deutschdreamers.mensis.notifications.ReminderSync
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -21,6 +22,9 @@ class MensisApplication :
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject
+    lateinit var reminderSync: ReminderSync
+
     /** The backup worker gets its dependencies from Hilt. */
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
@@ -28,6 +32,7 @@ class MensisApplication :
     override fun onCreate() {
         super.onCreate()
         appLockManager.start()
+        reminderSync.start()
         // Copies made for "Share file" live only until the next start.
         documentFiles.clearShared()
     }

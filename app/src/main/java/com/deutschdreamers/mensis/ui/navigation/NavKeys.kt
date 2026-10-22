@@ -22,6 +22,10 @@ data object TrackLevel : MensisNavKey
 @Serializable
 data object Contraception : MensisNavKey
 
+/** Settings → Reminders and the Contraception reminder row (design §10). */
+@Serializable
+data object Reminders : MensisNavKey
+
 /** Settings → Export data (design §13). */
 @Serializable
 data object Export : MensisNavKey
@@ -44,7 +48,7 @@ data class Restore(
 
 /** Screens that arrive in later build steps; their Settings rows already navigate somewhere. */
 @Serializable
-enum class LaterScreen { MODE, UNITS, REMINDERS, REPORT, DELETE_ALL, THEME, ABOUT }
+enum class LaterScreen { MODE, UNITS, REPORT, DELETE_ALL, THEME, ABOUT }
 
 @Serializable
 data class ComingSoon(

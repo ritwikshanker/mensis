@@ -62,6 +62,7 @@ fun SettingsRow(
     iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     showChevron: Boolean = true,
     enabled: Boolean = true,
+    horizontalPadding: androidx.compose.ui.unit.Dp = 16.dp,
     onClick: () -> Unit,
 ) {
     Row(
@@ -70,7 +71,7 @@ fun SettingsRow(
                 .fillMaxWidth()
                 .clickable(enabled = enabled, onClick = onClick)
                 .defaultMinSize(minHeight = 56.dp)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = horizontalPadding, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {

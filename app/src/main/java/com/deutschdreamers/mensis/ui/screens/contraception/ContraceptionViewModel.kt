@@ -4,15 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.deutschdreamers.mensis.data.repo.ContraceptionRecord
 import com.deutschdreamers.mensis.data.repo.ContraceptionRepository
-import com.deutschdreamers.mensis.data.repo.DayEntryRepository
+import com.deutschdreamers.mensis.data.repo.SettingsRepository
+import com.deutschdreamers.mensis.data.repo.TrackerData
+import com.deutschdreamers.mensis.data.repo.TrackerDataRepository
 import com.deutschdreamers.mensis.domain.contraception.MethodSchedule
 import com.deutschdreamers.mensis.domain.model.ContraceptionMethod
 import com.deutschdreamers.mensis.domain.model.ContraceptionPeriod
 import com.deutschdreamers.mensis.domain.model.MethodKind
 import com.deutschdreamers.mensis.domain.model.Regimen
-import com.deutschdreamers.mensis.ui.format.Formats
-import com.deutschdreamers.mensis.ui.format.Formats.MIDDLE_DOT
+import com.deutschdreamers.mensis.domain.reminders.ReminderCatalog
+import com.deutschdreamers.mensis.domain.reminders.ReminderConfig
+import com.deutschdreamers.mensis.notifications.ReminderTexts
 import com.deutschdreamers.mensis.ui.format.MethodLabels
+import com.deutschdreamers.mensis.ui.screens.reminders.RemindersUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -45,13 +49,18 @@ class ContraceptionViewModel
     @Inject
     constructor(
         private val repository: ContraceptionRepository,
-        dayEntries: DayEntryRepository,
+        trackerData: TrackerDataRepository,
+        settings: SettingsRepository,
         private val clock: Clock,
     ) : ViewModel() {
         private var current: ContraceptionRecord? = null
 
         val uiState: StateFlow<ContraceptionUiState?> =
-            combine(repository.observeRecords(), dayEntries.observeAll()) { records, entries ->
+            combine(
+                repository.observeRecords(),
+                trackerData.observe(),
+                settings.observeReminders(),
+            ) { records, data, reminders ->
                 val record = records.filter { it.period.endDate == null }.maxByOrNull { it.period.startDate }
                 current = record
                 val period = record?.period ?: ContraceptionPeriod(ContraceptionMethod.NONE, LocalDate.now(clock))
@@ -60,7 +69,7 @@ class ContraceptionViewModel
                     when {
                         method == ContraceptionMethod.INJECTION ->
                             "Next injection" to
-                                MethodSchedule.nextInjectionDate(period, entries)
+                                MethodSchedule.nextInjectionDate(period, data.entries)
                         method.isLongActing -> "Replace by" to MethodSchedule.replaceByDate(period)
                         else -> "" to null
                     }
@@ -77,7 +86,7 @@ class ContraceptionViewModel
                     nextDate = next.second,
                     checkupDate = period.checkupDate,
                     effect = MethodLabels.effect(period.kind),
-                    reminderSummary = reminderSummary(period),
+                    reminderSummary = reminderSummary(record?.period, reminders, data),
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), null)
 
@@ -105,23 +114,28 @@ class ContraceptionViewModel
 
         fun setCheckupDate(date: LocalDate?) = edit { it.copy(checkupDate = date) }
 
+        /** "Pill · Daily · 21:00", "Pill · Off" or "No method reminder". */
+        private fun reminderSummary(
+            period: ContraceptionPeriod?,
+            reminders: ReminderConfig,
+            data: TrackerData,
+        ): String {
+            val resolved =
+                ReminderCatalog
+                    .methodType(
+                        period?.method,
+                    )?.let { ReminderCatalog.resolve(it, reminders, period) }
+            return ReminderTexts.methodSummary(
+                resolved,
+                period,
+                resolved?.let { RemindersUi.scheduleDate(it, period, data) },
+            )
+        }
+
         private fun edit(transform: (ContraceptionPeriod) -> ContraceptionPeriod) {
             val record = current ?: return
             viewModelScope.launch { repository.save(transform(record.period), record.id) }
         }
-
-        private fun reminderSummary(period: ContraceptionPeriod): String =
-            when (period.method) {
-                ContraceptionMethod.NONE -> "No method reminder"
-                ContraceptionMethod.COMBINED_PILL, ContraceptionMethod.PROGESTIN_ONLY_PILL ->
-                    "Pill $MIDDLE_DOT daily" + (period.dailyTime?.let { ", ${Formats.time(it)}" } ?: "")
-                ContraceptionMethod.PATCH -> "Change patch $MIDDLE_DOT weekly"
-                ContraceptionMethod.RING -> "Ring out, then in $MIDDLE_DOT every 3 weeks"
-                ContraceptionMethod.INJECTION -> "Next injection $MIDDLE_DOT 12 weeks"
-                ContraceptionMethod.IMPLANT -> "Implant replacement $MIDDLE_DOT 3 months before"
-                ContraceptionMethod.HORMONAL_IUD, ContraceptionMethod.COPPER_IUD ->
-                    "IUD replacement $MIDDLE_DOT 3 months before"
-            }
 
         private companion object {
             const val STOP_TIMEOUT_MS = 5_000L

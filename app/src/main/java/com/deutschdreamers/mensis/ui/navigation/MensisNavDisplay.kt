@@ -14,6 +14,7 @@ import com.deutschdreamers.mensis.ui.screens.importer.ImportScreen
 import com.deutschdreamers.mensis.ui.screens.later.ComingSoonScreen
 import com.deutschdreamers.mensis.ui.screens.main.MainScreen
 import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingScreen
+import com.deutschdreamers.mensis.ui.screens.reminders.RemindersScreen
 import com.deutschdreamers.mensis.ui.screens.restore.RestoreScreen
 import com.deutschdreamers.mensis.ui.screens.track.TrackLevelScreen
 
@@ -42,9 +43,10 @@ fun MensisNavDisplay(startAtOnboarding: Boolean) {
                 entry<Contraception> {
                     ContraceptionScreen(
                         onBack = navigator::pop,
-                        onReminders = { navigator.push(ComingSoon(LaterScreen.REMINDERS)) },
+                        onReminders = { navigator.push(Reminders) },
                     )
                 }
+                entry<Reminders> { RemindersScreen(onBack = navigator::pop) }
                 entry<Export> { ExportScreen(onBack = navigator::pop) }
                 entry<Import> { ImportScreen(onBack = navigator::pop) }
                 entry<Backup> { key ->

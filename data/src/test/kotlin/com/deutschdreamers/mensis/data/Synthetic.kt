@@ -80,7 +80,7 @@ object Synthetic {
             typicalPeriodLength = 5,
             temperatureUnit = "CELSIUS",
             weightUnit = "KILOGRAM",
-            remindersJson = """{"period":{"enabled":true,"lead":2}}""",
+            remindersJson = """{"period":{"enabled":true,"time":"09:00","option":"two_days_before"}}""",
             discreetWording = true,
             createdAt = createdAt,
             updatedAt = createdAt,

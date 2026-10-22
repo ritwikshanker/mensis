@@ -3,10 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-      Reminders (build step 7) and the "reconnect your Google account" backup notice post local
-      notifications; onboarding step 9 asks for this on Android 13+.
+      Reminders and the "reconnect your Google account" backup notice post local notifications;
+      onboarding step 9 and the Reminders screen ask for this on Android 13+.
     -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Alarms are lost on reboot; reminders are planned again once the phone has started. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!--
+      Exact reminder times when the user grants it (Reminders screen); never required. Without it a
+      reminder arrives within a 15-minute window. USE_EXACT_ALARM is for alarm-clock apps and not used.
+    -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!--
       Privacy rule 4: no Android auto-backup or device-to-device transfer of app data. The SQLCipher
@@ -49,6 +58,24 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+
+        <!-- A reminder alarm went off; only the app's own AlarmManager PendingIntent reaches it. -->
+        <receiver
+            android:name=".notifications.ReminderReceiver"
+            android:exported="false" />
+
+        <!-- System broadcasts after which reminders are planned again. -->
+        <receiver
+            android:name=".notifications.RescheduleReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Export "Share file": hands one exported file to the app the user picks, read-only. -->
         <provider

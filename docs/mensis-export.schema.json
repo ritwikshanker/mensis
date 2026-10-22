@@ -27,6 +27,20 @@
     "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
     "time": { "type": "string", "pattern": "^\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?$" },
     "instant": { "type": "string", "format": "date-time" },
+    "reminder": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "time": { "$ref": "#/$defs/time" },
+        "option": {
+          "enum": [
+            "same_day", "one_day_before", "two_days_before", "daily", "active_days_only", "weekly",
+            "three_weeks_in_one_out", "four_weekly", "twelve_weeks", "thirteen_weeks",
+            "one_month_before", "three_months_before", "follicular_only"
+          ]
+        }
+      }
+    },
     "settings": {
       "type": "object",
       "required": [
@@ -42,7 +56,22 @@
         "typicalPeriodLength": { "type": "integer", "minimum": 1 },
         "temperatureUnit": { "enum": ["celsius", "fahrenheit"] },
         "weightUnit": { "enum": ["kilogram", "pound"] },
-        "reminders": { "type": "object" },
+        "reminders": {
+          "type": "object",
+          "description": "One entry per reminder the user has touched; absent entries and fields use the defaults",
+          "properties": {
+            "period": { "$ref": "#/$defs/reminder" },
+            "fertile": { "$ref": "#/$defs/reminder" },
+            "pill": { "$ref": "#/$defs/reminder" },
+            "patch": { "$ref": "#/$defs/reminder" },
+            "ring": { "$ref": "#/$defs/reminder" },
+            "injection": { "$ref": "#/$defs/reminder" },
+            "replacement": { "$ref": "#/$defs/reminder" },
+            "temperature": { "$ref": "#/$defs/reminder" },
+            "discreetTitle": { "type": "string" },
+            "discreetBody": { "type": "string" }
+          }
+        },
         "discreetWording": { "type": "boolean" },
         "createdAt": { "$ref": "#/$defs/instant" },
         "updatedAt": { "$ref": "#/$defs/instant" }

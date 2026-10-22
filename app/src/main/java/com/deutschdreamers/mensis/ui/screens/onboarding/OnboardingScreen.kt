@@ -50,6 +50,7 @@ import com.deutschdreamers.mensis.domain.model.Goal
 import com.deutschdreamers.mensis.ui.components.InfoBanner
 import com.deutschdreamers.mensis.ui.components.MensisDatePickerDialog
 import com.deutschdreamers.mensis.ui.components.MsIcon
+import com.deutschdreamers.mensis.ui.components.NotificationPreview
 import com.deutschdreamers.mensis.ui.components.PasswordField
 import com.deutschdreamers.mensis.ui.components.RadioRow
 import com.deutschdreamers.mensis.ui.components.StepProgressBar
@@ -71,7 +72,9 @@ fun OnboardingScreen(
     LaunchedEffect(draft.finished) { if (draft.finished) onFinished() }
     val connect = rememberGoogleConnect(viewModel.accounts, viewModel.lock, viewModel::onBackupConnect)
     val permissionLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { viewModel.finish() }
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            viewModel.finish(remindersAllowed = granted)
+        }
     OnboardingContent(
         draft = draft,
         today = viewModel.today,
@@ -84,7 +87,7 @@ fun OnboardingScreen(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     } else {
-                        viewModel.finish()
+                        viewModel.finish(remindersAllowed = true)
                     }
                 draft.needsGoogleConnect -> connect.connect(null)
                 else -> viewModel.next()
@@ -515,48 +518,11 @@ private fun PasswordStep(
 private fun RemindersStep() {
     Headline(stringResource(R.string.onboarding_reminders_title))
     Supporting(stringResource(R.string.onboarding_reminders_body))
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(
-                    MaterialTheme.colorScheme.surfaceContainerLowest,
-                    MaterialTheme.shapes.medium,
-                ).padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(
-                        40.dp,
-                    ).background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            MsIcon(
-                resId = R.drawable.ms_timeline_fill,
-                contentDescription = null,
-                size = 22.dp,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        }
-        Column {
-            Text(
-                text = stringResource(R.string.onboarding_notification_app),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = stringResource(R.string.onboarding_notification_title),
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-            )
-            Text(
-                text = stringResource(R.string.onboarding_notification_body),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-    }
+    NotificationPreview(
+        appLine = stringResource(R.string.onboarding_notification_app),
+        title = stringResource(R.string.onboarding_notification_title),
+        body = stringResource(R.string.onboarding_notification_body),
+    )
     Supporting(stringResource(R.string.onboarding_reminders_footer))
 }
 

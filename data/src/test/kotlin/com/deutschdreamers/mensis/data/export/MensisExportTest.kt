@@ -27,6 +27,8 @@ import com.deutschdreamers.mensis.domain.model.SexType
 import com.deutschdreamers.mensis.domain.model.Symptom
 import com.deutschdreamers.mensis.domain.model.TestResult
 import com.deutschdreamers.mensis.domain.model.TrackingLevel
+import com.deutschdreamers.mensis.domain.reminders.ReminderOption
+import com.deutschdreamers.mensis.domain.reminders.ReminderType
 import io.kotest.property.checkAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -263,6 +265,18 @@ class MensisExportTest {
         assertEquals(names(TrackingLevel.entries), enumOf("settings", "properties", "trackingLevel"))
         assertEquals(names(Goal.entries), enumOf("settings", "properties", "goal"))
         assertEquals(names(ThemeScheme.entries), enumOf("uiPrefs", "properties", "theme"))
+        assertEquals(names(ReminderOption.entries), enumOf("reminder", "properties", "option"))
+        val reminderKeys =
+            defs
+                .getValue("settings")
+                .jsonObject
+                .getValue("properties")
+                .jsonObject
+                .getValue("reminders")
+                .jsonObject
+                .getValue("properties")
+                .jsonObject.keys
+        assertEquals(names(ReminderType.entries) + setOf("discreetTitle", "discreetBody"), reminderKeys)
         assertEquals(
             MensisExport.FORMAT_VERSION,
             schema

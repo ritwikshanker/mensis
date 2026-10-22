@@ -10,11 +10,15 @@ import com.deutschdreamers.mensis.data.settings.AppearanceMode
 import com.deutschdreamers.mensis.data.settings.ThemeScheme
 import com.deutschdreamers.mensis.data.settings.UiPrefs
 import com.deutschdreamers.mensis.domain.model.ContraceptionMethod
+import com.deutschdreamers.mensis.domain.model.ContraceptionPeriod
 import com.deutschdreamers.mensis.domain.model.TrackerMode
 import com.deutschdreamers.mensis.domain.model.TrackerSettings
 import com.deutschdreamers.mensis.domain.model.TrackingLevel
 import com.deutschdreamers.mensis.domain.model.activeOn
+import com.deutschdreamers.mensis.domain.reminders.ReminderCatalog
+import com.deutschdreamers.mensis.domain.reminders.ReminderConfig
 import com.deutschdreamers.mensis.lock.DeviceCredentialChecker
+import com.deutschdreamers.mensis.notifications.ReminderTexts
 import com.deutschdreamers.mensis.ui.format.Formats
 import com.deutschdreamers.mensis.ui.format.Formats.MIDDLE_DOT
 import com.deutschdreamers.mensis.ui.format.MethodLabels
@@ -35,6 +39,7 @@ data class SettingsUiState(
     val trackSummary: String,
     val contraceptionSummary: String,
     val unitsSummary: String,
+    val remindersSummary: String,
     val lockEnabled: Boolean,
     val lockAvailable: Boolean,
     val hideInRecents: Boolean,
@@ -59,7 +64,8 @@ class SettingsViewModel
                 settings.observeTracker(),
                 contraception.observePeriods(),
                 backup.status,
-            ) { prefs, tracker, periods, status ->
+                settings.observeReminders(),
+            ) { prefs, tracker, periods, status, reminders ->
                 val method = periods.activeOn(LocalDate.now(clock))
                 SettingsUiState(
                     modeSummary = modeSummary(tracker),
@@ -72,6 +78,7 @@ class SettingsViewModel
                     unitsSummary = "${Units.temperatureSymbol(
                         tracker.temperatureUnit,
                     )} $MIDDLE_DOT ${Units.weightSymbol(tracker.weightUnit)}",
+                    remindersSummary = remindersSummary(reminders, method, tracker.trackingLevel),
                     lockEnabled = prefs.lockEnabled,
                     lockAvailable = credentials.canAuthenticate(),
                     hideInRecents = prefs.hideInRecents,
@@ -89,6 +96,16 @@ class SettingsViewModel
 
         private fun updatePrefs(transform: (UiPrefs) -> UiPrefs) {
             viewModelScope.launch { settings.updateUiPrefs(transform) }
+        }
+
+        /** Only the reminders that apply to the current method and tracking level count. */
+        private fun remindersSummary(
+            config: ReminderConfig,
+            method: ContraceptionPeriod?,
+            level: TrackingLevel,
+        ): String {
+            val enabled = ReminderCatalog.available(method, level).filter { config.setting(it).enabled }
+            return ReminderTexts.summary(enabled, method)
         }
 
         private fun modeSummary(tracker: TrackerSettings): String =
