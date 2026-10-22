@@ -281,7 +281,7 @@ class DailyLogViewModel
                 injectionGiven = injectionGiven == true,
                 emergencyContraception = emergencyContraception == true,
                 sleepText = sleepMinutes?.let { formatSleepInput(it) } ?: "",
-                weightText = weightKg?.let { Formats.weight(Units.toDisplayWeight(it, settings.weightUnit)) } ?: "",
+                weightText = weightKg?.let { Formats.oneDecimal(Units.toDisplayWeight(it, settings.weightUnit)) } ?: "",
                 notes = notes ?: "",
             )
 

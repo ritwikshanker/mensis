@@ -162,6 +162,16 @@
     <string name="legend_predicted">Predicted</string>
     <string name="legend_logged">Logged</string>
 
+    <!-- Insights (design §6). The empty texts are additions the design does not draw -->
+    <string name="insights_cycle_length">Cycle length</string>
+    <string name="insights_days_mean">days, mean</string>
+    <string name="insights_period_length">Period length</string>
+    <string name="insights_luteal_phase">Luteal phase</string>
+    <string name="insights_temperature_title">Waking temperature, this cycle</string>
+    <string name="insights_recurring_symptoms">Recurring symptoms</string>
+    <string name="insights_no_cycles">Means and ranges appear after your first complete cycle, when the next period starts.</string>
+    <string name="insights_footer">Computed on this phone from your entries only. Means and ranges use the last %1$d complete cycles.</string>
+
     <!-- Settings (design §7) -->
     <string name="settings_section_cycle">Cycle</string>
     <string name="settings_section_privacy">Privacy</string>

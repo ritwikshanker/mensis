@@ -9,9 +9,12 @@ import com.deutschdreamers.mensis.domain.model.Flow
 import com.deutschdreamers.mensis.domain.model.Mood
 import com.deutschdreamers.mensis.domain.model.Regimen
 import com.deutschdreamers.mensis.domain.model.Symptom
+import com.deutschdreamers.mensis.domain.model.TemperatureUnit
 import com.deutschdreamers.mensis.domain.model.TrackerMode
 import com.deutschdreamers.mensis.domain.model.TrackerSettings
 import com.deutschdreamers.mensis.domain.model.TrackingLevel
+import com.deutschdreamers.mensis.ui.screens.insights.InsightsUiBuilder
+import com.deutschdreamers.mensis.ui.screens.insights.InsightsUiState
 import com.deutschdreamers.mensis.ui.screens.today.TodayUiBuilder
 import com.deutschdreamers.mensis.ui.screens.today.TodayUiState
 import java.time.LocalDate
@@ -104,6 +107,106 @@ object FakeData {
         val settings = settings.copy(mode = TrackerMode.PREGNANCY, pregnancyLmp = lmp)
         return today(data(emptyList(), settings = settings), lmp.plusDays(7L * 8 + 1))
     }
+
+    /** Insights fixture "today": day 17 of a cycle that started on 5 Oct 2026, as in the design. */
+    val insightsToday: LocalDate = LocalDate.of(2026, 10, 21)
+
+    private val insightLengths = listOf(29, 31, 28, 30, 27, 32, 29, 29)
+    private val insightPeriodDays = listOf(5, 4, 5, 6, 5, 5, 4, 5)
+    private val insightLuteal = listOf(null, null, 14, 13, 15, 14, 14, 13)
+    private val insightHeadache = setOf(1, 2, 3, 5, 6, 7)
+    private val insightFatigue = setOf(0, 1, 3, 5, 6)
+    private val insightFlows = listOf(Flow.MEDIUM, Flow.HEAVY, Flow.MEDIUM, Flow.LIGHT, Flow.LIGHT, Flow.LIGHT)
+    private val lowTemps =
+        listOf(36.42, 36.38, 36.45, 36.40, 36.36, 36.44, 36.41, 36.39, 36.43, 36.45, 36.40, 36.38, 36.39, 36.35)
+    private val highTemps = listOf(36.61, 36.68, 36.71, 36.66, 36.70, 36.64, 36.69)
+    private val wakingTime = LocalTime.of(6, 40)
+
+    /**
+     * The design's Insights numbers: the last [cycles] of eight complete cycles (29, 31, 28, 30, 27, 32,
+     * 29, 29 days; periods 4–6 days, heaviest on day 2; six with a temperature shift and a 13–15 day
+     * luteal phase; cramps, headache and fatigue in 8, 6 and 5 of 8 cycles) plus the open cycle on day 17
+     * of [insightsToday], whose temperatures rise from day 15.
+     */
+    fun insightsHistory(cycles: Int = insightLengths.size): List<DayEntry> {
+        val first = insightLengths.size - cycles
+        val currentStart = insightsToday.minusDays(16)
+        val starts =
+            insightLengths
+                .drop(
+                    first,
+                ).reversed()
+                .runningFold(currentStart) { d, l -> d.minusDays(l.toLong()) }
+                .reversed()
+        val days = mutableMapOf<LocalDate, DayEntry>()
+
+        fun add(
+            date: LocalDate,
+            change: (DayEntry) -> DayEntry,
+        ) {
+            days[date] = change(days[date] ?: DayEntry(date))
+        }
+        for (index in first until insightLengths.size) {
+            val start = starts[index - first]
+            val length = insightLengths[index]
+            insightFlows.take(insightPeriodDays[index]).forEachIndexed { day, flow ->
+                add(start.plusDays(day.toLong())) { it.copy(flow = flow) }
+            }
+            add(start) { it.copy(symptoms = it.symptoms + Symptom.CRAMPS) }
+            if (index in
+                insightHeadache
+            ) {
+                add(start.plusDays(length - 2L)) { it.copy(symptoms = it.symptoms + Symptom.HEADACHE) }
+            }
+            if (index in
+                insightFatigue
+            ) {
+                add(start.plusDays(length - 5L)) { it.copy(symptoms = it.symptoms + Symptom.FATIGUE) }
+            }
+            insightLuteal[index]?.let { luteal -> addTemperatures(start, length, length - luteal + 2, ::add) }
+        }
+        insightFlows.take(periodFlows.size).forEachIndexed { day, flow ->
+            add(currentStart.plusDays(day.toLong())) { it.copy(flow = flow) }
+        }
+        add(currentStart) { it.copy(symptoms = it.symptoms + Symptom.CRAMPS) }
+        addTemperatures(currentStart, 17, 15, ::add)
+        return days.values.sortedBy { it.date }
+    }
+
+    /** Readings on days 1..[through]: low before [firstHighDay], high from it. */
+    private fun addTemperatures(
+        start: LocalDate,
+        through: Int,
+        firstHighDay: Int,
+        add: (LocalDate, (DayEntry) -> DayEntry) -> Unit,
+    ) {
+        for (day in 1..through) {
+            val value =
+                if (day <
+                    firstHighDay
+                ) {
+                    lowTemps[(day - 1) % lowTemps.size]
+                } else {
+                    highTemps[(day - firstHighDay) % highTemps.size]
+                }
+            add(start.plusDays(day - 1L)) { it.copy(temperatureC = value, temperatureTime = wakingTime) }
+        }
+    }
+
+    fun insights(
+        cycles: Int = insightLengths.size,
+        trackingLevel: TrackingLevel = TrackingLevel.FULL,
+        temperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
+        contraception: List<ContraceptionPeriod> = emptyList(),
+    ): InsightsUiState =
+        InsightsUiBuilder.build(
+            data(
+                insightsHistory(cycles),
+                settings = settings.copy(trackingLevel = trackingLevel, temperatureUnit = temperatureUnit),
+                contraception = contraception,
+            ),
+            insightsToday,
+        )
 
     const val CYCLE_LENGTH: Int = 29
     private const val MINUTES_PER_HOUR = 60

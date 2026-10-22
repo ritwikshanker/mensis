@@ -23,7 +23,7 @@ import com.deutschdreamers.mensis.ui.navigation.Backup
 import com.deutschdreamers.mensis.ui.navigation.Import
 import com.deutschdreamers.mensis.ui.navigation.MensisNavKey
 import com.deutschdreamers.mensis.ui.screens.calendar.CalendarScreen
-import com.deutschdreamers.mensis.ui.screens.insights.InsightsPlaceholderScreen
+import com.deutschdreamers.mensis.ui.screens.insights.InsightsScreen
 import com.deutschdreamers.mensis.ui.screens.log.DailyLogHost
 import com.deutschdreamers.mensis.ui.screens.log.LogRequest
 import com.deutschdreamers.mensis.ui.screens.settings.SettingsScreen
@@ -82,7 +82,7 @@ fun MainScreen(
                             viewModel = hiltViewModel(),
                             onLog = { date -> logRequest = LogRequest(date) },
                         )
-                    MainTab.INSIGHTS -> InsightsPlaceholderScreen()
+                    MainTab.INSIGHTS -> InsightsScreen(viewModel = hiltViewModel())
                     MainTab.SETTINGS -> SettingsScreen(viewModel = hiltViewModel(), onNavigate = onNavigate)
                 }
             }

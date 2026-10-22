@@ -15,6 +15,12 @@ class UnitsTest {
     }
 
     @Test
+    fun `a temperature rise converts without the offset`() {
+        assertEquals(0.54, Units.toDisplayTemperatureDelta(0.3, TemperatureUnit.FAHRENHEIT), 0.0001)
+        assertEquals(0.3, Units.toDisplayTemperatureDelta(0.3, TemperatureUnit.CELSIUS), 0.0)
+    }
+
+    @Test
     fun `weight converts both ways and storage stays kilograms`() {
         assertEquals(136.2, Units.toDisplayWeight(61.8, WeightUnit.POUND), 0.0001)
         assertEquals(61.8, Units.toKilograms(136.2, WeightUnit.POUND), 0.0001)

@@ -113,8 +113,8 @@ object Formats {
     /** "36.71" with two decimals in the English locale (dot separator, as the design shows). */
     fun temperature(value: Double): String = String.format(locale, "%.2f", value)
 
-    /** "61.8" */
-    fun weight(value: Double): String = String.format(locale, "%.1f", value)
+    /** "61.8" (a weight), "1.6" (a standard deviation): one decimal in the English locale. */
+    fun oneDecimal(value: Double): String = String.format(locale, "%.1f", value)
 
     /** Ordinal "1st", "2nd", "3rd". */
     fun ordinal(n: Int): String = ORDINALS.getOrNull(n - 1) ?: "${n}th"

@@ -17,6 +17,7 @@ import com.deutschdreamers.mensis.data.importer.ParsedImport
 import com.deutschdreamers.mensis.data.importer.RestoreResult
 import com.deutschdreamers.mensis.data.importer.SkipReason
 import com.deutschdreamers.mensis.data.importer.SkippedRow
+import com.deutschdreamers.mensis.domain.model.TrackingLevel
 import com.deutschdreamers.mensis.ui.screens.backup.BackupActions
 import com.deutschdreamers.mensis.ui.screens.backup.BackupContent
 import com.deutschdreamers.mensis.ui.screens.backup.BackupDraft
@@ -26,6 +27,8 @@ import com.deutschdreamers.mensis.ui.screens.export.ExportUiState
 import com.deutschdreamers.mensis.ui.screens.importer.ImportContent
 import com.deutschdreamers.mensis.ui.screens.importer.ImportStep
 import com.deutschdreamers.mensis.ui.screens.importer.ImportUiState
+import com.deutschdreamers.mensis.ui.screens.insights.InsightsScreenContent
+import com.deutschdreamers.mensis.ui.screens.insights.InsightsUiState
 import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingContent
 import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingDraft
 import com.deutschdreamers.mensis.ui.screens.restore.RestoreActions
@@ -81,6 +84,32 @@ private fun TodaySuppressedPreview() = TodayPreview(FakeData.suppressed())
 @PreviewLightDark
 @Composable
 private fun TodayPregnancyPreview() = TodayPreview(FakeData.pregnancy())
+
+@Composable
+private fun InsightsPreview(state: InsightsUiState) {
+    MensisTheme { InsightsScreenContent(state) }
+}
+
+@PreviewLightDark
+@Composable
+private fun InsightsEightCyclesPreview() = InsightsPreview(FakeData.insights())
+
+@Preview(fontScale = 2.0f)
+@Composable
+private fun InsightsLargeTextPreview() = InsightsPreview(FakeData.insights())
+
+@PreviewLightDark
+@Composable
+private fun InsightsOneCyclePreview() = InsightsPreview(FakeData.insights(cycles = 1))
+
+@PreviewLightDark
+@Composable
+private fun InsightsNoCyclePreview() = InsightsPreview(FakeData.insights(cycles = 0))
+
+@PreviewLightDark
+@Composable
+private fun InsightsWithoutTemperaturePreview() =
+    InsightsPreview(FakeData.insights(trackingLevel = TrackingLevel.SYMPTOMS))
 
 @PreviewLightDark
 @Composable

@@ -16,6 +16,8 @@ class FormatsTest {
         assertEquals("21 Oct", Formats.dayMonth(date))
         assertEquals("21 Oct 2026", Formats.dayMonthYear(date))
         assertEquals("Oct 2026", Formats.monthYear(date))
+        assertEquals("1.6", Formats.oneDecimal(1.598))
+        assertEquals("29.0", Formats.oneDecimal(29.0))
         assertEquals("October 2026", Formats.fullMonthYear(date))
         assertEquals("Wednesday 21 October", Formats.spokenDate(date))
         assertEquals("06:40", Formats.time(LocalTime.of(6, 40)))
@@ -73,7 +75,7 @@ class FormatsTest {
         assertEquals("1 cycle", Formats.cycles(1))
         assertEquals("8 cycles", Formats.cycles(8))
         assertEquals("36.71", Formats.temperature(36.71))
-        assertEquals("61.8", Formats.weight(61.8))
+        assertEquals("61.8", Formats.oneDecimal(61.8))
         assertEquals("1st", Formats.ordinal(1))
         assertEquals("3rd", Formats.ordinal(3))
     }

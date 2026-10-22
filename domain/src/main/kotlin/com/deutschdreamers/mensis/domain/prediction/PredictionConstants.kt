@@ -187,6 +187,9 @@ object PredictionConstants {
     /** Today's strip shows at least this many days. */
     const val STRIP_MIN_DAYS: Int = 32
 
+    /** Symptom patterns are looked for only once at least this many complete cycles exist. */
+    const val SYMPTOM_PATTERN_MIN_CYCLES: Int = 2
+
     /** A symptom pattern is reported when it occurs in at least this fraction of the considered cycles. */
     const val SYMPTOM_PATTERN_MIN_FRACTION: Double = 0.5
 

@@ -1,9 +1,13 @@
 package com.deutschdreamers.mensis.domain.insights
 
+import com.deutschdreamers.mensis.domain.bbt.TemperatureReading
+import com.deutschdreamers.mensis.domain.bbt.TemperatureShift
+import com.deutschdreamers.mensis.domain.bbt.TemperatureShiftDetector
 import com.deutschdreamers.mensis.domain.cycle.Cycle
 import com.deutschdreamers.mensis.domain.model.DateRange
 import com.deutschdreamers.mensis.domain.model.DayEntry
 import com.deutschdreamers.mensis.domain.model.Symptom
+import com.deutschdreamers.mensis.domain.model.daysUntil
 import com.deutschdreamers.mensis.domain.prediction.ConfirmedOvulation
 import com.deutschdreamers.mensis.domain.prediction.PredictionConstants
 import java.time.LocalDate
@@ -29,8 +33,23 @@ data class PeriodLengthStats(
     val mean: Double,
     val min: Int,
     val max: Int,
-    /** 1-based period day on which flow was heaviest most often, or null without flow detail. */
+    /**
+     * 1-based period day on which flow was heaviest most often, or null without flow detail. A period
+     * counts only when one day's flow is heavier than every other day's.
+     */
     val peakFlowDay: Int?,
+)
+
+/**
+ * Waking temperatures of one cycle (oldest first) and the shift the 3-over-6 rule finds in them.
+ * [heldDays] counts the days from the first elevated reading to the last valid reading of the run
+ * that stays above the coverline.
+ */
+data class CycleTemperatures(
+    val cycle: Cycle,
+    val readings: List<TemperatureReading>,
+    val shift: TemperatureShift?,
+    val heldDays: Int,
 )
 
 data class LutealStats(
@@ -52,11 +71,17 @@ data class SymptomPattern(
 }
 
 object InsightsCalculator {
+    /** The complete cycles Insights describes: the last [window], oldest first. */
+    fun windowCycles(
+        cycles: List<Cycle>,
+        window: Int = PredictionConstants.INSIGHTS_WINDOW_CYCLES,
+    ): List<Cycle> = cycles.filter { it.isComplete }.takeLast(window)
+
     fun cycleLengths(
         cycles: List<Cycle>,
         window: Int = PredictionConstants.INSIGHTS_WINDOW_CYCLES,
     ): CycleLengthStats? {
-        val complete = cycles.filter { it.isComplete }.takeLast(window)
+        val complete = windowCycles(cycles, window)
         val lengths = complete.mapNotNull { it.lengthDays }
         if (lengths.isEmpty()) return null
         val mean = lengths.average()
@@ -69,14 +94,16 @@ object InsightsCalculator {
         entries: List<DayEntry>,
         window: Int = PredictionConstants.INSIGHTS_WINDOW_CYCLES,
     ): PeriodLengthStats? {
-        val complete = cycles.filter { it.isComplete }.takeLast(window)
+        val complete = windowCycles(cycles, window)
         if (complete.isEmpty()) return null
         val lengths = complete.map { it.periodLengthDays }
         val peakDays =
             complete.mapNotNull { cycle ->
-                entries
-                    .filter { it.date in cycle.periodRange && it.isBleedingDay }
-                    .maxByOrNull { it.flow?.ordinal ?: 0 }
+                val bleeding = entries.filter { it.date in cycle.periodRange && it.isBleedingDay }
+                val heaviest = bleeding.maxOfOrNull { it.flow?.ordinal ?: 0 }
+                bleeding
+                    .filter { (it.flow?.ordinal ?: 0) == heaviest }
+                    .singleOrNull()
                     ?.let { cycle.dayOf(it.date) }
             }
         val peak =
@@ -101,8 +128,8 @@ object InsightsCalculator {
         window: Int = PredictionConstants.INSIGHTS_WINDOW_CYCLES,
         limit: Int = DEFAULT_PATTERN_LIMIT,
     ): List<SymptomPattern> {
-        val complete = cycles.filter { it.isComplete }.takeLast(window)
-        if (complete.size < MIN_CYCLES_FOR_PATTERNS) return emptyList()
+        val complete = windowCycles(cycles, window)
+        if (complete.size < PredictionConstants.SYMPTOM_PATTERN_MIN_CYCLES) return emptyList()
         val byDate = entries.associateBy { it.date }
         val patterns =
             Symptom.entries.flatMap { symptom ->
@@ -121,6 +148,26 @@ object InsightsCalculator {
             .filter { it.cyclesWith > 0 && it.fraction >= PredictionConstants.SYMPTOM_PATTERN_MIN_FRACTION }
             .sortedWith(compareByDescending<SymptomPattern> { it.fraction }.thenBy { it.phase }.thenBy { it.symptom })
             .take(limit)
+    }
+
+    /** The readings of [cycle] and its shift, found the same way the prediction engine finds it. */
+    fun temperatures(
+        cycle: Cycle,
+        entries: List<DayEntry>,
+    ): CycleTemperatures {
+        val inCycle = entries.filter { it.date in cycle }
+        val readings = inCycle.mapNotNull { TemperatureReading.from(it) }.sortedBy { it.date }
+        val shift = TemperatureShiftDetector.detect(readings)
+        val held =
+            shift?.let { found ->
+                val run =
+                    readings
+                        .filterNot { it.isLate }
+                        .dropWhile { it.date.isBefore(found.firstElevatedDate) }
+                        .takeWhile { it.temperatureC > found.coverlineC }
+                found.firstElevatedDate.daysUntil(run.last().date) + 1
+            } ?: 0
+        return CycleTemperatures(cycle, readings, shift, held)
     }
 
     private fun bucketRange(
@@ -153,5 +200,4 @@ object InsightsCalculator {
     }
 
     private const val DEFAULT_PATTERN_LIMIT = 3
-    private const val MIN_CYCLES_FOR_PATTERNS = 2
 }

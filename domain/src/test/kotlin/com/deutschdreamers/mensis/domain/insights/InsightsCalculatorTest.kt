@@ -3,6 +3,7 @@ package com.deutschdreamers.mensis.domain.insights
 import com.deutschdreamers.mensis.domain.Synthetic
 import com.deutschdreamers.mensis.domain.cycle.CycleDeriver
 import com.deutschdreamers.mensis.domain.model.DayEntry
+import com.deutschdreamers.mensis.domain.model.Flow
 import com.deutschdreamers.mensis.domain.model.Symptom
 import com.deutschdreamers.mensis.domain.prediction.ConfirmedOvulation
 import com.deutschdreamers.mensis.domain.prediction.OvulationSource
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.time.LocalTime
 
 class InsightsCalculatorTest {
     private val lengths = listOf(29, 31, 28, 30, 27, 32, 29, 29)
@@ -41,6 +43,53 @@ class InsightsCalculatorTest {
         assertEquals(5, stats.min)
         assertEquals(5, stats.max)
         assertEquals(2, stats.peakFlowDay)
+    }
+
+    @Test
+    fun `periods without one heaviest day give no peak`() {
+        val even = Synthetic.cyclesWithLengths(lengths = listOf(29, 29, 29)).map { it.copy(flow = Flow.MEDIUM) }
+        val tied = Synthetic.cyclesWithLengths(lengths = listOf(29, 29, 29)).map { it.copy(flow = Flow.HEAVY) }
+        for (history in listOf(even, tied)) {
+            val stats = checkNotNull(InsightsCalculator.periodLengths(CycleDeriver.derive(history), history))
+            assertNull(stats.peakFlowDay)
+            assertEquals(5.0, stats.mean, 1e-9)
+        }
+    }
+
+    @Test
+    fun `this cycle's temperatures carry the shift and how long it held`() {
+        val history = Synthetic.cyclesWithLengths(lengths = listOf(29))
+        val start = Synthetic.lastStart(history)
+        val temps = Synthetic.temperatures(start, lowDays = 14, highDays = 4)
+        val late = DayEntry(start.plusDays(18), temperatureC = 36.30, temperatureTime = LocalTime.of(10, 0))
+        val all = Synthetic.merge(history, temps, listOf(late))
+        val current = CycleDeriver.derive(all).last()
+        val result = InsightsCalculator.temperatures(current, all)
+        assertEquals(19, result.readings.size)
+        val shift = checkNotNull(result.shift)
+        assertEquals(start.plusDays(14), shift.firstElevatedDate)
+        assertEquals(36.40, shift.coverlineC, 1e-9)
+        assertEquals(4, result.heldDays)
+    }
+
+    @Test
+    fun `a flat temperature curve has no shift`() {
+        val history = Synthetic.cyclesWithLengths(lengths = listOf(29))
+        val start = Synthetic.lastStart(history)
+        val all = Synthetic.merge(history, Synthetic.temperatures(start, lowDays = 12, highDays = 0))
+        val result = InsightsCalculator.temperatures(CycleDeriver.derive(all).last(), all)
+        assertEquals(12, result.readings.size)
+        assertNull(result.shift)
+        assertEquals(0, result.heldDays)
+    }
+
+    @Test
+    fun `window cycles are the last complete ones`() {
+        val many = CycleDeriver.derive(Synthetic.cyclesWithLengths(lengths = List(10) { 28 }))
+        val window = InsightsCalculator.windowCycles(many)
+        assertEquals(8, window.size)
+        assertTrue(window.all { it.isComplete })
+        assertEquals(many[many.size - 2], window.last())
     }
 
     @Test

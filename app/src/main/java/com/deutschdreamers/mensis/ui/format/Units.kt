@@ -21,6 +21,16 @@ object Units {
             TemperatureUnit.FAHRENHEIT -> round2(celsius * F_SCALE + F_OFFSET)
         }
 
+    /** A temperature difference (a rise), so no offset: 0.3 °C is 0.54 °F. */
+    fun toDisplayTemperatureDelta(
+        celsius: Double,
+        unit: TemperatureUnit,
+    ): Double =
+        when (unit) {
+            TemperatureUnit.CELSIUS -> celsius
+            TemperatureUnit.FAHRENHEIT -> round2(celsius * F_SCALE)
+        }
+
     fun toCelsius(
         display: Double,
         unit: TemperatureUnit,

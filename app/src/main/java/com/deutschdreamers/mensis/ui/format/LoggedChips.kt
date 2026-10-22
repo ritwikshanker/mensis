@@ -74,7 +74,7 @@ object LoggedChips {
                 val shown = Units.toDisplayWeight(kg, settings.weightUnit)
                 ValueChipUi(
                     R.drawable.ms_monitor_weight,
-                    "${Formats.weight(shown)} ${Units.weightSymbol(settings.weightUnit)}",
+                    "${Formats.oneDecimal(shown)} ${Units.weightSymbol(settings.weightUnit)}",
                 )
             },
             ValueChipUi(R.drawable.ms_draft, "Note").takeIf { !entry.notes.isNullOrBlank() },
@@ -110,7 +110,7 @@ object LoggedChips {
             Symptom.NAUSEA -> "Nausea"
         }
 
-    private fun symptomIcon(symptom: Symptom): Int =
+    fun symptomIcon(symptom: Symptom): Int =
         when (symptom) {
             Symptom.CRAMPS, Symptom.BACK_PAIN -> R.drawable.ms_bolt
             Symptom.FATIGUE -> R.drawable.ms_battery_low
