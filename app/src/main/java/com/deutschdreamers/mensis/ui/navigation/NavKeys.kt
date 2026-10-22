@@ -30,9 +30,21 @@ data object Export : MensisNavKey
 @Serializable
 data object Import : MensisNavKey
 
+/** Settings → Backup (design §11); [reconnect] opens Google's reconnect screen at once (Today's banner). */
+@Serializable
+data class Backup(
+    val reconnect: Boolean = false,
+) : MensisNavKey
+
+/** Restore from a Drive backup (design §12), from onboarding step 1 or from Backup. */
+@Serializable
+data class Restore(
+    val fromOnboarding: Boolean,
+) : MensisNavKey
+
 /** Screens that arrive in later build steps; their Settings rows already navigate somewhere. */
 @Serializable
-enum class LaterScreen { MODE, UNITS, REMINDERS, BACKUP, RESTORE, REPORT, DELETE_ALL, THEME, ABOUT }
+enum class LaterScreen { MODE, UNITS, REMINDERS, REPORT, DELETE_ALL, THEME, ABOUT }
 
 @Serializable
 data class ComingSoon(

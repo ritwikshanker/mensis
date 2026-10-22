@@ -28,6 +28,7 @@ import com.deutschdreamers.mensis.ui.components.RadioRow
 import com.deutschdreamers.mensis.ui.components.SectionHeader
 import com.deutschdreamers.mensis.ui.components.SettingsRow
 import com.deutschdreamers.mensis.ui.components.SwitchRow
+import com.deutschdreamers.mensis.ui.navigation.Backup
 import com.deutschdreamers.mensis.ui.navigation.ComingSoon
 import com.deutschdreamers.mensis.ui.navigation.Contraception
 import com.deutschdreamers.mensis.ui.navigation.Export
@@ -125,7 +126,7 @@ fun SettingsScreenContent(
             )
             SectionHeader(stringResource(R.string.settings_section_data))
             SettingsRow(R.drawable.ms_cloud_upload, stringResource(R.string.settings_backup), state.backupSummary) {
-                onNavigate(ComingSoon(LaterScreen.BACKUP))
+                onNavigate(Backup())
             }
             SettingsRow(
                 R.drawable.ms_download,

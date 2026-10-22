@@ -20,7 +20,7 @@ no analytics, no ads. Optional encrypted backup to your own Google Drive.
 - Predictions are statistics about your own history. Mensis is not a medical device and is not a method
   of contraception.
 
-The threat model is described in `PRIVACY.md` (written in build step 3). The export and import formats
+The threat model is described in [`PRIVACY.md`](PRIVACY.md). The export and import formats
 are documented in [`docs/export-format.md`](docs/export-format.md), with a JSON Schema in
 [`docs/mensis-export.schema.json`](docs/mensis-export.schema.json).
 
@@ -34,6 +34,11 @@ platform 37. Then:
 ./gradlew check                # ktlint, detekt, lint, unit tests
 ./gradlew connectedCheck       # instrumented tests on a connected device or emulator
 ```
+
+Google Drive backup needs an OAuth web client ID from your own Google Cloud project, set as
+`mensis.googleWebClientId` in `~/.gradle/gradle.properties`; [`GOOGLE_CLOUD_SETUP.md`](GOOGLE_CLOUD_SETUP.md)
+walks through it. Without it the app builds and works, and the Backup screen says Drive backup is not
+configured in this build.
 
 The bundled fonts and Material Symbols icons are not kept in the repository: the first build downloads
 them from Google Fonts and google/material-design-icons into `app/build/generated/designAssets` (the

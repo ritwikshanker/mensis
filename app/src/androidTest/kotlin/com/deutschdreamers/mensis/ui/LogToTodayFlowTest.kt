@@ -73,7 +73,7 @@ class LogToTodayFlowTest {
         contraception = ContraceptionRepository(holder, clock)
         val settings = SettingsRepository(holder, UiPrefsStore(context), clock)
         trackerData = TrackerDataRepository(dayEntries, settings, contraception)
-        todayViewModel = TodayViewModel(trackerData, NoBackupStatusSource, clock)
+        todayViewModel = TodayViewModel(trackerData, NoBackupStatusSource, {}, clock)
         logViewModel = DailyLogViewModel(trackerData, dayEntries)
         calendarViewModel = CalendarViewModel(trackerData, dayEntries, clock)
     }
@@ -111,7 +111,7 @@ class LogToTodayFlowTest {
                         viewModel = todayViewModel,
                         onLog = {},
                         onImport = {},
-                        onBackupAction = {},
+                        onOpenBackup = {},
                         onMethodSettings = {},
                     )
                 }

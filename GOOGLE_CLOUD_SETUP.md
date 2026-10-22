@@ -1,0 +1,102 @@
+# Google Cloud setup for Drive backup
+
+Drive backup needs an OAuth configuration in a Google Cloud project owned by whoever builds and
+publishes the app. Without it the app builds and runs normally; the Backup screen then says that Drive
+backup is not configured in this build, and export and import keep working.
+
+What Mensis asks Google for:
+
+- **Sign in with Google** (Credential Manager) to pick the account. Mensis reads the e-mail address
+  from the returned credential and sends the credential nowhere.
+- **One scope, `https://www.googleapis.com/auth/drive.appdata`**: Drive's hidden app-data folder. The
+  app cannot see or change any other file in the user's Drive, and the folder is not visible in the
+  Drive UI.
+- Calls to the **Google Drive API v3** to list, upload, download and delete files in that folder.
+
+Console menu names change from time to time; the steps below name what to look for.
+
+## 1. Project and API
+
+1. Create a project at <https://console.cloud.google.com/> (for example "Mensis").
+2. APIs & Services → Library → **Google Drive API** → Enable.
+
+## 2. OAuth consent screen
+
+In APIs & Services → OAuth consent screen (shown as "Google Auth Platform" in newer consoles):
+
+1. **Branding**: app name `Mensis`, a user-support e-mail, a developer contact e-mail, the home page
+   (the GitHub repository or the GitHub Pages site) and the **privacy policy URL** (the GitHub Pages
+   privacy policy, build step 11). Leave the logo empty unless you want to go through brand review
+   for it.
+2. **Audience**: user type **External**. While the app is in *Testing*, add the Google accounts that
+   may sign in as test users.
+3. **Data access**: add the scope `.../auth/drive.appdata` ("See, create, and delete its own
+   configuration data in your Google Drive"). No other scope is needed. The page shows how Google
+   classifies each scope (non-sensitive, sensitive, restricted); check it there, because that decides
+   what review publishing needs.
+
+## 3. OAuth clients
+
+Credentials → Create credentials → OAuth client ID, three times at most:
+
+| Client type | For | Values |
+|---|---|---|
+| Android | debug builds | package `com.deutschdreamers.mensis`, SHA-1 of the debug keystore |
+| Android | Play and GitHub-release builds | package `com.deutschdreamers.mensis`, SHA-1 of the **app signing key** |
+| Web application | the build | name e.g. "Mensis sign-in"; no origins or redirect URIs |
+
+- Debug SHA-1, from the standard debug keystore:
+
+  ```
+  keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android
+  ```
+
+  or `./gradlew :app:signingReport`. Every machine that builds debug APKs for testing has its own
+  debug keystore unless you share one; add one Android client per debug keystore you use.
+- Release SHA-1: Google Play re-signs uploads with the **app signing key**, so use that certificate's
+  SHA-1 from Play Console (Test and release → App integrity → App signing), not the upload key's.
+  GitHub-release APKs are signed locally with the same app signing key (RELEASING.md, build step 11),
+  so the one Android client covers both.
+- Android clients have no secret. They tie the package name and signing certificate to the project;
+  a build signed with any other key cannot get a token.
+- The **web client ID** is what the build needs: Credential Manager's "Sign in with Google" asks for a
+  server client ID even though Mensis has no server. It is a public value, not a secret. Do not create
+  or download a client secret for it; Mensis never uses one.
+
+## 4. Put the web client ID into the build
+
+The ID looks like `123456789012-abc123def456.apps.googleusercontent.com`. It is read by
+`backup-drive/build.gradle.kts`:
+
+- Locally: add to `~/.gradle/gradle.properties` (outside the repository)
+
+  ```
+  mensis.googleWebClientId=123456789012-abc123def456.apps.googleusercontent.com
+  ```
+
+  or pass `-Pmensis.googleWebClientId=…` on the command line.
+- In CI: set the environment variable `MENSIS_GOOGLE_WEB_CLIENT_ID` for the release workflow (build
+  step 11 wires it to a repository variable).
+
+Builds without it report Drive backup as "not configured in this build".
+
+## 5. Publish
+
+While the consent screen is in *Testing*, only the listed test users can sign in, Google shows an
+"unverified app" notice, and Google may limit how long a grant lasts, so test devices may be asked to
+reconnect (Mensis then shows "Google account needs reconnecting" and posts a notification). Before
+release, publish the app (Audience → Publish app). Whether Google requires verification depends on the
+scope classification shown on the Data access page and on the branding you set; follow the
+console's prompts and Google's current OAuth verification help pages.
+
+## 6. Check it works
+
+1. Install a debug build made with the web client ID set.
+2. Settings → Backup → Turn on backup → Continue with Google: the account sheet appears, then a
+   consent screen naming Mensis and "its own configuration data in your Google Drive".
+3. Choose a password; "Backing up…" turns into "Backed up just now".
+4. On another phone or after Delete all data: onboarding → Restore from backup finds the backup.
+
+If the account sheet never appears or sign-in fails at once, compare the installed build's package
+name and signing SHA-1 with the Android OAuth clients, and check that the web client ID belongs to the
+same project. Users can see and remove Mensis's access at <https://myaccount.google.com/permissions>.

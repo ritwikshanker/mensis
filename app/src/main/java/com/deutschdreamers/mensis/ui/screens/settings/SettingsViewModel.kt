@@ -100,6 +100,7 @@ class SettingsViewModel
         private fun backupSummary(status: BackupStatus): String =
             when (status) {
                 BackupStatus.Off -> "Off"
+                BackupStatus.Unavailable -> "Not available"
                 is BackupStatus.Idle ->
                     "Encrypted $MIDDLE_DOT Google Drive" +
                         (

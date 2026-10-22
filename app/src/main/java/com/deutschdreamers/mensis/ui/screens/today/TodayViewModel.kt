@@ -3,6 +3,7 @@ package com.deutschdreamers.mensis.ui.screens.today
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.deutschdreamers.mensis.data.backup.BackupStatusSource
+import com.deutschdreamers.mensis.data.backup.BackupTrigger
 import com.deutschdreamers.mensis.data.repo.TrackerDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ class TodayViewModel
     constructor(
         trackerData: TrackerDataRepository,
         backup: BackupStatusSource,
+        private val backupTrigger: BackupTrigger,
         private val clock: Clock,
     ) : ViewModel() {
         private val today = MutableStateFlow(LocalDate.now(clock))
@@ -31,6 +33,9 @@ class TodayViewModel
                 TodayUiBuilder.build(data, date, status)
             }.flowOn(Dispatchers.Default)
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), null)
+
+        /** Banner "Retry" / "Back up now". */
+        fun backUpNow() = backupTrigger.backUpNow()
 
         /** Called when the screen resumes so a day change while in the background is picked up. */
         fun refreshToday() {

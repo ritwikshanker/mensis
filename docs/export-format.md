@@ -138,6 +138,11 @@ through salt) are the GCM associated data, so changing any header byte makes dec
 password and a modified file fail in the same way; a file too short to hold a header and tag is reported
 as damaged. The password is never stored; without it the file cannot be opened, by anyone.
 
+A Drive backup (`mensis-backup.enc` in the account's hidden app-data folder) is this container around the
+complete JSON export. All backups made with one password share its salt, because Mensis keeps the derived
+key (wrapped in the Android Keystore) so scheduled backups need no password; each file still has its own
+random nonce. Changing the backup password creates a new salt and key.
+
 To read an encrypted export without Mensis, for example with Python and the `argon2-cffi` and
 `cryptography` packages:
 

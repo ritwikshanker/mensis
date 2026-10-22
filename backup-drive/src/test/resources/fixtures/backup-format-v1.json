@@ -1,0 +1,106 @@
+{
+    "format": "mensis-export",
+    "formatVersion": 1,
+    "schemaVersion": 1,
+    "exportedAt": "2026-10-01T21:14:00Z",
+    "app": {
+        "versionName": "0.1.0",
+        "versionCode": 1
+    },
+    "settings": {
+        "trackingLevel": "full",
+        "goal": "track_cycle",
+        "mode": "cycle",
+        "typicalCycleLength": 28,
+        "typicalPeriodLength": 4,
+        "temperatureUnit": "celsius",
+        "weightUnit": "kilogram",
+        "reminders": {
+            "period": {
+                "enabled": true,
+                "lead": 2
+            }
+        },
+        "discreetWording": true,
+        "createdAt": "2026-07-01T08:00:00Z",
+        "updatedAt": "2026-07-01T08:00:00Z"
+    },
+    "uiPrefs": {
+        "theme": "sage",
+        "appearance": "dark",
+        "lockEnabled": true,
+        "hideInRecents": false,
+        "relockTimeoutMinutes": 5
+    },
+    "contraceptionPeriods": [
+        {
+            "id": "fixture-p1",
+            "method": "copper_iud",
+            "startDate": "2025-03-01",
+            "replaceByDate": "2035-03-01",
+            "createdAt": "2026-07-01T08:00:00Z",
+            "updatedAt": "2026-07-01T08:00:00Z"
+        }
+    ],
+    "dayEntries": [
+        {
+            "id": "fixture-d1",
+            "date": "2026-08-03",
+            "flow": "heavy",
+            "symptoms": [
+                "cramps"
+            ],
+            "createdAt": "2026-08-03T07:00:00Z",
+            "updatedAt": "2026-08-03T07:00:00Z"
+        },
+        {
+            "id": "fixture-d2",
+            "date": "2026-08-04",
+            "flow": "medium",
+            "temperatureC": 36.42,
+            "temperatureTime": "06:40",
+            "createdAt": "2026-08-04T07:00:00Z",
+            "updatedAt": "2026-08-04T07:00:00Z"
+        },
+        {
+            "id": "fixture-d3",
+            "date": "2026-08-05",
+            "flow": "light",
+            "moods": [
+                "calm"
+            ],
+            "notes": "synthetic note",
+            "createdAt": "2026-08-05T07:00:00Z",
+            "updatedAt": "2026-08-05T07:00:00Z"
+        },
+        {
+            "id": "fixture-d4",
+            "date": "2026-08-20",
+            "createdAt": "2026-08-20T07:00:00Z",
+            "updatedAt": "2026-08-21T07:00:00Z",
+            "deletedAt": "2026-08-21T07:00:00Z"
+        },
+        {
+            "id": "fixture-d5",
+            "date": "2026-08-31",
+            "flow": "heavy",
+            "createdAt": "2026-08-31T07:00:00Z",
+            "updatedAt": "2026-08-31T07:00:00Z"
+        },
+        {
+            "id": "fixture-d6",
+            "date": "2026-09-01",
+            "flow": "medium",
+            "weightKg": 61.5,
+            "createdAt": "2026-09-01T07:00:00Z",
+            "updatedAt": "2026-09-01T07:00:00Z"
+        },
+        {
+            "id": "fixture-d7",
+            "date": "2026-09-28",
+            "flow": "medium",
+            "createdAt": "2026-09-28T07:00:00Z",
+            "updatedAt": "2026-09-28T07:00:00Z"
+        }
+    ]
+}

@@ -15,7 +15,26 @@ class DamagedContainerException(
 ) : Exception(message, cause)
 
 /**
- * Password-encrypted file format shared by exports and (from build step 6) Drive backups:
+ * An Argon2id-derived AES-256 key together with the salt and parameters it was derived with, which
+ * go into the header of every file it seals. [bytes] is secret; [destroy] overwrites it.
+ */
+class ContainerKey(
+    val bytes: ByteArray,
+    val salt: ByteArray,
+    val params: KdfParams,
+) {
+    init {
+        require(bytes.size == Argon2Kdf.KEY_BYTES) { "key must be ${Argon2Kdf.KEY_BYTES} bytes" }
+        require(salt.size == EncryptedContainer.SALT_BYTES) { "salt must be ${EncryptedContainer.SALT_BYTES} bytes" }
+    }
+
+    fun destroy() {
+        bytes.fill(0)
+    }
+}
+
+/**
+ * Password-encrypted file format shared by exports and Drive backups:
  *
  * `magic "MENSISBK" (8) ‖ version (1) ‖ kdf = 1, Argon2id (1) ‖ memory KiB (4) ‖ iterations (4) ‖
  * parallelism (1) ‖ salt (16) ‖ nonce (12) ‖ AES-256-GCM(gzip(payload)) with its 16-byte tag`
@@ -44,14 +63,24 @@ object EncryptedContainer {
         password: CharArray,
         params: KdfParams = KdfParams.DEFAULT,
     ): ByteArray {
-        val salt = ByteArray(SALT_BYTES).also(random::nextBytes)
-        val header = header(params, salt)
-        val key = Argon2Kdf.derive(password, salt, params)
+        val key = deriveKey(password, params)
         try {
-            return header + AesGcm.encrypt(key, gzip(payload), header)
+            return seal(payload, key)
         } finally {
-            key.fill(0)
+            key.destroy()
         }
+    }
+
+    /**
+     * Seals with a key derived earlier, so a scheduled backup needs no password. Every file sealed
+     * with the same key shares its salt; the GCM nonce is still random per file.
+     */
+    fun seal(
+        payload: ByteArray,
+        key: ContainerKey,
+    ): ByteArray {
+        val header = header(key.params, key.salt)
+        return header + AesGcm.encrypt(key.bytes, gzip(payload), header)
     }
 
     /** @throws AuthenticationFailedException wrong password or altered ciphertext. */
@@ -59,16 +88,44 @@ object EncryptedContainer {
         container: ByteArray,
         password: CharArray,
     ): ByteArray {
-        val (params, salt) = readHeader(container)
+        val key = keyFor(container, password)
+        try {
+            return open(container, key)
+        } finally {
+            key.destroy()
+        }
+    }
+
+    /** @throws AuthenticationFailedException the key does not belong to this file, or the file was altered. */
+    fun open(
+        container: ByteArray,
+        key: ContainerKey,
+    ): ByteArray {
+        readHeader(container)
         val header = container.copyOfRange(0, HEADER_BYTES)
-        val key = Argon2Kdf.derive(password, salt, params)
-        val compressed =
-            try {
-                AesGcm.decrypt(key, container.copyOfRange(HEADER_BYTES, container.size), header)
-            } finally {
-                key.fill(0)
-            }
+        val compressed = AesGcm.decrypt(key.bytes, container.copyOfRange(HEADER_BYTES, container.size), header)
         return gunzip(compressed)
+    }
+
+    /** A new key from [password] with a fresh random salt. Slow by design (Argon2id). */
+    fun deriveKey(
+        password: CharArray,
+        params: KdfParams = KdfParams.DEFAULT,
+    ): ContainerKey {
+        val salt = ByteArray(SALT_BYTES).also(random::nextBytes)
+        return ContainerKey(Argon2Kdf.derive(password, salt, params), salt, params)
+    }
+
+    /**
+     * The key [password] gives for this file, using the salt and parameters in its header. Restore keeps
+     * it so later backups are sealed under the same password without asking for it again.
+     */
+    fun keyFor(
+        container: ByteArray,
+        password: CharArray,
+    ): ContainerKey {
+        val (params, salt) = readHeader(container)
+        return ContainerKey(Argon2Kdf.derive(password, salt, params), salt, params)
     }
 
     /** The KDF parameters and salt, after checking everything that can be checked without the password. */

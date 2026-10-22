@@ -19,9 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.deutschdreamers.mensis.ui.components.MsIcon
-import com.deutschdreamers.mensis.ui.navigation.ComingSoon
+import com.deutschdreamers.mensis.ui.navigation.Backup
 import com.deutschdreamers.mensis.ui.navigation.Import
-import com.deutschdreamers.mensis.ui.navigation.LaterScreen
 import com.deutschdreamers.mensis.ui.navigation.MensisNavKey
 import com.deutschdreamers.mensis.ui.screens.calendar.CalendarScreen
 import com.deutschdreamers.mensis.ui.screens.insights.InsightsPlaceholderScreen
@@ -75,7 +74,7 @@ fun MainScreen(
                             viewModel = hiltViewModel(),
                             onLog = { request -> logRequest = request },
                             onImport = { onNavigate(Import) },
-                            onBackupAction = { onNavigate(ComingSoon(LaterScreen.BACKUP)) },
+                            onOpenBackup = { reconnect -> onNavigate(Backup(reconnect = reconnect)) },
                             onMethodSettings = { onNavigate(com.deutschdreamers.mensis.ui.navigation.Contraception) },
                         )
                     MainTab.CALENDAR ->

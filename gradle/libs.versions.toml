@@ -81,11 +81,19 @@ androidx-biometric = { group = "androidx.biometric", name = "biometric", version
 # AppCompat — already pulled in by androidx.biometric; declared so the activity theme can extend Theme.AppCompat, which the
 # biometric library's fingerprint dialog on Android 8.x requires (it is an AppCompat AlertDialog)
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-# Google sign-in / Drive REST over OkHttp — only in :backup-drive, only for the optional encrypted backup
+# Google sign-in / Drive REST over OkHttp — only in :backup-drive, only for the optional encrypted backup.
+# Credential Manager + googleid: "Continue with Google" picks the account (the ID token is never sent anywhere);
+# credentials-play-services-auth is Credential Manager's provider on Android 13 and lower.
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+# play-services-auth: AuthorizationClient grants the drive.appdata scope and refreshes access tokens in the background;
+# Google's supported replacement for the deprecated GoogleSignIn API
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+# Awaits Play services Tasks from coroutines; already a transitive dependency of play-services-auth, declared to keep
+# it on the same version as the other coroutines libraries
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
+# OkHttp: four Drive REST v3 calls (list, upload, download, delete); much smaller than the Google API client libraries
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver3", version.ref = "okhttp" }
 # Kotlin libraries — coroutines/Flow for UDF, serialization for nav keys and the export format

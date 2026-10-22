@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,6 +36,15 @@ data class ImportResult(
     val settings: ExtrasOutcome,
     /** False when nothing changed, so there is nothing to undo. */
     val undoable: Boolean,
+)
+
+/** What a full restore wrote. */
+data class RestoreResult(
+    val entries: Int,
+    val cycles: Int,
+    val firstDate: LocalDate?,
+    val lastDate: LocalDate?,
+    val settingsRestored: Boolean,
 )
 
 /** The latest import, as stored with its undo rows. */
@@ -113,6 +123,34 @@ class ImportApplier
                     undoable = !plan.isEmpty,
                 )
             }
+
+        /**
+         * Restore from a backup: every row on the phone is replaced by the file's rows exactly as they
+         * were stored (ids, timestamps, tombstones), in one transaction. Only a Mensis export carries
+         * those rows. The undo of an earlier import is dropped, since the rows it refers to are gone.
+         */
+        suspend fun replaceAll(parsed: ParsedImport): RestoreResult {
+            val rows = requireNotNull(parsed.lossless) { "only a Mensis export can be restored" }
+            val kept = rows.dayEntries.values.toList()
+            val keptDates = kept.mapTo(HashSet()) { it.date }
+            val entries = kept + rows.tombstones.filter { it.date !in keptDates }
+            return store.transaction {
+                store.deleteDayEntries(store.dayEntries().map { it.id })
+                store.deleteContraceptionPeriods(store.contraceptionPeriods().map { it.id })
+                store.deleteTrackerSettings()
+                store.clearBatches()
+                if (entries.isNotEmpty()) store.upsertDayEntries(entries)
+                if (rows.contraception.isNotEmpty()) store.upsertContraceptionPeriods(rows.contraception)
+                rows.settings?.let { store.upsertTrackerSettings(it) }
+                RestoreResult(
+                    entries = parsed.days.size,
+                    cycles = CycleDeriver.derive(parsed.days).size,
+                    firstDate = parsed.days.firstOrNull()?.date,
+                    lastDate = parsed.days.lastOrNull()?.date,
+                    settingsRestored = rows.settings != null,
+                )
+            }
+        }
 
         suspend fun lastImport(): LastImport? {
             val batch = store.latestBatch() ?: return null

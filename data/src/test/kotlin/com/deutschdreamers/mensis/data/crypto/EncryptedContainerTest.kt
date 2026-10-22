@@ -106,4 +106,38 @@ class EncryptedContainerTest {
         assertTrue(d.memoryKib >= 19 * 1024 && d.iterations >= 2 && d.parallelism >= 1)
         assertTrue(d.isWithinLimits)
     }
+
+    @Test
+    fun `a stored key seals files the password opens`() {
+        val key = EncryptedContainer.deriveKey(password, fast)
+        val sealed = EncryptedContainer.seal(payload, key)
+        assertArrayEquals(payload, EncryptedContainer.open(sealed, password))
+        assertArrayEquals(payload, EncryptedContainer.open(sealed, key))
+    }
+
+    @Test
+    fun `the key read back from a file with its password seals compatible files`() {
+        val original = EncryptedContainer.seal(payload, password, fast)
+        val key = EncryptedContainer.keyFor(original, password)
+        val next = EncryptedContainer.seal("next".toByteArray(), key)
+        assertArrayEquals("next".toByteArray(), EncryptedContainer.open(next, password))
+        assertArrayEquals(
+            original.copyOfRange(0, EncryptedContainer.HEADER_BYTES),
+            next.copyOfRange(0, EncryptedContainer.HEADER_BYTES),
+        )
+    }
+
+    @Test
+    fun `a key derived from another password does not open the file`() {
+        val sealed = EncryptedContainer.seal(payload, EncryptedContainer.deriveKey(password, fast))
+        val other = EncryptedContainer.deriveKey("another password entirely".toCharArray(), fast)
+        assertThrows<AuthenticationFailedException> { EncryptedContainer.open(sealed, other) }
+    }
+
+    @Test
+    fun `destroy overwrites the key bytes`() {
+        val key = EncryptedContainer.deriveKey(password, fast)
+        key.destroy()
+        assertTrue(key.bytes.all { it == 0.toByte() })
+    }
 }

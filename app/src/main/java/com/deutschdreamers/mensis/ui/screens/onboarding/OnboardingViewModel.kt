@@ -2,11 +2,18 @@ package com.deutschdreamers.mensis.ui.screens.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.deutschdreamers.mensis.backup.BackupController
+import com.deutschdreamers.mensis.backup.auth.BackupAvailability
+import com.deutschdreamers.mensis.backup.auth.GoogleAccountGateway
 import com.deutschdreamers.mensis.data.repo.DayEntryRepository
 import com.deutschdreamers.mensis.data.repo.SettingsRepository
 import com.deutschdreamers.mensis.domain.model.Flow
 import com.deutschdreamers.mensis.domain.model.Goal
 import com.deutschdreamers.mensis.domain.model.TrackerSettings
+import com.deutschdreamers.mensis.lock.AppLockManager
+import com.deutschdreamers.mensis.ui.screens.backup.ConnectProblem
+import com.deutschdreamers.mensis.ui.screens.backup.ConnectResult
+import com.deutschdreamers.mensis.ui.screens.export.ExportUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,9 +33,13 @@ data class OnboardingDraft(
     val goal: Goal = Goal.TRACK_CYCLE,
     val lockEnabled: Boolean = true,
     val hideInRecents: Boolean = true,
-    /** Steps 7–8 are UI only until Drive backup lands; nothing is stored from them. */
+    val backupAvailability: BackupAvailability = BackupAvailability.AVAILABLE,
     val backupEnabled: Boolean = true,
+    /** The Google account connected on step 7; backup is turned on with it when onboarding finishes. */
+    val backupEmail: String? = null,
+    val backupProblem: ConnectProblem? = null,
     val backupPassword: String = "",
+    val backupRepeat: String = "",
     val finishing: Boolean = false,
     val finished: Boolean = false,
 ) {
@@ -38,10 +49,28 @@ data class OnboardingDraft(
     /** Design: Skip appears from step 3 (0-based 2) on; on the last step it reads "Not now". */
     val skippable: Boolean get() = step >= FIRST_SKIPPABLE_STEP
 
+    val backupOffered: Boolean get() = backupAvailability == BackupAvailability.AVAILABLE
+
+    /** Step 7's Continue first connects the Google account. */
+    val needsGoogleConnect: Boolean
+        get() = step == BACKUP_STEP && backupOffered && backupEnabled && backupEmail == null
+
+    val passwordsMatch: Boolean get() = backupPassword == backupRepeat
+
+    val backupPasswordValid: Boolean
+        get() = backupPassword.length >= ExportUiState.MIN_PASSWORD_LENGTH && passwordsMatch
+
+    /** Backup is turned on at the end only with an account and a valid password. */
+    val backupReady: Boolean get() = backupOffered && backupEnabled && backupEmail != null && backupPasswordValid
+
+    val canContinue: Boolean get() = !finishing && (step != PASSWORD_STEP || backupPasswordValid)
+
     companion object {
         const val STEP_COUNT: Int = 9
         const val LAST_STEP: Int = STEP_COUNT - 1
         const val FIRST_SKIPPABLE_STEP: Int = 2
+        const val BACKUP_STEP: Int = 6
+        const val PASSWORD_STEP: Int = 7
     }
 }
 
@@ -51,9 +80,21 @@ class OnboardingViewModel
     constructor(
         private val settings: SettingsRepository,
         private val dayEntries: DayEntryRepository,
+        private val backup: BackupController,
+        val accounts: GoogleAccountGateway,
+        val lock: AppLockManager,
         private val clock: Clock,
     ) : ViewModel() {
-        private val state = MutableStateFlow(OnboardingDraft())
+        private val state =
+            MutableStateFlow(
+                backup.availability().let {
+                    OnboardingDraft(
+                        backupAvailability = it,
+                        backupEnabled =
+                            it == BackupAvailability.AVAILABLE,
+                    )
+                },
+            )
         val draft: StateFlow<OnboardingDraft> = state
 
         val today: LocalDate get() = LocalDate.now(clock)
@@ -61,14 +102,55 @@ class OnboardingViewModel
         fun update(transform: (OnboardingDraft) -> OnboardingDraft) = state.update(transform)
 
         fun next() {
-            if (state.value.isLast) finish() else state.update { it.copy(step = it.step + 1) }
+            val current = state.value
+            when {
+                current.isLast -> finish()
+                !current.canContinue -> Unit
+                // Without backup there is no password to choose.
+                current.step == OnboardingDraft.BACKUP_STEP && !current.backupReadyToAsk() ->
+                    state.update { it.copy(step = OnboardingDraft.LAST_STEP, backupEnabled = false) }
+                else -> state.update { it.copy(step = it.step + 1) }
+            }
         }
 
-        fun back() = state.update { if (it.step > 0) it.copy(step = it.step - 1) else it }
+        fun back() =
+            state.update {
+                when {
+                    it.step == OnboardingDraft.LAST_STEP && !it.backupEnabled ->
+                        it.copy(
+                            step = OnboardingDraft.BACKUP_STEP,
+                        )
+                    it.step > 0 -> it.copy(step = it.step - 1)
+                    else -> it
+                }
+            }
 
-        fun skip() = next()
+        /** Skipping step 7 or 8 skips backup altogether. */
+        fun skip() {
+            val step = state.value.step
+            if (step == OnboardingDraft.BACKUP_STEP || step == OnboardingDraft.PASSWORD_STEP) {
+                state.update { it.copy(step = OnboardingDraft.LAST_STEP, backupEnabled = false) }
+            } else {
+                next()
+            }
+        }
 
-        /** Writes the draft, marks onboarding complete and reports back through [OnboardingDraft.finished]. */
+        fun onBackupConnect(result: ConnectResult) {
+            when (result) {
+                is ConnectResult.Connected ->
+                    state.update {
+                        it.copy(backupEmail = result.email, backupProblem = null, step = OnboardingDraft.PASSWORD_STEP)
+                    }
+                ConnectResult.Cancelled -> Unit
+                ConnectResult.NoAccount -> state.update { it.copy(backupProblem = ConnectProblem.NO_ACCOUNT) }
+                ConnectResult.Failed -> state.update { it.copy(backupProblem = ConnectProblem.FAILED) }
+            }
+        }
+
+        /**
+         * Writes the draft, turns backup on when it was set up, marks onboarding complete and reports
+         * back through [OnboardingDraft.finished].
+         */
         fun finish() {
             val current = state.value
             if (current.finishing) return
@@ -82,6 +164,15 @@ class OnboardingViewModel
                         goal = current.goal,
                     )
                 }
+                val email = current.backupEmail
+                if (current.backupReady && email != null) {
+                    val password = current.backupPassword.toCharArray()
+                    try {
+                        backup.turnOn(email, password)
+                    } finally {
+                        password.fill('\u0000')
+                    }
+                }
                 settings.updateUiPrefs {
                     it.copy(
                         lockEnabled = current.lockEnabled,
@@ -89,7 +180,9 @@ class OnboardingViewModel
                         onboardingCompleted = true,
                     )
                 }
-                state.update { it.copy(finished = true) }
+                state.update { it.copy(finished = true, backupPassword = "", backupRepeat = "") }
             }
         }
+
+        private fun OnboardingDraft.backupReadyToAsk(): Boolean = backupOffered && backupEnabled && backupEmail != null
     }

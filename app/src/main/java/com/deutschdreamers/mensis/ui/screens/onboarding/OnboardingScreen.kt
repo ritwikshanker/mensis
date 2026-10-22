@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -42,22 +41,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.deutschdreamers.mensis.R
+import com.deutschdreamers.mensis.backup.auth.BackupAvailability
 import com.deutschdreamers.mensis.domain.model.Goal
 import com.deutschdreamers.mensis.ui.components.InfoBanner
 import com.deutschdreamers.mensis.ui.components.MensisDatePickerDialog
 import com.deutschdreamers.mensis.ui.components.MsIcon
+import com.deutschdreamers.mensis.ui.components.PasswordField
 import com.deutschdreamers.mensis.ui.components.RadioRow
 import com.deutschdreamers.mensis.ui.components.StepProgressBar
 import com.deutschdreamers.mensis.ui.components.StepperCard
 import com.deutschdreamers.mensis.ui.components.SwitchRow
 import com.deutschdreamers.mensis.ui.format.Formats
+import com.deutschdreamers.mensis.ui.screens.backup.ConnectProblem
+import com.deutschdreamers.mensis.ui.screens.backup.rememberGoogleConnect
 import com.deutschdreamers.mensis.ui.theme.SerifStyles
 import java.time.LocalDate
 
@@ -69,6 +69,7 @@ fun OnboardingScreen(
 ) {
     val draft by viewModel.draft.collectAsStateWithLifecycle()
     LaunchedEffect(draft.finished) { if (draft.finished) onFinished() }
+    val connect = rememberGoogleConnect(viewModel.accounts, viewModel.lock, viewModel::onBackupConnect)
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { viewModel.finish() }
     OnboardingContent(
@@ -78,14 +79,15 @@ fun OnboardingScreen(
         onBack = viewModel::back,
         onSkip = viewModel::skip,
         onNext = {
-            if (draft.isLast) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    viewModel.finish()
-                }
-            } else {
-                viewModel.next()
+            when {
+                draft.isLast ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        viewModel.finish()
+                    }
+                draft.needsGoogleConnect -> connect.connect(null)
+                else -> viewModel.next()
             }
         },
         onRestore = onRestore,
@@ -143,7 +145,7 @@ fun OnboardingContent(
             }
         }
         Column(modifier = Modifier.padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = onNext, enabled = !draft.finishing, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Button(onClick = onNext, enabled = draft.canContinue, modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 Text(
                     stringResource(
                         when {
@@ -436,11 +438,42 @@ private fun BackupStep(
     SwitchRow(
         icon = R.drawable.ms_cloud_upload,
         title = stringResource(R.string.onboarding_backup_switch),
-        supporting = stringResource(R.string.onboarding_backup_switch_body),
-        checked = draft.backupEnabled,
-        onCheckedChange = { v -> onUpdate { it.copy(backupEnabled = v) } },
+        supporting =
+            draft.backupEmail?.let { stringResource(R.string.onboarding_backup_connected, it) }
+                ?: stringResource(R.string.onboarding_backup_switch_body),
+        checked = draft.backupEnabled && draft.backupOffered,
+        onCheckedChange = { v -> onUpdate { it.copy(backupEnabled = v, backupProblem = null) } },
+        enabled = draft.backupOffered,
         horizontalPadding = 0.dp,
     )
+    if (!draft.backupOffered) {
+        InfoBanner(
+            text =
+                stringResource(
+                    if (draft.backupAvailability == BackupAvailability.NO_PLAY_SERVICES) {
+                        R.string.backup_unavailable_play
+                    } else {
+                        R.string.backup_unavailable_config
+                    },
+                ),
+        )
+    }
+    draft.backupProblem?.let { problem ->
+        InfoBanner(
+            text =
+                stringResource(
+                    if (problem == ConnectProblem.NO_ACCOUNT) {
+                        R.string.backup_connect_no_account
+                    } else {
+                        R.string.backup_connect_failed
+                    },
+                ),
+            icon = R.drawable.ms_error,
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            iconTint = MaterialTheme.colorScheme.onErrorContainer,
+        )
+    }
     InfoBanner(text = stringResource(R.string.onboarding_backup_warning), icon = R.drawable.ms_phonelink_erase)
 }
 
@@ -449,29 +482,26 @@ private fun PasswordStep(
     draft: OnboardingDraft,
     onUpdate: ((OnboardingDraft) -> OnboardingDraft) -> Unit,
 ) {
-    var visible by remember { mutableStateOf(false) }
     Headline(stringResource(R.string.onboarding_password_title))
-    OutlinedTextField(
-        value = draft.backupPassword,
-        onValueChange = { v -> onUpdate { it.copy(backupPassword = v) } },
-        label = { Text(stringResource(R.string.onboarding_password_label)) },
-        singleLine = true,
-        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        trailingIcon = {
-            IconButton(onClick = { visible = !visible }) {
-                MsIcon(
-                    resId = if (visible) R.drawable.ms_visibility_off else R.drawable.ms_visibility,
-                    contentDescription =
-                        stringResource(
-                            if (visible) R.string.onboarding_hide_password else R.string.onboarding_show_password,
-                        ),
-                )
-            }
-        },
-        modifier = Modifier.fillMaxWidth(),
-    )
-    PasswordStrengthBar(draft.backupPassword)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        PasswordField(
+            value = draft.backupPassword,
+            onValueChange = { v -> onUpdate { it.copy(backupPassword = v) } },
+            label = stringResource(R.string.onboarding_password_label),
+            supporting = stringResource(R.string.onboarding_password_hint),
+        )
+        PasswordStrengthBar(draft.backupPassword)
+        PasswordField(
+            value = draft.backupRepeat,
+            onValueChange = { v -> onUpdate { it.copy(backupRepeat = v) } },
+            label = stringResource(R.string.export_password_repeat),
+            isError = draft.backupRepeat.isNotEmpty() && !draft.passwordsMatch,
+            supporting =
+                stringResource(R.string.export_password_mismatch).takeIf {
+                    draft.backupRepeat.isNotEmpty() && !draft.passwordsMatch
+                },
+        )
+    }
     InfoBanner(
         text = stringResource(R.string.onboarding_password_warning),
         icon = R.drawable.ms_key_off,

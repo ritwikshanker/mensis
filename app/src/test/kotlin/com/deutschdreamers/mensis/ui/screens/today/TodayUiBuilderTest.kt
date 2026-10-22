@@ -1,5 +1,6 @@
 package com.deutschdreamers.mensis.ui.screens.today
 
+import com.deutschdreamers.mensis.data.backup.BackupError
 import com.deutschdreamers.mensis.data.backup.BackupStatus
 import com.deutschdreamers.mensis.domain.model.ContraceptionMethod
 import com.deutschdreamers.mensis.domain.model.ContraceptionPeriod
@@ -161,13 +162,16 @@ class TodayUiBuilderTest {
         assertEquals("Last backup was 23 days ago.", FakeData.today(data, today, BackupStatus.Overdue(23)).banner?.text)
         assertEquals("Reconnect", FakeData.today(data, today, BackupStatus.NeedsReconnect).banner?.action)
         assertNull(FakeData.today(data, today, BackupStatus.Idle(null)).banner)
-        assertFalse(
-            FakeData
-                .today(data, today, BackupStatus.Failing("no connection"))
-                .banner
-                ?.text
-                .isNullOrEmpty(),
+        assertEquals(
+            "Last backup failed: no connection. It will retry on Wi-Fi.",
+            FakeData.today(data, today, BackupStatus.Failing(BackupError.NETWORK, wifiOnly = true)).banner?.text,
         )
+        assertEquals(
+            "Last backup failed: Google Drive is full. It will retry automatically.",
+            FakeData.today(data, today, BackupStatus.Failing(BackupError.DRIVE_FULL, wifiOnly = false)).banner?.text,
+        )
+        assertEquals("Turn on", FakeData.today(data, today, BackupStatus.Off).banner?.action)
+        assertNull(FakeData.today(data, today, BackupStatus.Unavailable).banner)
     }
 
     @Test

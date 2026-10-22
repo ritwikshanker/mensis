@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Reminders (build step 7) post local notifications; onboarding step 9 asks for this on Android 13+. -->
+    <!--
+      Reminders (build step 7) and the "reconnect your Google account" backup notice post local
+      notifications; onboarding step 9 asks for this on Android 13+.
+    -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!--
@@ -34,6 +37,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- WorkManager is configured by MensisApplication (Hilt workers), not by its default initializer. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
 
         <!-- Export "Share file": hands one exported file to the app the user picks, read-only. -->
         <provider

@@ -20,7 +20,7 @@ Resolved by Gradle from Google Maven and Maven Central; versions in `gradle/libs
 | Library | Licence |
 |---|---|
 | AndroidX (Compose, Navigation 3, Lifecycle, Room, DataStore, WorkManager, Biometric, Credentials, Core) | Apache-2.0 |
-| Kotlin standard library, kotlinx.coroutines, kotlinx.serialization | Apache-2.0 |
+| Kotlin standard library, kotlinx.coroutines (incl. its Play services integration), kotlinx.serialization | Apache-2.0 |
 | Dagger / Hilt | Apache-2.0 |
 | SQLCipher for Android (net.zetetic) | BSD-3-Clause |
 | OkHttp | Apache-2.0 |

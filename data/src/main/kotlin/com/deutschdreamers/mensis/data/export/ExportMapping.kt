@@ -3,6 +3,8 @@ package com.deutschdreamers.mensis.data.export
 import com.deutschdreamers.mensis.data.db.ContraceptionPeriodEntity
 import com.deutschdreamers.mensis.data.db.DayEntryEntity
 import com.deutschdreamers.mensis.data.db.TrackerSettingsEntity
+import com.deutschdreamers.mensis.data.settings.AppearanceMode
+import com.deutschdreamers.mensis.data.settings.ThemeScheme
 import com.deutschdreamers.mensis.data.settings.UiPrefs
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -142,6 +144,18 @@ fun UiPrefs.toExported(): ExportedUiPrefs =
     ExportedUiPrefs(
         theme = theme.name.lowercase(),
         appearance = appearance.name.lowercase(),
+        lockEnabled = lockEnabled,
+        hideInRecents = hideInRecents,
+        relockTimeoutMinutes = relockTimeoutMinutes,
+    )
+
+/** A restore's device preferences over [current]; values this version does not know keep the current ones. */
+fun ExportedUiPrefs.applyTo(current: UiPrefs): UiPrefs =
+    current.copy(
+        theme = ThemeScheme.entries.firstOrNull { it.name.equals(theme, ignoreCase = true) } ?: current.theme,
+        appearance =
+            AppearanceMode.entries.firstOrNull { it.name.equals(appearance, ignoreCase = true) }
+                ?: current.appearance,
         lockEnabled = lockEnabled,
         hideInRecents = hideInRecents,
         relockTimeoutMinutes = relockTimeoutMinutes,

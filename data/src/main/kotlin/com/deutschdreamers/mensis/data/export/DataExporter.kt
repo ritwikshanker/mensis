@@ -101,7 +101,7 @@ object ExportFiles {
     }
 }
 
-/** Reads one consistent snapshot of everything stored, for export and (from build step 6) backup. */
+/** Reads one consistent snapshot of everything stored, for export and Drive backup. */
 @Singleton
 class DataExporter
     @Inject

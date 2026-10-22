@@ -37,8 +37,6 @@ val LaterScreen.titleRes: Int
             LaterScreen.MODE -> R.string.settings_mode
             LaterScreen.UNITS -> R.string.settings_units
             LaterScreen.REMINDERS -> R.string.settings_reminders
-            LaterScreen.BACKUP -> R.string.settings_backup
-            LaterScreen.RESTORE -> R.string.onboarding_restore
             LaterScreen.REPORT -> R.string.settings_report
             LaterScreen.DELETE_ALL -> R.string.settings_delete_all
             LaterScreen.THEME -> R.string.settings_theme

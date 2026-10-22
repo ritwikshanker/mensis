@@ -54,7 +54,7 @@ fun TodayScreen(
     viewModel: TodayViewModel,
     onLog: (LogRequest) -> Unit,
     onImport: () -> Unit,
-    onBackupAction: () -> Unit,
+    onOpenBackup: (reconnect: Boolean) -> Unit,
     onMethodSettings: () -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -71,7 +71,13 @@ fun TodayScreen(
         state = current,
         onLog = onLog,
         onImport = onImport,
-        onBackupAction = onBackupAction,
+        onBackupAction = { kind ->
+            when (kind) {
+                BannerKind.OFF -> onOpenBackup(false)
+                BannerKind.RECONNECT -> onOpenBackup(true)
+                BannerKind.FAILING, BannerKind.OVERDUE -> viewModel.backUpNow()
+            }
+        },
         onMethodSettings = onMethodSettings,
     )
 }
@@ -82,7 +88,7 @@ fun TodayScreenContent(
     state: TodayUiState,
     onLog: (LogRequest) -> Unit,
     onImport: () -> Unit,
-    onBackupAction: () -> Unit,
+    onBackupAction: (BannerKind) -> Unit,
     onMethodSettings: () -> Unit,
 ) {
     Scaffold(
@@ -115,7 +121,7 @@ fun TodayScreenContent(
                     text = banner.text,
                     icon = banner.icon,
                     actionLabel = banner.action,
-                    onAction = onBackupAction,
+                    onAction = { onBackupAction(banner.kind) },
                 )
             }
             HeaderRow(state)

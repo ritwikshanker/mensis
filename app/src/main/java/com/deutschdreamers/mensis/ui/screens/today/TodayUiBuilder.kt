@@ -27,6 +27,7 @@ import com.deutschdreamers.mensis.ui.format.Formats.EN_DASH
 import com.deutschdreamers.mensis.ui.format.Formats.MIDDLE_DOT
 import com.deutschdreamers.mensis.ui.format.LoggedChips
 import com.deutschdreamers.mensis.ui.format.MethodLabels
+import com.deutschdreamers.mensis.ui.screens.backup.BackupTexts
 import java.time.LocalDate
 
 /**
@@ -83,7 +84,8 @@ object TodayUiBuilder {
                 BannerUi(
                     BannerKind.FAILING,
                     R.drawable.ms_sync_problem,
-                    "Last backup failed: ${status.lastError}. It will retry on Wi-Fi.",
+                    "Last backup failed: ${BackupTexts.reason(status.error)}. " +
+                        if (status.wifiOnly) "It will retry on Wi-Fi." else "It will retry automatically.",
                     "Retry",
                 )
             is BackupStatus.Overdue ->
@@ -100,7 +102,7 @@ object TodayUiBuilder {
                     "Google account needs reconnecting before the next backup.",
                     "Reconnect",
                 )
-            is BackupStatus.Idle -> null
+            is BackupStatus.Idle, BackupStatus.Unavailable -> null
         }
 
     private fun laneLabels(model: TodayModel): Map<StripLaneKind, String> =
