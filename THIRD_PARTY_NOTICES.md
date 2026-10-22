@@ -27,4 +27,5 @@ Resolved by Gradle from Google Maven and Maven Central; versions in `gradle/libs
 | Bouncy Castle | MIT |
 | Google Play services auth, Google Identity (googleid) | Android Software Development Kit License |
 
-The in-app "Open-source libraries" screen (build step 10) renders this file.
+The app shows this file under About and privacy → Open-source libraries, followed by the full texts of the
+Apache License 2.0 and the SIL Open Font License 1.1 (both bundled with the app).

@@ -24,9 +24,11 @@ class DataWipe
         private val uiPrefsStore: UiPrefsStore,
     ) {
         suspend fun wipeAll() {
-            database.close()
-            DatabaseFactory.databaseFiles(context).forEach { it.delete() }
-            keyProvider.delete()
+            // Held closed until the files and the key are gone, so nothing reopens it with the old key.
+            database.closeAndThen {
+                DatabaseFactory.databaseFiles(context).forEach { it.delete() }
+                keyProvider.delete()
+            }
             uiPrefsStore.clear()
         }
     }

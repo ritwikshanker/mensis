@@ -23,6 +23,7 @@ import com.deutschdreamers.mensis.domain.model.TrackingLevel
 import com.deutschdreamers.mensis.domain.model.WeightUnit
 import com.deutschdreamers.mensis.domain.model.activeOn
 import com.deutschdreamers.mensis.domain.prediction.PredictionConstants
+import com.deutschdreamers.mensis.domain.pregnancy.PregnancyCalculator
 import com.deutschdreamers.mensis.domain.today.CyclePhase
 import com.deutschdreamers.mensis.domain.today.TodayState
 import com.deutschdreamers.mensis.domain.today.TodayStateResolver
@@ -30,6 +31,7 @@ import com.deutschdreamers.mensis.ui.format.Formats
 import com.deutschdreamers.mensis.ui.format.Formats.MIDDLE_DOT
 import com.deutschdreamers.mensis.ui.format.MethodLabels
 import com.deutschdreamers.mensis.ui.format.Units
+import com.deutschdreamers.mensis.ui.screens.mode.PregnancyOffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -83,7 +85,11 @@ data class LogUiState(
     val temperatureError: Boolean = false,
     val sleepError: Boolean = false,
     val weightError: Boolean = false,
+    /** Offered when this save records a positive pregnancy test (null: nothing to offer). */
+    val offerOnPositive: PregnancyOffer? = null,
     val saved: Boolean = false,
+    /** Set by a save that recorded a newly positive pregnancy test. */
+    val pregnancyOffer: PregnancyOffer? = null,
 )
 
 @HiltViewModel
@@ -118,6 +124,13 @@ class DailyLogViewModel
                         weightUnit = settings.weightUnit,
                         method = methodUi(method, request.date, data.entries),
                         testsFirst = request.testsFirst,
+                        offerOnPositive =
+                            PregnancyOffer.onPositive(
+                                mode = settings.mode,
+                                before = existing?.pregnancyTest,
+                                testDate = request.date,
+                                lmp = PregnancyCalculator.lastPeriodStart(data.entries, request.date),
+                            ),
                     )
             }
         }
@@ -171,9 +184,10 @@ class DailyLogViewModel
                     weightKg = weight?.let { Units.toKilograms(it, current.weightUnit) },
                     notes = draft.notes.takeIf { it.isNotBlank() },
                 )
+            val offer = current.offerOnPositive?.takeIf { draft.pregnancyTest == TestResult.POSITIVE }
             viewModelScope.launch {
                 dayEntries.save(entry)
-                state.update { it?.copy(saved = true) }
+                state.update { it?.copy(saved = true, pregnancyOffer = offer) }
             }
         }
 

@@ -1,6 +1,7 @@
 package com.deutschdreamers.mensis.backup
 
 import com.deutschdreamers.mensis.backup.Fixtures.EMAIL
+import com.deutschdreamers.mensis.backup.drive.ReconnectRequiredException
 import com.deutschdreamers.mensis.data.crypto.AuthenticationFailedException
 import com.deutschdreamers.mensis.data.crypto.EncryptedContainer
 import com.deutschdreamers.mensis.domain.model.Flow
@@ -154,6 +155,52 @@ class BackupControllerTest {
             assertTrue(backups().isEmpty())
             assertEquals(1, drive.files.size)
             assertNull(store.current().lastSuccessAt)
+        }
+
+    @Test
+    fun `erasing deletes the Drive backups, then forgets the key, the account and every setting`() =
+        runBlocking {
+            controller.turnOn(EMAIL, Fixtures.PASSWORD.toCharArray())
+            controller.setFrequency(BackupFrequency.DAILY)
+            drive.put(BackupPayload.FILE_NAME, byteArrayOf(1), emptyMap())
+            drive.put("other.bin", byteArrayOf(3), emptyMap())
+
+            controller.erase(deleteDriveBackups = true)
+
+            assertTrue(backups().isEmpty())
+            assertEquals(1, drive.files.size)
+            assertNull(keys.key)
+            assertEquals(BackupConfig(), store.current())
+            assertEquals(listOf(EMAIL), gateway.disconnected)
+            assertEquals(1, scheduler.cancelled)
+        }
+
+    @Test
+    fun `erasing without the Drive option keeps the Drive backups`() =
+        runBlocking {
+            controller.turnOn(EMAIL, Fixtures.PASSWORD.toCharArray())
+            drive.put(BackupPayload.FILE_NAME, byteArrayOf(1), emptyMap())
+
+            controller.erase(deleteDriveBackups = false)
+
+            assertEquals(1, backups().size)
+            assertNull(keys.key)
+            assertEquals(BackupConfig(), store.current())
+        }
+
+    @Test
+    fun `a failed Drive deletion leaves backup on and the key in place`() =
+        runBlocking {
+            controller.turnOn(EMAIL, Fixtures.PASSWORD.toCharArray())
+            tokens.reconnectRequired = true
+
+            assertThrows<ReconnectRequiredException> { runBlocking { controller.erase(deleteDriveBackups = true) } }
+
+            assertNotNull(keys.key)
+            assertTrue(store.current().enabled)
+            assertEquals(EMAIL, store.current().accountEmail)
+            assertTrue(gateway.disconnected.isEmpty())
+            assertEquals(0, scheduler.cancelled)
         }
 
     @Test

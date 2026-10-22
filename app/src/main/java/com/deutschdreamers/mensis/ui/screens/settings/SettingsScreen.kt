@@ -12,14 +12,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.deutschdreamers.mensis.BuildConfig
 import com.deutschdreamers.mensis.R
@@ -28,23 +31,30 @@ import com.deutschdreamers.mensis.ui.components.RadioRow
 import com.deutschdreamers.mensis.ui.components.SectionHeader
 import com.deutschdreamers.mensis.ui.components.SettingsRow
 import com.deutschdreamers.mensis.ui.components.SwitchRow
+import com.deutschdreamers.mensis.ui.navigation.About
 import com.deutschdreamers.mensis.ui.navigation.Backup
-import com.deutschdreamers.mensis.ui.navigation.ComingSoon
 import com.deutschdreamers.mensis.ui.navigation.Contraception
 import com.deutschdreamers.mensis.ui.navigation.Export
 import com.deutschdreamers.mensis.ui.navigation.Import
-import com.deutschdreamers.mensis.ui.navigation.LaterScreen
+import com.deutschdreamers.mensis.ui.navigation.MeasurementUnits
 import com.deutschdreamers.mensis.ui.navigation.MensisNavKey
+import com.deutschdreamers.mensis.ui.navigation.Mode
 import com.deutschdreamers.mensis.ui.navigation.Reminders
 import com.deutschdreamers.mensis.ui.navigation.Report
+import com.deutschdreamers.mensis.ui.navigation.Theme
 import com.deutschdreamers.mensis.ui.navigation.TrackLevel
+import com.deutschdreamers.mensis.ui.screens.deleteall.DeleteAllDialog
+import com.deutschdreamers.mensis.ui.screens.deleteall.DeleteAllViewModel
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     onNavigate: (MensisNavKey) -> Unit,
+    onDataDeleted: () -> Unit,
+    deleteViewModel: DeleteAllViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var showDelete by rememberSaveable { mutableStateOf(false) }
     val current = state
     if (current == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -56,10 +66,24 @@ fun SettingsScreen(
         onLockEnabled = viewModel::setLockEnabled,
         onHideInRecents = viewModel::setHideInRecents,
         onRelockTimeout = viewModel::setRelockTimeout,
+        onDeleteAll = { showDelete = true },
     )
+    if (showDelete) {
+        val deleteState by deleteViewModel.uiState.collectAsStateWithLifecycle()
+        LaunchedEffect(deleteState.deleted) { if (deleteState.deleted) onDataDeleted() }
+        DeleteAllDialog(
+            state = deleteState,
+            onDeleteDriveChange = deleteViewModel::setDeleteDrive,
+            onConfirm = deleteViewModel::delete,
+            onDismiss = {
+                showDelete = false
+                deleteViewModel.reset()
+            },
+        )
+    }
 }
 
-/** Design §7 settings list. Rows whose screens come later open a placeholder. */
+/** Design §7 settings list. */
 @Composable
 fun SettingsScreenContent(
     state: SettingsUiState,
@@ -67,14 +91,19 @@ fun SettingsScreenContent(
     onLockEnabled: (Boolean) -> Unit,
     onHideInRecents: (Boolean) -> Unit,
     onRelockTimeout: (Int) -> Unit,
+    onDeleteAll: () -> Unit,
 ) {
     var showRelockDialog by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxSize()) {
         MensisTopBar(title = stringResource(R.string.tab_settings))
         Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
             SectionHeader(stringResource(R.string.settings_section_cycle))
-            SettingsRow(R.drawable.ms_timeline, stringResource(R.string.settings_mode), state.modeSummary) {
-                onNavigate(ComingSoon(LaterScreen.MODE))
+            SettingsRow(
+                if (state.pregnancyMode) R.drawable.ms_child_care else R.drawable.ms_timeline,
+                stringResource(R.string.settings_mode),
+                state.modeSummary,
+            ) {
+                onNavigate(Mode)
             }
             SettingsRow(R.drawable.ms_checklist, stringResource(R.string.settings_track), state.trackSummary) {
                 onNavigate(TrackLevel)
@@ -87,7 +116,7 @@ fun SettingsScreenContent(
                 onNavigate(Contraception)
             }
             SettingsRow(R.drawable.ms_straighten, stringResource(R.string.settings_units), state.unitsSummary) {
-                onNavigate(ComingSoon(LaterScreen.UNITS))
+                onNavigate(MeasurementUnits)
             }
             SettingsRow(
                 R.drawable.ms_notifications,
@@ -158,17 +187,17 @@ fun SettingsScreenContent(
                 titleColor = MaterialTheme.colorScheme.error,
                 iconTint = MaterialTheme.colorScheme.error,
                 showChevron = false,
-                onClick = { onNavigate(ComingSoon(LaterScreen.DELETE_ALL)) },
+                onClick = onDeleteAll,
             )
             SectionHeader(stringResource(R.string.settings_section_appearance))
             SettingsRow(R.drawable.ms_palette, stringResource(R.string.settings_theme), state.themeSummary) {
-                onNavigate(ComingSoon(LaterScreen.THEME))
+                onNavigate(Theme)
             }
             SettingsRow(
                 icon = R.drawable.ms_info,
                 title = stringResource(R.string.settings_about),
                 supporting = stringResource(R.string.settings_about_supporting, BuildConfig.VERSION_NAME),
-                onClick = { onNavigate(ComingSoon(LaterScreen.ABOUT)) },
+                onClick = { onNavigate(About) },
             )
         }
     }

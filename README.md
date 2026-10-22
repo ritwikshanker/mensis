@@ -41,8 +41,9 @@ walks through it. Without it the app builds and works, and the Backup screen say
 configured in this build.
 
 The bundled fonts and Material Symbols icons are not kept in the repository: the first build downloads
-them from Google Fonts and google/material-design-icons into `app/build/generated/designAssets` (the
-`fetchDesignAssets` Gradle task), so the first build needs network access.
+them from Google Fonts and google/material-design-icons, together with the Apache License 2.0 text shown
+in the app, into `app/build/generated/designAssets` (the `fetchDesignAssets` Gradle task), so the first
+build needs network access.
 
 ## Project layout
 

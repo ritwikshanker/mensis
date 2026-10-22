@@ -50,11 +50,27 @@ data class Restore(
     val fromOnboarding: Boolean,
 ) : MensisNavKey
 
-/** Screens that arrive in later build steps; their Settings rows already navigate somewhere. */
+/** Settings → Mode: cycle tracking or pregnancy. */
 @Serializable
-enum class LaterScreen { MODE, UNITS, DELETE_ALL, THEME, ABOUT }
+data object Mode : MensisNavKey
+
+/** Settings → Units: °C/°F and kg/lb for entry and display. */
+@Serializable
+data object MeasurementUnits : MensisNavKey
+
+/** Settings → Theme (design §16). */
+@Serializable
+data object Theme : MensisNavKey
+
+/** Settings → About and privacy (design §17). */
+@Serializable
+data object About : MensisNavKey
+
+/** The texts behind About's Licence and Open-source libraries rows. */
+@Serializable
+enum class NoticeDocument { LICENCE, LIBRARIES }
 
 @Serializable
-data class ComingSoon(
-    val screen: LaterScreen,
+data class Notices(
+    val document: NoticeDocument,
 ) : MensisNavKey

@@ -26,6 +26,9 @@ import com.deutschdreamers.mensis.ui.screens.calendar.CalendarScreen
 import com.deutschdreamers.mensis.ui.screens.insights.InsightsScreen
 import com.deutschdreamers.mensis.ui.screens.log.DailyLogHost
 import com.deutschdreamers.mensis.ui.screens.log.LogRequest
+import com.deutschdreamers.mensis.ui.screens.mode.ModeViewModel
+import com.deutschdreamers.mensis.ui.screens.mode.PregnancyOffer
+import com.deutschdreamers.mensis.ui.screens.mode.PregnancyOfferDialog
 import com.deutschdreamers.mensis.ui.screens.settings.SettingsScreen
 import com.deutschdreamers.mensis.ui.screens.today.TodayScreen
 
@@ -33,10 +36,12 @@ import com.deutschdreamers.mensis.ui.screens.today.TodayScreen
 @Composable
 fun MainScreen(
     onNavigate: (MensisNavKey) -> Unit,
+    onDataDeleted: () -> Unit,
     initialTab: MainTab = MainTab.TODAY,
 ) {
     var tab by rememberSaveable { mutableStateOf(initialTab) }
     var logRequest by rememberSaveable(stateSaver = LogRequest.Saver) { mutableStateOf<LogRequest?>(null) }
+    var pregnancyOffer by rememberSaveable(stateSaver = PregnancyOffer.Saver) { mutableStateOf<PregnancyOffer?>(null) }
     val stateHolder = rememberSaveableStateHolder()
     Scaffold(
         bottomBar = {
@@ -83,12 +88,34 @@ fun MainScreen(
                             onLog = { date -> logRequest = LogRequest(date) },
                         )
                     MainTab.INSIGHTS -> InsightsScreen(viewModel = hiltViewModel())
-                    MainTab.SETTINGS -> SettingsScreen(viewModel = hiltViewModel(), onNavigate = onNavigate)
+                    MainTab.SETTINGS ->
+                        SettingsScreen(
+                            viewModel = hiltViewModel(),
+                            onNavigate = onNavigate,
+                            onDataDeleted = onDataDeleted,
+                        )
                 }
             }
         }
     }
     logRequest?.let { request ->
-        DailyLogHost(request = request, viewModel = hiltViewModel(), onDismiss = { logRequest = null })
+        DailyLogHost(
+            request = request,
+            viewModel = hiltViewModel(),
+            onDismiss = { logRequest = null },
+            onPregnancyOffer = { pregnancyOffer = it },
+        )
+    }
+    pregnancyOffer?.let { offer ->
+        val modeViewModel: ModeViewModel = hiltViewModel()
+        PregnancyOfferDialog(
+            offer = offer,
+            onConfirm = { lmp ->
+                modeViewModel.setPregnancy(lmp)
+                pregnancyOffer = null
+                tab = MainTab.TODAY
+            },
+            onDismiss = { pregnancyOffer = null },
+        )
     }
 }

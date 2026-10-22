@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,11 +68,13 @@ class ReminderSync
                     .distinctUntilChanged()
                     .flatMapLatest { completed ->
                         if (completed) {
+                            // Delete-all closes the database under this observer; it resumes on the new
+                            // database once onboarding completes again.
                             combine(
                                 trackerData.observe(),
                                 settings.observeReminders(),
                                 ::Pair,
-                            )
+                            ).catch { }
                         } else {
                             flowOf(null)
                         }

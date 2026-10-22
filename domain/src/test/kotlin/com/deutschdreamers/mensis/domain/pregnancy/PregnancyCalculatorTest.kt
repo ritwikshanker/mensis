@@ -1,6 +1,8 @@
 package com.deutschdreamers.mensis.domain.pregnancy
 
+import com.deutschdreamers.mensis.domain.Synthetic
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -43,5 +45,15 @@ class PregnancyCalculatorTest {
     @Test
     fun `dates before the last period count as day zero`() {
         assertEquals(0, PregnancyCalculator.calculate(lmp, lmp.minusDays(5)).daysSinceLmp)
+    }
+
+    @Test
+    fun `the last period start is the latest one on or before the date`() {
+        val entries = Synthetic.cyclesWithLengths(LocalDate.of(2026, 6, 22), listOf(28, 28))
+        assertEquals(lmp, PregnancyCalculator.lastPeriodStart(entries, LocalDate.of(2026, 10, 21)))
+        assertEquals(lmp, PregnancyCalculator.lastPeriodStart(entries, lmp))
+        assertEquals(LocalDate.of(2026, 7, 20), PregnancyCalculator.lastPeriodStart(entries, lmp.minusDays(1)))
+        assertNull(PregnancyCalculator.lastPeriodStart(entries, LocalDate.of(2026, 6, 21)))
+        assertNull(PregnancyCalculator.lastPeriodStart(emptyList(), lmp))
     }
 }

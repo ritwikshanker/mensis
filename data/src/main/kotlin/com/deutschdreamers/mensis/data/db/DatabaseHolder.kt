@@ -31,4 +31,13 @@ class DatabaseHolder
                 database = null
             }
         }
+
+        /** Closes the database and runs [block] before anything can open it again (delete-all-data). */
+        fun closeAndThen(block: () -> Unit) {
+            synchronized(this) {
+                database?.close()
+                database = null
+                block()
+            }
+        }
     }

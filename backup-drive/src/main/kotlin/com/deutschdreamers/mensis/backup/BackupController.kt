@@ -122,6 +122,19 @@ class BackupController(
     }
 
     /**
+     * Delete all data: with [deleteDriveBackups] the account's backups are deleted first, and if that
+     * fails nothing else changes. Then everything [turnOff] forgets goes, along with the remaining
+     * settings. Runs between backups, so a run in progress cannot upload after the Drive files are gone.
+     */
+    suspend fun erase(deleteDriveBackups: Boolean) {
+        manager.exclusive {
+            if (deleteDriveBackups) deleteDriveBackups()
+            turnOff()
+            store.clear()
+        }
+    }
+
+    /**
      * Deletes every Mensis backup in the account's app folder (Backup screen, delete-all-data).
      * @return how many files were deleted.
      */

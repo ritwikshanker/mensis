@@ -9,7 +9,6 @@
     <string name="action_ok">OK</string>
     <string name="action_continue">Continue</string>
     <string name="action_pick_date">Pick a date</string>
-    <string name="coming_soon_body">This screen arrives in a later build step.</string>
 
     <!-- Bottom navigation -->
     <string name="tab_today">Today</string>
@@ -419,4 +418,73 @@
     <string name="report_save">Save to Files</string>
     <string name="report_discard">Discard</string>
     <string name="report_saved">Saved as %1$s.</string>
+    <!-- Mode and pregnancy -->
+    <string name="mode_intro">Pregnancy mode pauses period and fertility predictions and counts the weeks of pregnancy instead. Nothing you have logged changes.</string>
+    <string name="mode_cycle">Cycle tracking</string>
+    <string name="mode_cycle_desc">Period and fertile-window predictions from your logged cycles</string>
+    <string name="mode_pregnancy">Pregnancy</string>
+    <string name="mode_pregnancy_desc">Weeks counted from the first day of your last period</string>
+    <string name="mode_lmp">First day of last period</string>
+    <string name="mode_lmp_choose">Choose a date</string>
+    <string name="mode_info">Period, fertile-window and follicular temperature reminders pause while pregnancy mode is on. Switch back to cycle mode at any time.</string>
+    <string name="mode_footer">Due dates are estimates; most births happen within two weeks either side.</string>
+    <string name="pregnancy_offer_title">Switch to pregnancy mode?</string>
+    <string name="pregnancy_offer_body">Period and fertility predictions pause, and Today counts the weeks from the first day of your last period. You can switch back in Settings at any time.</string>
+    <string name="pregnancy_offer_confirm">Switch</string>
+    <string name="pregnancy_offer_dismiss">Not now</string>
+
+    <!-- Units -->
+    <string name="units_temperature">Temperature</string>
+    <string name="units_weight">Weight</string>
+    <string name="units_footer">Mensis keeps every value in °C and kg and converts only for entry and display, so switching units never changes your data.</string>
+
+    <!-- Theme (design §16) -->
+    <string name="theme_colour">Colour</string>
+    <string name="theme_rose">Rose</string>
+    <string name="theme_rose_desc">Warm neutrals, muted rose accent</string>
+    <string name="theme_sage">Sage</string>
+    <string name="theme_sage_desc">Warm neutrals, green accent</string>
+    <string name="theme_dynamic">System colours</string>
+    <string name="theme_dynamic_desc">From your wallpaper (Material You)</string>
+    <string name="theme_dynamic_unavailable">Needs Android 12 or later</string>
+    <string name="theme_appearance">Appearance</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="theme_fixed">Fixed meanings</string>
+    <string name="theme_fixed_body">Period red, fertile teal and the predicted hatch stay the same in every theme, so the calendar reads the same way whichever colour you choose.</string>
+
+    <!-- About and privacy (design §17) -->
+    <string name="about_version">VERSION %1$s · MIT</string>
+    <string name="about_tagline">A private menstrual cycle tracker. Your data stays on your phone.</string>
+    <string name="about_created_by">CREATED BY</string>
+    <string name="about_author">Ritwik Shanker</string>
+    <string name="about_made_with">Made with ♥ in 🇩🇪 by 🇮🇳</string>
+    <string name="about_source">github.com/ritwikshanker/mensis</string>
+    <string name="about_leaves_title">What leaves this phone</string>
+    <string name="about_leaves_nothing">Nothing, by default. No analytics, no crash reporting, no ads, no account.</string>
+    <string name="about_leaves_backup">If you turn on backup: one encrypted file to your own Google Drive app folder. It is encrypted on the phone first; the password never leaves it.</string>
+    <string name="about_leaves_export">If you export or share a report: only the file you choose, to the app you choose.</string>
+    <string name="about_licence">Licence</string>
+    <string name="about_licence_desc">MIT License</string>
+    <string name="about_libraries">Open-source libraries</string>
+    <string name="about_libraries_desc">Jetpack Compose, Room, SQLCipher</string>
+    <string name="about_report">Report a problem</string>
+    <string name="about_report_desc">Opens the issue tracker. No data is attached.</string>
+    <string name="about_disclaimer">Mensis is not a medical device and does not provide medical advice or contraception.</string>
+    <string name="about_copyright">© 2026 Ritwik Shanker · Free software under MIT</string>
+    <string name="about_no_browser">No app on this phone can open the link.</string>
+    <string name="notices_apache">Apache License 2.0</string>
+    <string name="notices_ofl_roboto">SIL Open Font License 1.1 · Roboto Flex</string>
+    <string name="notices_ofl_serif">SIL Open Font License 1.1 · Source Serif 4</string>
+
+    <!-- Delete all data (design §18) -->
+    <string name="delete_title">Delete all data?</string>
+    <string name="delete_body">Removes every entry, cycle and setting from this phone. This cannot be undone. Exports you saved elsewhere are not affected.</string>
+    <string name="delete_drive">Also delete the backup in Google Drive</string>
+    <string name="delete_confirm">Delete</string>
+    <string name="delete_working">Deleting…</string>
+    <string name="delete_failed_connection">Google Drive could not be reached, so nothing was deleted. Try again when you are online, or untick the Drive option.</string>
+    <string name="delete_failed_reconnect">The Google account needs reconnecting before its backup can be deleted, so nothing was deleted. Reconnect under Backup, or untick the Drive option.</string>
+    <string name="delete_failed_other">The backup in Google Drive could not be deleted, so nothing was deleted. Try again, or untick the Drive option.</string>
 </resources>

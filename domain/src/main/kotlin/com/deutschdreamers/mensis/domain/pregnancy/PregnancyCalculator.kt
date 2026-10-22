@@ -1,5 +1,7 @@
 package com.deutschdreamers.mensis.domain.pregnancy
 
+import com.deutschdreamers.mensis.domain.cycle.CycleDeriver
+import com.deutschdreamers.mensis.domain.model.DayEntry
 import com.deutschdreamers.mensis.domain.model.daysUntil
 import com.deutschdreamers.mensis.domain.prediction.PredictionConstants
 import java.time.LocalDate
@@ -46,4 +48,13 @@ object PregnancyCalculator {
             progress = (days.toDouble() / PredictionConstants.PREGNANCY_DURATION_DAYS).coerceIn(0.0, 1.0),
         )
     }
+
+    /**
+     * The first day of the last period on or before [date]: what pregnancy mode counts from unless the
+     * user picks another day. Null when no period start is logged by then.
+     */
+    fun lastPeriodStart(
+        entries: Collection<DayEntry>,
+        date: LocalDate,
+    ): LocalDate? = CycleDeriver.periodStarts(entries).lastOrNull { !it.isAfter(date) }
 }

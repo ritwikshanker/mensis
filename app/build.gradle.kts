@@ -36,6 +36,8 @@ abstract class FetchDesignAssets : DefaultTask() {
         download("$fontBase/robotoflex/OFL.txt", raw.resolve("ofl_roboto_flex.txt"))
         download("$fontBase/sourceserif4/SourceSerif4%5Bopsz%2Cwght%5D.ttf", fonts.resolve("source_serif_4.ttf"))
         download("$fontBase/sourceserif4/OFL.txt", raw.resolve("ofl_source_serif_4.txt"))
+        // The icons' and most libraries' licence, shown under About → Open-source libraries.
+        download("https://www.apache.org/licenses/LICENSE-2.0.txt", raw.resolve("apache_2_0.txt"))
         val iconBase = "https://raw.githubusercontent.com/google/material-design-icons/master/symbols/android"
         iconList
             .get()
@@ -84,6 +86,36 @@ abstract class FetchDesignAssets : DefaultTask() {
 val fetchDesignAssets by tasks.registering(FetchDesignAssets::class) {
     iconList.set(layout.projectDirectory.file("material-symbols.txt"))
     outputDir.set(layout.buildDirectory.dir("generated/designAssets/res"))
+}
+
+/** Bundles the repository's LICENSE and THIRD_PARTY_NOTICES.md as raw resources for the About screens. */
+abstract class CopyLegalTexts : DefaultTask() {
+    @get:InputFile
+    abstract val licence: RegularFileProperty
+
+    @get:InputFile
+    abstract val notices: RegularFileProperty
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun copy() {
+        val raw =
+            outputDir
+                .get()
+                .asFile
+                .resolve("raw")
+                .apply { mkdirs() }
+        licence.get().asFile.copyTo(raw.resolve("licence_mit.txt"), overwrite = true)
+        notices.get().asFile.copyTo(raw.resolve("third_party_notices.md"), overwrite = true)
+    }
+}
+
+val copyLegalTexts by tasks.registering(CopyLegalTexts::class) {
+    licence.set(rootProject.layout.projectDirectory.file("LICENSE"))
+    notices.set(rootProject.layout.projectDirectory.file("THIRD_PARTY_NOTICES.md"))
+    outputDir.set(layout.buildDirectory.dir("generated/legalTexts/res"))
 }
 
 // detekt 1.23.x embeds an older Kotlin compiler that rejects the daemon's JDK 25 as a JVM target.
@@ -137,6 +169,7 @@ android {
 androidComponents {
     onVariants { variant ->
         variant.sources.res?.addGeneratedSourceDirectory(fetchDesignAssets, FetchDesignAssets::outputDir)
+        variant.sources.res?.addGeneratedSourceDirectory(copyLegalTexts, CopyLegalTexts::outputDir)
     }
 }
 
@@ -177,6 +210,8 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.core)
+    // Tests give stores their own preference files; the app's singletons hold the real ones open.
+    androidTestImplementation(libs.androidx.datastore.preferences)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

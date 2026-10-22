@@ -50,6 +50,16 @@ Cycles, phases and predictions are never stored; they are computed from the dail
 - Exact alarms are used only when the user allows them; otherwise a reminder arrives within 15
   minutes of its time.
 
+### Deleting everything
+
+Settings → Delete all data removes from the phone: the database and its key (the key file and its
+Keystore key), the `ui_prefs` and `backup_prefs` preferences, the backup key and its Keystore key,
+reminder alarms, posted notifications and copies made for sharing. Scheduled backups stop and Mensis's
+Drive access is revoked. With "Also delete the backup in Google Drive" ticked, Mensis first deletes
+its backups from the Drive app folder; if that fails (no connection, or the account needs
+reconnecting), nothing is deleted and the dialog says so. Files you exported or shared elsewhere are
+not affected. The app then starts again with onboarding.
+
 ## What leaves the phone
 
 **Nothing, by default.** Mensis has no analytics, crash reporting, ads, remote configuration or

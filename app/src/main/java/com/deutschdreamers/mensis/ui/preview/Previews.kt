@@ -17,11 +17,19 @@ import com.deutschdreamers.mensis.data.importer.ParsedImport
 import com.deutschdreamers.mensis.data.importer.RestoreResult
 import com.deutschdreamers.mensis.data.importer.SkipReason
 import com.deutschdreamers.mensis.data.importer.SkippedRow
+import com.deutschdreamers.mensis.data.settings.AppearanceMode
+import com.deutschdreamers.mensis.data.settings.ThemeScheme
+import com.deutschdreamers.mensis.domain.model.TemperatureUnit
+import com.deutschdreamers.mensis.domain.model.TrackerMode
 import com.deutschdreamers.mensis.domain.model.TrackingLevel
+import com.deutschdreamers.mensis.domain.model.WeightUnit
+import com.deutschdreamers.mensis.ui.screens.about.AboutContent
 import com.deutschdreamers.mensis.ui.screens.backup.BackupActions
 import com.deutschdreamers.mensis.ui.screens.backup.BackupContent
 import com.deutschdreamers.mensis.ui.screens.backup.BackupDraft
 import com.deutschdreamers.mensis.ui.screens.backup.BackupUiState
+import com.deutschdreamers.mensis.ui.screens.deleteall.DeleteAllDialog
+import com.deutschdreamers.mensis.ui.screens.deleteall.DeleteAllUiState
 import com.deutschdreamers.mensis.ui.screens.export.ExportContent
 import com.deutschdreamers.mensis.ui.screens.export.ExportUiState
 import com.deutschdreamers.mensis.ui.screens.importer.ImportContent
@@ -29,14 +37,20 @@ import com.deutschdreamers.mensis.ui.screens.importer.ImportStep
 import com.deutschdreamers.mensis.ui.screens.importer.ImportUiState
 import com.deutschdreamers.mensis.ui.screens.insights.InsightsScreenContent
 import com.deutschdreamers.mensis.ui.screens.insights.InsightsUiState
+import com.deutschdreamers.mensis.ui.screens.mode.ModeContent
+import com.deutschdreamers.mensis.ui.screens.mode.ModeUiState
 import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingContent
 import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingDraft
 import com.deutschdreamers.mensis.ui.screens.restore.RestoreActions
 import com.deutschdreamers.mensis.ui.screens.restore.RestoreContent
 import com.deutschdreamers.mensis.ui.screens.restore.RestoreStep
 import com.deutschdreamers.mensis.ui.screens.restore.RestoreUiState
+import com.deutschdreamers.mensis.ui.screens.theme.ThemeContent
+import com.deutschdreamers.mensis.ui.screens.theme.ThemeUiState
 import com.deutschdreamers.mensis.ui.screens.today.TodayScreenContent
 import com.deutschdreamers.mensis.ui.screens.today.TodayUiState
+import com.deutschdreamers.mensis.ui.screens.units.UnitsContent
+import com.deutschdreamers.mensis.ui.screens.units.UnitsUiState
 import com.deutschdreamers.mensis.ui.theme.MensisTheme
 import java.time.Instant
 import java.time.LocalDate
@@ -310,3 +324,73 @@ private fun RestoreDonePreview() =
             result = RestoreResult(243, 8, LocalDate.of(2026, 3, 6), LocalDate.of(2026, 10, 20), true),
         ),
     )
+
+@PreviewLightDark
+@Composable
+private fun ThemePreview() {
+    MensisTheme {
+        ThemeContent(
+            state = ThemeUiState(ThemeScheme.ROSE, AppearanceMode.LIGHT),
+            onScheme = {},
+            onAppearance = {},
+            onBack = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun AboutPreview() {
+    MensisTheme { AboutContent(version = "1.0.0", onOpenLink = {}, onNotices = {}, onBack = {}) }
+}
+
+@Preview(fontScale = 2.0f)
+@Composable
+private fun AboutLargeTextPreview() {
+    MensisTheme { AboutContent(version = "1.0.0", onOpenLink = {}, onNotices = {}, onBack = {}) }
+}
+
+@PreviewLightDark
+@Composable
+private fun ModePregnancyPreview() {
+    MensisTheme {
+        ModeContent(
+            state =
+                ModeUiState(
+                    mode = TrackerMode.PREGNANCY,
+                    lmp = LocalDate.of(2026, 8, 17),
+                    today = LocalDate.of(2026, 10, 21),
+                    suggestedLmp = LocalDate.of(2026, 8, 17),
+                ),
+            onCycle = {},
+            onPregnancy = {},
+            onBack = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun UnitsPreview() {
+    MensisTheme {
+        UnitsContent(
+            state = UnitsUiState(TemperatureUnit.CELSIUS, WeightUnit.KILOGRAM),
+            onTemperature = {},
+            onWeight = {},
+            onBack = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DeleteAllPreview() {
+    MensisTheme {
+        DeleteAllDialog(
+            state = DeleteAllUiState(driveBackupOn = true),
+            onDeleteDriveChange = {},
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
+}

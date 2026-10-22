@@ -107,7 +107,10 @@ fun <T> MultiChoiceChips(
     }
 }
 
-/** Material 3 single-select segmented button row (design "segmented"). */
+/**
+ * Material 3 single-select segmented button row (design "segmented"). With [icon], each segment shows
+ * its own icon, and the selected one a check in its place (design §16 Appearance).
+ */
 @Composable
 fun <T> SegmentedChoice(
     options: List<T>,
@@ -115,11 +118,13 @@ fun <T> SegmentedChoice(
     label: (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
+    icon: ((T) -> Int)? = null,
 ) {
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         options.forEachIndexed { index, option ->
+            val active = option == selected
             SegmentedButton(
-                selected = option == selected,
+                selected = active,
                 onClick = { onSelect(option) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                 colors =
@@ -127,6 +132,17 @@ fun <T> SegmentedChoice(
                         activeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                         activeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     ),
+                icon = {
+                    if (icon == null) {
+                        SegmentedButtonDefaults.Icon(active)
+                    } else {
+                        MsIcon(
+                            resId = if (active) R.drawable.ms_check else icon(option),
+                            contentDescription = null,
+                            size = SegmentedButtonDefaults.IconSize,
+                        )
+                    }
+                },
                 label = { Text(label(option), maxLines = 1) },
             )
         }

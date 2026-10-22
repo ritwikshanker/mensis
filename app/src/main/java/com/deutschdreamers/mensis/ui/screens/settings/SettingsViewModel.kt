@@ -11,9 +11,10 @@ import com.deutschdreamers.mensis.data.settings.ThemeScheme
 import com.deutschdreamers.mensis.data.settings.UiPrefs
 import com.deutschdreamers.mensis.domain.model.ContraceptionMethod
 import com.deutschdreamers.mensis.domain.model.ContraceptionPeriod
+import com.deutschdreamers.mensis.domain.model.TemperatureUnit
 import com.deutschdreamers.mensis.domain.model.TrackerMode
-import com.deutschdreamers.mensis.domain.model.TrackerSettings
 import com.deutschdreamers.mensis.domain.model.TrackingLevel
+import com.deutschdreamers.mensis.domain.model.WeightUnit
 import com.deutschdreamers.mensis.domain.model.activeOn
 import com.deutschdreamers.mensis.domain.reminders.ReminderCatalog
 import com.deutschdreamers.mensis.domain.reminders.ReminderConfig
@@ -35,6 +36,7 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 data class SettingsUiState(
+    val pregnancyMode: Boolean,
     val modeSummary: String,
     val trackSummary: String,
     val contraceptionSummary: String,
@@ -68,23 +70,22 @@ class SettingsViewModel
             ) { prefs, tracker, periods, status, reminders ->
                 val method = periods.activeOn(LocalDate.now(clock))
                 SettingsUiState(
-                    modeSummary = modeSummary(tracker),
+                    pregnancyMode = tracker.mode == TrackerMode.PREGNANCY,
+                    modeSummary = modeSummary(tracker.mode),
                     trackSummary = trackSummary(tracker.trackingLevel),
                     contraceptionSummary =
                         MethodLabels.summary(
                             method?.method ?: ContraceptionMethod.NONE,
                             method?.regimen,
                         ),
-                    unitsSummary = "${Units.temperatureSymbol(
-                        tracker.temperatureUnit,
-                    )} $MIDDLE_DOT ${Units.weightSymbol(tracker.weightUnit)}",
+                    unitsSummary = unitsSummary(tracker.temperatureUnit, tracker.weightUnit),
                     remindersSummary = remindersSummary(reminders, method, tracker.trackingLevel),
                     lockEnabled = prefs.lockEnabled,
                     lockAvailable = credentials.canAuthenticate(),
                     hideInRecents = prefs.hideInRecents,
                     relockTimeoutMinutes = prefs.relockTimeoutMinutes,
                     backupSummary = backupSummary(status),
-                    themeSummary = themeSummary(prefs),
+                    themeSummary = themeSummary(prefs.theme, prefs.appearance),
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), null)
 
@@ -108,12 +109,6 @@ class SettingsViewModel
             return ReminderTexts.summary(enabled, method)
         }
 
-        private fun modeSummary(tracker: TrackerSettings): String =
-            when (tracker.mode) {
-                TrackerMode.CYCLE -> "Cycle tracking"
-                TrackerMode.PREGNANCY -> "Pregnancy $MIDDLE_DOT predictions paused"
-            }
-
         private fun backupSummary(status: BackupStatus): String =
             when (status) {
                 BackupStatus.Off -> "Off"
@@ -133,24 +128,39 @@ class SettingsViewModel
                 BackupStatus.NeedsReconnect -> "Needs reconnecting"
             }
 
-        private fun themeSummary(prefs: UiPrefs): String {
-            val scheme =
-                when (prefs.theme) {
-                    ThemeScheme.ROSE -> "Rose"
-                    ThemeScheme.SAGE -> "Sage"
-                    ThemeScheme.DYNAMIC -> "System colours"
-                }
-            val appearance =
-                when (prefs.appearance) {
-                    AppearanceMode.LIGHT -> "Light"
-                    AppearanceMode.DARK -> "Dark"
-                    AppearanceMode.SYSTEM -> "System"
-                }
-            return "$scheme $MIDDLE_DOT $appearance"
-        }
-
         companion object {
             private const val STOP_TIMEOUT_MS = 5_000L
+
+            fun modeSummary(mode: TrackerMode): String =
+                when (mode) {
+                    TrackerMode.CYCLE -> "Cycle tracking"
+                    TrackerMode.PREGNANCY -> "Pregnancy $MIDDLE_DOT predictions paused"
+                }
+
+            fun unitsSummary(
+                temperature: TemperatureUnit,
+                weight: WeightUnit,
+            ): String = "${Units.temperatureSymbol(temperature)} $MIDDLE_DOT ${Units.weightSymbol(weight)}"
+
+            /** Design §7: "Rose · Light". */
+            fun themeSummary(
+                scheme: ThemeScheme,
+                appearance: AppearanceMode,
+            ): String {
+                val name =
+                    when (scheme) {
+                        ThemeScheme.ROSE -> "Rose"
+                        ThemeScheme.SAGE -> "Sage"
+                        ThemeScheme.DYNAMIC -> "System colours"
+                    }
+                val mode =
+                    when (appearance) {
+                        AppearanceMode.LIGHT -> "Light"
+                        AppearanceMode.DARK -> "Dark"
+                        AppearanceMode.SYSTEM -> "System"
+                    }
+                return "$name $MIDDLE_DOT $mode"
+            }
 
             fun trackSummary(level: TrackingLevel): String =
                 when (level) {

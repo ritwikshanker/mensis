@@ -37,6 +37,20 @@ fun SectionHeader(
     )
 }
 
+/** Section title inside padded content (Theme, Units): 14 medium in `primary`, no padding of its own. */
+@Composable
+fun ContentSectionTitle(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier,
+    )
+}
+
 /** Section label inside a sheet or form: 14 medium `onSurfaceVariant`. */
 @Composable
 fun FieldLabel(
@@ -63,6 +77,7 @@ fun SettingsRow(
     showChevron: Boolean = true,
     enabled: Boolean = true,
     horizontalPadding: androidx.compose.ui.unit.Dp = 16.dp,
+    @DrawableRes trailingIcon: Int = R.drawable.ms_chevron_right,
     onClick: () -> Unit,
 ) {
     Row(
@@ -88,7 +103,7 @@ fun SettingsRow(
         }
         if (showChevron) {
             MsIcon(
-                resId = R.drawable.ms_chevron_right,
+                resId = trailingIcon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

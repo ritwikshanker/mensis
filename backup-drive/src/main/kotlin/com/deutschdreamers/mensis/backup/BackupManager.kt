@@ -71,6 +71,9 @@ class BackupManager(
 ) {
     private val mutex = Mutex()
 
+    /** Runs [block] while no backup run is in progress, and keeps new runs waiting until it ends. */
+    suspend fun <T> exclusive(block: suspend () -> T): T = mutex.withLock { block() }
+
     /**
      * @param force upload even when the data has not changed (a new password needs a new file).
      * @param interactive started from the screen: a reconnect is shown there, not as a notification.

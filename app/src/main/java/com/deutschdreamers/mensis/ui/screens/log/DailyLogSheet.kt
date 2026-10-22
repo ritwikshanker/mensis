@@ -60,6 +60,7 @@ import com.deutschdreamers.mensis.ui.components.SwitchRow
 import com.deutschdreamers.mensis.ui.format.Formats
 import com.deutschdreamers.mensis.ui.format.LoggedChips
 import com.deutschdreamers.mensis.ui.format.Units
+import com.deutschdreamers.mensis.ui.screens.mode.PregnancyOffer
 import kotlinx.coroutines.launch
 
 /**
@@ -73,14 +74,17 @@ fun DailyLogHost(
     request: LogRequest,
     viewModel: DailyLogViewModel,
     onDismiss: () -> Unit,
+    onPregnancyOffer: (PregnancyOffer) -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(request) { viewModel.open(request) }
     val saved = state?.saved == true
     LaunchedEffect(saved) {
         if (saved) {
+            val offer = state?.pregnancyOffer
             viewModel.close()
             onDismiss()
+            offer?.let(onPregnancyOffer)
         }
     }
     // The sheet is composed only once the day is loaded: measured against a small placeholder it would

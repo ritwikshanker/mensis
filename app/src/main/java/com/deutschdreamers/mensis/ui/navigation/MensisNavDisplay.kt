@@ -7,17 +7,21 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.deutschdreamers.mensis.ui.screens.about.AboutScreen
+import com.deutschdreamers.mensis.ui.screens.about.NoticesScreen
 import com.deutschdreamers.mensis.ui.screens.backup.BackupScreen
 import com.deutschdreamers.mensis.ui.screens.contraception.ContraceptionScreen
 import com.deutschdreamers.mensis.ui.screens.export.ExportScreen
 import com.deutschdreamers.mensis.ui.screens.importer.ImportScreen
-import com.deutschdreamers.mensis.ui.screens.later.ComingSoonScreen
 import com.deutschdreamers.mensis.ui.screens.main.MainScreen
+import com.deutschdreamers.mensis.ui.screens.mode.ModeScreen
 import com.deutschdreamers.mensis.ui.screens.onboarding.OnboardingScreen
 import com.deutschdreamers.mensis.ui.screens.reminders.RemindersScreen
 import com.deutschdreamers.mensis.ui.screens.report.ReportScreen
 import com.deutschdreamers.mensis.ui.screens.restore.RestoreScreen
+import com.deutschdreamers.mensis.ui.screens.theme.ThemeScreen
 import com.deutschdreamers.mensis.ui.screens.track.TrackLevelScreen
+import com.deutschdreamers.mensis.ui.screens.units.UnitsScreen
 
 @Composable
 fun MensisNavDisplay(startAtOnboarding: Boolean) {
@@ -39,7 +43,13 @@ fun MensisNavDisplay(startAtOnboarding: Boolean) {
                         onRestore = { navigator.push(Restore(fromOnboarding = true)) },
                     )
                 }
-                entry<Main> { MainScreen(onNavigate = navigator::push) }
+                entry<Main> {
+                    MainScreen(
+                        onNavigate = navigator::push,
+                        // Everything is gone: start again at onboarding step 1 with nothing to go back to.
+                        onDataDeleted = { navigator.replaceAll(Onboarding) },
+                    )
+                }
                 entry<TrackLevel> { TrackLevelScreen(onBack = navigator::pop) }
                 entry<Contraception> {
                     ContraceptionScreen(
@@ -65,7 +75,11 @@ fun MensisNavDisplay(startAtOnboarding: Boolean) {
                         fromOnboarding = key.fromOnboarding,
                     )
                 }
-                entry<ComingSoon> { key -> ComingSoonScreen(screen = key.screen, onBack = navigator::pop) }
+                entry<Mode> { ModeScreen(onBack = navigator::pop) }
+                entry<MeasurementUnits> { UnitsScreen(onBack = navigator::pop) }
+                entry<Theme> { ThemeScreen(onBack = navigator::pop) }
+                entry<About> { AboutScreen(onBack = navigator::pop, onNotices = { navigator.push(Notices(it)) }) }
+                entry<Notices> { key -> NoticesScreen(document = key.document, onBack = navigator::pop) }
             },
     )
 }
