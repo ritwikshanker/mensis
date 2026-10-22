@@ -62,6 +62,7 @@ class SettingsRoundTripTest {
     private val today: LocalDate = LocalDate.of(2026, 10, 21)
     private val lmp: LocalDate = LocalDate.of(2026, 8, 17)
     private val clock: Clock = Clock.fixed(Instant.parse("2026-10-21T12:00:00Z"), ZoneOffset.UTC)
+    private val viewModels = TestViewModels()
 
     private lateinit var holder: DatabaseHolder
     private lateinit var dayEntries: DayEntryRepository
@@ -83,6 +84,7 @@ class SettingsRoundTripTest {
     @After
     fun tearDown() =
         runBlocking<Unit> {
+            viewModels.cancelAndJoin()
             holder.close()
             DatabaseFactory.databaseFiles(context).forEach { it.delete() }
             uiPrefs.clear()
@@ -93,25 +95,27 @@ class SettingsRoundTripTest {
         runBlocking<Unit> {
             dayEntries.save(DayEntry(lmp, flow = Flow.MEDIUM))
             val settingsViewModel =
-                SettingsViewModel(
-                    settings,
-                    ContraceptionRepository(holder, clock),
-                    NoBackupStatusSource,
-                    DeviceCredentialChecker(context),
-                    clock,
+                viewModels.track(
+                    SettingsViewModel(
+                        settings,
+                        ContraceptionRepository(holder, clock),
+                        NoBackupStatusSource,
+                        DeviceCredentialChecker(context),
+                        clock,
+                    ),
                 )
             val first = settingsViewModel.uiState.awaitNotNull()
             assertEquals("Cycle tracking", first.modeSummary)
             assertEquals("°C · kg", first.unitsSummary)
             assertEquals("Rose · System", first.themeSummary)
 
-            val mode = ModeViewModel(trackerData, settings, clock)
+            val mode = viewModels.track(ModeViewModel(trackerData, settings, clock))
             assertEquals(lmp, mode.uiState.awaitNotNull().suggestedLmp)
             mode.setPregnancy(lmp)
-            val units = UnitsViewModel(settings)
+            val units = viewModels.track(UnitsViewModel(settings))
             units.setTemperature(TemperatureUnit.FAHRENHEIT)
             units.setWeight(WeightUnit.POUND)
-            val theme = ThemeViewModel(settings)
+            val theme = viewModels.track(ThemeViewModel(settings))
             theme.setScheme(ThemeScheme.SAGE)
             theme.setAppearance(AppearanceMode.DARK)
 
@@ -130,10 +134,10 @@ class SettingsRoundTripTest {
     @Test
     fun fahrenheitEntry_isStoredInCelsius() =
         runBlocking<Unit> {
-            UnitsViewModel(settings).setTemperature(TemperatureUnit.FAHRENHEIT)
+            viewModels.track(UnitsViewModel(settings)).setTemperature(TemperatureUnit.FAHRENHEIT)
             awaitTracker { it.temperatureUnit == TemperatureUnit.FAHRENHEIT }
 
-            val log = DailyLogViewModel(trackerData, dayEntries)
+            val log = viewModels.track(DailyLogViewModel(trackerData, dayEntries))
             log.open(LogRequest(today))
             assertEquals(TemperatureUnit.FAHRENHEIT, log.uiState.awaitNotNull().temperatureUnit)
             log.update { it.copy(temperatureText = "97.70") }
@@ -147,7 +151,7 @@ class SettingsRoundTripTest {
     fun positivePregnancyTest_offersPregnancyMode_andTodayFollows() =
         runBlocking<Unit> {
             dayEntries.save(DayEntry(lmp, flow = Flow.MEDIUM))
-            val log = DailyLogViewModel(trackerData, dayEntries)
+            val log = viewModels.track(DailyLogViewModel(trackerData, dayEntries))
             log.open(LogRequest(today, testsFirst = true))
             log.uiState.awaitNotNull()
             log.update { it.copy(pregnancyTest = TestResult.POSITIVE) }
@@ -161,9 +165,9 @@ class SettingsRoundTripTest {
             log.save()
             assertNull(log.uiState.awaitMatching { it.saved }.pregnancyOffer)
 
-            ModeViewModel(trackerData, settings, clock).setPregnancy(lmp)
+            viewModels.track(ModeViewModel(trackerData, settings, clock)).setPregnancy(lmp)
             awaitTracker { it.mode == TrackerMode.PREGNANCY }
-            val todayViewModel = TodayViewModel(trackerData, NoBackupStatusSource, {}, clock)
+            val todayViewModel = viewModels.track(TodayViewModel(trackerData, NoBackupStatusSource, {}, clock))
             val state = todayViewModel.uiState.awaitMatching { it.state == TodayState.PREGNANCY }
             assertEquals("10", state.numeral)
             assertEquals("Week 10, day 3", state.phase)

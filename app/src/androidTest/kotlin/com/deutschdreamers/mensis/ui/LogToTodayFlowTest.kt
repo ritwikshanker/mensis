@@ -56,6 +56,7 @@ class LogToTodayFlowTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val today: LocalDate = LocalDate.of(2026, 10, 21)
     private val clock: Clock = Clock.fixed(Instant.parse("2026-10-21T12:00:00Z"), ZoneOffset.UTC)
+    private val viewModels = TestViewModels()
 
     private lateinit var holder: DatabaseHolder
     private lateinit var dayEntries: DayEntryRepository
@@ -73,16 +74,18 @@ class LogToTodayFlowTest {
         contraception = ContraceptionRepository(holder, clock)
         val settings = SettingsRepository(holder, UiPrefsStore(context), clock)
         trackerData = TrackerDataRepository(dayEntries, settings, contraception)
-        todayViewModel = TodayViewModel(trackerData, NoBackupStatusSource, {}, clock)
-        logViewModel = DailyLogViewModel(trackerData, dayEntries)
-        calendarViewModel = CalendarViewModel(trackerData, dayEntries, clock)
+        todayViewModel = viewModels.track(TodayViewModel(trackerData, NoBackupStatusSource, {}, clock))
+        logViewModel = viewModels.track(DailyLogViewModel(trackerData, dayEntries))
+        calendarViewModel = viewModels.track(CalendarViewModel(trackerData, dayEntries, clock))
     }
 
     @After
-    fun tearDown() {
-        holder.close()
-        DatabaseFactory.databaseFiles(context).forEach { it.delete() }
-    }
+    fun tearDown() =
+        runBlocking<Unit> {
+            viewModels.cancelAndJoin()
+            holder.close()
+            DatabaseFactory.databaseFiles(context).forEach { it.delete() }
+        }
 
     @Test
     fun loggingAPeriodStart_showsOnTodayAndCalendar() =
