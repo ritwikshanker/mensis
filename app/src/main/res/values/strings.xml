@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Mensis</string>
+
+    <!-- Locked screen (design §2) -->
+    <string name="locked_title">Mensis is locked</string>
+    <string name="locked_body">Unlock with your phone\'s fingerprint or PIN.</string>
+    <string name="locked_unlock">Unlock</string>
+    <string name="locked_use_pin">Use PIN</string>
+    <string name="unlock_prompt_title">Unlock Mensis</string>
+    <string name="unlock_prompt_subtitle">Touch the fingerprint sensor</string>
 </resources>

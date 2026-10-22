@@ -1,0 +1,391 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "29607124ef968fed7819d5d7bd0de18a",
+    "entities": [
+      {
+        "tableName": "day_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `date` TEXT NOT NULL, `flow` TEXT, `temperature_c` REAL, `temperature_time` TEXT, `symptoms` TEXT NOT NULL, `moods` TEXT NOT NULL, `cervical_mucus` TEXT, `lh_test` TEXT, `pregnancy_test` TEXT, `sex` TEXT, `pill_state` TEXT, `patch_changed` INTEGER, `ring_state` TEXT, `injection_given` INTEGER, `emergency_contraception` INTEGER, `sleep_minutes` INTEGER, `weight_kg` REAL, `notes` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `deleted_at` TEXT, `import_batch_id` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "flow",
+            "columnName": "flow",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "temperatureC",
+            "columnName": "temperature_c",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "temperatureTime",
+            "columnName": "temperature_time",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "symptoms",
+            "columnName": "symptoms",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moods",
+            "columnName": "moods",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cervicalMucus",
+            "columnName": "cervical_mucus",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lhTest",
+            "columnName": "lh_test",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pregnancyTest",
+            "columnName": "pregnancy_test",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sex",
+            "columnName": "sex",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pillState",
+            "columnName": "pill_state",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "patchChanged",
+            "columnName": "patch_changed",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ringState",
+            "columnName": "ring_state",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "injectionGiven",
+            "columnName": "injection_given",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "emergencyContraception",
+            "columnName": "emergency_contraception",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sleepMinutes",
+            "columnName": "sleep_minutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "weightKg",
+            "columnName": "weight_kg",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deletedAt",
+            "columnName": "deleted_at",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "importBatchId",
+            "columnName": "import_batch_id",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_day_entries_date",
+            "unique": true,
+            "columnNames": [
+              "date"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_day_entries_date` ON `${TABLE_NAME}` (`date`)"
+          }
+        ]
+      },
+      {
+        "tableName": "contraception_periods",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `method` TEXT NOT NULL, `regimen` TEXT, `start_date` TEXT NOT NULL, `end_date` TEXT, `daily_time` TEXT, `replace_by_date` TEXT, `checkup_date` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "method",
+            "columnName": "method",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "regimen",
+            "columnName": "regimen",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "startDate",
+            "columnName": "start_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "end_date",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dailyTime",
+            "columnName": "daily_time",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "replaceByDate",
+            "columnName": "replace_by_date",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "checkupDate",
+            "columnName": "checkup_date",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deletedAt",
+            "columnName": "deleted_at",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "tracker_settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `tracking_level` TEXT NOT NULL, `goal` TEXT NOT NULL, `mode` TEXT NOT NULL, `pregnancy_lmp` TEXT, `typical_cycle_length` INTEGER NOT NULL, `typical_period_length` INTEGER NOT NULL, `temperature_unit` TEXT NOT NULL, `weight_unit` TEXT NOT NULL, `reminders_json` TEXT NOT NULL, `discreet_wording` INTEGER NOT NULL, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackingLevel",
+            "columnName": "tracking_level",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "goal",
+            "columnName": "goal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mode",
+            "columnName": "mode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pregnancyLmp",
+            "columnName": "pregnancy_lmp",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "typicalCycleLength",
+            "columnName": "typical_cycle_length",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typicalPeriodLength",
+            "columnName": "typical_period_length",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "temperatureUnit",
+            "columnName": "temperature_unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weightUnit",
+            "columnName": "weight_unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remindersJson",
+            "columnName": "reminders_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "discreetWording",
+            "columnName": "discreet_wording",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "import_batches",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `source` TEXT NOT NULL, `imported_at` TEXT NOT NULL, `summary_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "importedAt",
+            "columnName": "imported_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "summaryJson",
+            "columnName": "summary_json",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "import_undo_rows",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`batch_id` TEXT NOT NULL, `table_name` TEXT NOT NULL, `row_id` TEXT NOT NULL, `previous_row_json` TEXT, PRIMARY KEY(`batch_id`, `table_name`, `row_id`))",
+        "fields": [
+          {
+            "fieldPath": "batchId",
+            "columnName": "batch_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tableName",
+            "columnName": "table_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowId",
+            "columnName": "row_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "previousRowJson",
+            "columnName": "previous_row_json",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "batch_id",
+            "table_name",
+            "row_id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '29607124ef968fed7819d5d7bd0de18a')"
+    ]
+  }
+}

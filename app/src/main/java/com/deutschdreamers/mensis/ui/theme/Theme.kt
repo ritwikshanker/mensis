@@ -11,12 +11,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-
-/** Colour scheme choice from the Theme screen. [DYNAMIC] falls back to [ROSE] below Android 12. */
-enum class ColorSchemeChoice { ROSE, SAGE, DYNAMIC }
-
-/** Light / dark / follow system. */
-enum class Appearance { LIGHT, DARK, SYSTEM }
+import com.deutschdreamers.mensis.data.settings.AppearanceMode
+import com.deutschdreamers.mensis.data.settings.ThemeScheme
 
 val LocalMensisColors = staticCompositionLocalOf { MensisColorsLight }
 
@@ -29,15 +25,15 @@ object MensisTheme {
 
 @Composable
 fun MensisTheme(
-    scheme: ColorSchemeChoice = ColorSchemeChoice.ROSE,
-    appearance: Appearance = Appearance.SYSTEM,
+    scheme: ThemeScheme = ThemeScheme.ROSE,
+    appearance: AppearanceMode = AppearanceMode.SYSTEM,
     content: @Composable () -> Unit,
 ) {
     val darkTheme =
         when (appearance) {
-            Appearance.LIGHT -> false
-            Appearance.DARK -> true
-            Appearance.SYSTEM -> isSystemInDarkTheme()
+            AppearanceMode.LIGHT -> false
+            AppearanceMode.DARK -> true
+            AppearanceMode.SYSTEM -> isSystemInDarkTheme()
         }
     val colorScheme = colorSchemeFor(scheme, darkTheme)
     val mensisColors = if (darkTheme) MensisColorsDark else MensisColorsLight
@@ -51,15 +47,16 @@ fun MensisTheme(
     }
 }
 
+/** [ThemeScheme.DYNAMIC] falls back to Rose below Android 12. */
 @Composable
 private fun colorSchemeFor(
-    scheme: ColorSchemeChoice,
+    scheme: ThemeScheme,
     darkTheme: Boolean,
 ): ColorScheme =
     when (scheme) {
-        ColorSchemeChoice.ROSE -> if (darkTheme) RoseDarkColorScheme else RoseLightColorScheme
-        ColorSchemeChoice.SAGE -> if (darkTheme) SageDarkColorScheme else SageLightColorScheme
-        ColorSchemeChoice.DYNAMIC ->
+        ThemeScheme.ROSE -> if (darkTheme) RoseDarkColorScheme else RoseLightColorScheme
+        ThemeScheme.SAGE -> if (darkTheme) SageDarkColorScheme else SageLightColorScheme
+        ThemeScheme.DYNAMIC ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val context = LocalContext.current
                 if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)

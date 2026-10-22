@@ -16,6 +16,7 @@ sqlcipher = "4.19.1"
 datastore = "1.3.0"
 work = "2.12.0"
 biometric = "1.1.0"
+appcompat = "1.8.0"
 credentials = "1.6.0"
 playServicesAuth = "22.0.0"
 googleid = "1.2.1"
@@ -29,6 +30,8 @@ mockk = "1.14.11"
 turbine = "1.2.1"
 truth = "1.4.5"
 androidxTestJunit = "1.3.0"
+androidxTest = "1.7.0"
+fragment = "1.9.1"
 espresso = "3.7.0"
 robolectric = "4.17"
 ktlintGradle = "14.2.0"
@@ -44,6 +47,7 @@ androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lif
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-navigation3 = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycle" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment" }
 # Compose — the UI toolkit (Material 3)
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -73,6 +77,9 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
 androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "work" }
 androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+# AppCompat — already pulled in by androidx.biometric; declared so the activity theme can extend Theme.AppCompat, which the
+# biometric library's fingerprint dialog on Android 8.x requires (it is an AppCompat AlertDialog)
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 # Google sign-in / Drive REST over OkHttp — only in :backup-drive, only for the optional encrypted backup
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
@@ -98,6 +105,9 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestJunit" }
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTest" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTest" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxTest" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
