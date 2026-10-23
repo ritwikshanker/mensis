@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -109,11 +110,26 @@ fun OnboardingContent(
     onRestore: () -> Unit,
 ) {
     if (!draft.isFirst) BackHandler(onBack = onBack)
+    // A Surface, not a background modifier: it also sets the content colour, which is black otherwise.
+    Surface(modifier = Modifier.fillMaxSize()) {
+        OnboardingLayout(draft, today, onUpdate, onBack, onSkip, onNext, onRestore)
+    }
+}
+
+@Composable
+private fun OnboardingLayout(
+    draft: OnboardingDraft,
+    today: LocalDate,
+    onUpdate: ((OnboardingDraft) -> OnboardingDraft) -> Unit,
+    onBack: () -> Unit,
+    onSkip: () -> Unit,
+    onNext: () -> Unit,
+    onRestore: () -> Unit,
+) {
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
                 .safeDrawingPadding()
                 .padding(horizontal = 24.dp),
     ) {
