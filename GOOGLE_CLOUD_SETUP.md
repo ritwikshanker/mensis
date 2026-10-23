@@ -38,12 +38,13 @@ In APIs & Services → OAuth consent screen (shown as "Google Auth Platform" in 
 
 ## 3. OAuth clients
 
-Credentials → Create credentials → OAuth client ID, three times at most:
+Credentials → Create credentials → OAuth client ID, four times at most:
 
 | Client type | For | Values |
 |---|---|---|
 | Android | debug builds | package `com.deutschdreamers.mensis`, SHA-1 of the debug keystore |
 | Android | builds installed from Google Play | package `com.deutschdreamers.mensis`, SHA-1 of the **app signing key** |
+| Android | signed release builds installed directly, not through Play (optional) | package `com.deutschdreamers.mensis`, SHA-1 of the **upload key** |
 | Web application | the build | name e.g. "Mensis sign-in"; no origins or redirect URIs |
 
 - Debug SHA-1, from the standard debug keystore:
@@ -57,6 +58,9 @@ Credentials → Create credentials → OAuth client ID, three times at most:
 - Release SHA-1: Google Play re-signs uploads with the **app signing key**, so use that certificate's
   SHA-1 from Play Console (Test and release → App integrity → App signing, available after the first
   upload), not the upload key's (RELEASING.md).
+- An APK from Android Studio's Generate Signed App Bundle or APK, installed on a phone directly, is
+  signed with the upload key instead. Sign-in from such a build needs its own Android client with the
+  upload key's SHA-1 (`keytool -list -v -keystore keystore.jks`); a debug build needs no extra client.
 - Android clients have no secret. They tie the package name and signing certificate to the project;
   a build signed with any other key cannot get a token.
 - The **web client ID** is what the build needs: Credential Manager's "Sign in with Google" asks for a
@@ -100,6 +104,7 @@ Google's current rules.
 3. Choose a password; "Backing up…" turns into "Backed up just now".
 4. On another phone or after Delete all data: onboarding → Restore from backup finds the backup.
 
-If the account sheet never appears or sign-in fails at once, compare the installed build's package
-name and signing SHA-1 with the Android OAuth clients, and check that the web client ID belongs to the
-same project. Users can see and remove Mensis's access at <https://myaccount.google.com/permissions>.
+If the account sheet never appears, sign-in fails at once, or choosing the account just returns to
+the backup screen (Google reports an unregistered signing key as a cancelled sign-in), compare the
+installed build's package name and signing SHA-1 with the Android OAuth clients, and check that the
+web client ID belongs to the same project. Users can see and remove Mensis's access at <https://myaccount.google.com/permissions>.
