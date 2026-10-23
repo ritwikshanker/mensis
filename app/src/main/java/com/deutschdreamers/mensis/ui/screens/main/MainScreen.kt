@@ -44,32 +44,7 @@ fun MainScreen(
     var pregnancyOffer by rememberSaveable(stateSaver = PregnancyOffer.Saver) { mutableStateOf<PregnancyOffer?>(null) }
     val stateHolder = rememberSaveableStateHolder()
     Scaffold(
-        bottomBar = {
-            NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
-                for (item in MainTab.entries) {
-                    val selected = item == tab
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = { tab = item },
-                        icon = {
-                            MsIcon(
-                                resId = if (selected) item.iconFilled else item.icon,
-                                contentDescription = null,
-                            )
-                        },
-                        label = { Text(stringResource(item.labelRes)) },
-                        colors =
-                            NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                                selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            ),
-                    )
-                }
-            }
-        },
+        bottomBar = { MainNavigationBar(selected = tab, onSelect = { tab = it }) },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(bottom = padding.calculateBottomPadding())) {
             stateHolder.SaveableStateProvider(tab) {
@@ -117,5 +92,37 @@ fun MainScreen(
             },
             onDismiss = { pregnancyOffer = null },
         )
+    }
+}
+
+/** The bottom bar with the four tabs; the store screenshots draw it too. */
+@Composable
+internal fun MainNavigationBar(
+    selected: MainTab,
+    onSelect: (MainTab) -> Unit,
+) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+        for (item in MainTab.entries) {
+            val isSelected = item == selected
+            NavigationBarItem(
+                selected = isSelected,
+                onClick = { onSelect(item) },
+                icon = {
+                    MsIcon(
+                        resId = if (isSelected) item.iconFilled else item.icon,
+                        contentDescription = null,
+                    )
+                },
+                label = { Text(stringResource(item.labelRes)) },
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                        selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+            )
+        }
     }
 }
