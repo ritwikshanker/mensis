@@ -20,9 +20,9 @@ as upload key; RELEASING.md): the choice is final once a bundle has been uploade
   telemetry with Google" is turned off (Test and release → App integrity → Automatic protection
   settings). Both matter for the privacy statements in the README, PRIVACY.md and the privacy policy.
   Decision (23 October 2026): protection and telemetry stay on; the README, PRIVACY.md, the privacy
-  policy and the store description disclose it. **Check** whether the Data safety form has to declare
-  this telemetry, and note that the app's About screen ("What leaves this phone: Nothing, by default")
-  does not mention it.
+  policy, the store description and the app's About screen ("What leaves this phone", line "In the
+  version from Google Play") disclose it. **Check** whether the Data safety form has to declare this
+  telemetry: Google's automatic protection page does not mention Data safety.
 - Category **Health & Fitness** (Store settings). Contact e-mail: required, shown on the store page and
   named in the privacy policy as a contact. Website: <https://ritwikshanker.github.io/mensis/>.
 

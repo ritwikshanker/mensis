@@ -462,7 +462,8 @@
     <string name="about_made_with">Made with ♥ in 🇩🇪 by 🇮🇳</string>
     <string name="about_source">github.com/ritwikshanker/mensis</string>
     <string name="about_leaves_title">What leaves this phone</string>
-    <string name="about_leaves_nothing">Nothing, by default. No analytics, no crash reporting, no ads, no account.</string>
+    <string name="about_leaves_nothing">Nothing from Mensis, by default. No analytics, no crash reporting, no ads, no account.</string>
+    <string name="about_leaves_play">In the version from Google Play: automatic protection, which Google adds to the app. It checks, sometimes online, that Mensis came from Google Play, and shares anonymised environment and performance data with Google.</string>
     <string name="about_leaves_backup">If you turn on backup: one encrypted file to your own Google Drive app folder. It is encrypted on the phone first; the password never leaves it.</string>
     <string name="about_leaves_export">If you export or share a report: only the file you choose, to the app you choose.</string>
     <string name="about_licence">Licence</string>

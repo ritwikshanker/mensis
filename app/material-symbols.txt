@@ -46,6 +46,7 @@ code
 gavel
 library_books
 policy
+shield
 bug_report
 open_in_new
 chevron_right

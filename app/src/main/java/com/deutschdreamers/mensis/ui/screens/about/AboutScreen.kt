@@ -247,6 +247,11 @@ private fun WhatLeaves() {
         )
         LeavesRow(R.drawable.ms_check_circle, MensisTheme.colors.fertile, stringResource(R.string.about_leaves_nothing))
         LeavesRow(
+            R.drawable.ms_shield,
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            stringResource(R.string.about_leaves_play),
+        )
+        LeavesRow(
             R.drawable.ms_cloud_upload,
             MaterialTheme.colorScheme.onSurfaceVariant,
             stringResource(R.string.about_leaves_backup),
