@@ -67,6 +67,14 @@ not affected. The app then starts again with onboarding.
 tracking SDKs, and no network code outside the `:backup-drive` module. Cleartext (HTTP) traffic is
 disabled for the whole app.
 
+The version distributed on Google Play is an exception the source code cannot show: Google Play's
+automatic protection is turned on for it, so Google modifies and re-signs the bundle and adds an
+installer check and anti-tamper checks to the app's code. According to Google, the installer check can
+occasionally need a data connection (when the Play Store app has been offline for a long time), a copy
+installed from elsewhere asks the user to get Mensis from Google Play, and anonymised environment and
+performance data is shared with Google (the "Share app telemetry with Google" setting, left on). The
+privacy policy discloses this. Builds from source contain none of it.
+
 ### Files you export
 
 An export is written only where you choose in the system file picker. A JSON or CSV export without a
@@ -118,7 +126,8 @@ the phone and revokes Mensis's Drive access. Backups already in Drive stay there
 them (Backup → Delete backups from Drive) or remove Mensis's access in your Google account.
 
 Without Google Play services, Drive backup is unavailable; everything else, including export and
-import, works.
+import, works in builds from source. The Google Play version's installer check expects the app to come
+from Google Play.
 
 ## Logs
 

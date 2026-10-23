@@ -14,6 +14,15 @@ as upload key; RELEASING.md): the choice is final once a bundle has been uploade
   language English (United States), App, Free.
 - The create form offers "automatic protection": Play adds an installer check to the app's code, and
   users who got the app from another source are asked to get it from Google Play. It was left on.
+  Google's help page (Sources) adds that Play creates modified, re-signed APKs for it, that installer
+  checks "periodically require a data connection" when the Play Store app has been offline for a long
+  time, and that anonymised environment and performance data is shared with Google unless "Share app
+  telemetry with Google" is turned off (Test and release → App integrity → Automatic protection
+  settings). Both matter for the privacy statements in the README, PRIVACY.md and the privacy policy.
+  Decision (23 October 2026): protection and telemetry stay on; the README, PRIVACY.md, the privacy
+  policy and the store description disclose it. **Check** whether the Data safety form has to declare
+  this telemetry, and note that the app's About screen ("What leaves this phone: Nothing, by default")
+  does not mention it.
 - Category **Health & Fitness** (Store settings). Contact e-mail: required, shown on the store page and
   named in the privacy policy as a contact. Website: <https://ritwikshanker.github.io/mensis/>.
 
@@ -31,13 +40,14 @@ set up.
 | Release notes | `changelogs/<versionCode>.txt` | 500 characters |
 | App icon | `images/icon.png` | 512 × 512, 32-bit PNG with alpha, at most 1024 KB |
 | Feature graphic | `images/featureGraphic.png` | 1024 × 500, JPEG or 24-bit PNG without alpha; required |
-| Phone screenshots | `images/phoneScreenshots/` (to be added) | at least 2 (4 at 1080 px or more for recommendations), 320–3840 px, long side at most twice the short side |
+| Phone screenshots | `images/phoneScreenshots/` (7 PNGs, 1080 × 1920) | at least 2 (4 at 1080 px or more for recommendations), 320–3840 px, long side at most twice the short side |
 
 - The icon is the launcher icon's app tile; the feature graphic combines it with the wordmark and the
   welcome subtitle.
-- **Screenshots are still missing.** Take them on the phone with synthetic data only (import the
-  synthetic 8-cycle CSV): turn off Settings → Hide in recent apps first, because it blocks screenshots.
-  Suggested: Today, Calendar, Insights, Daily log, Backup, About ("What leaves this phone").
+- The phone screenshots are drawn from the real screens with the synthetic preview data by the
+  instrumented test `StoreScreenshots` (CONTRIBUTING.md, "Store screenshots"): Today, Daily log,
+  Calendar, Insights, Backup, About and Today in dark mode, as PNGs without an alpha channel. The README
+  shows the same files. Redraw them when one of these screens changes.
 - Metadata policy: no emojis or repeated special characters, no ALL CAPS, no "best", "#1", "top",
   "new", "free" or ranking claims in the title or icon.
 - Health apps that are not medical devices need a disclaimer in the description that the app "is not a
@@ -143,8 +153,26 @@ Drive sign-in for testers outside the consent screen's test-user list needs the 
 published (GOOGLE_CLOUD_SETUP.md, step 5) and the release Android OAuth client with Play's app signing
 SHA-1.
 
+### Public enrollment for the closed test
+
+The README and the project site invite anyone to join, so the closed test uses an open Google Group
+instead of an e-mail list:
+
+1. Create the group `mensis-testers` with the Mensis Google account (<https://groups.google.com/>):
+   anyone can join; only managers can view members (testers' addresses stay private); only managers can
+   post; conversation history off.
+2. Play Console → Test and release → Testing → Closed testing → the track's Testers tab: choose
+   Google Groups and add `mensis-testers@googlegroups.com`. Set the feedback channel to the GitHub issues
+   page.
+3. Copy the opt-in link the Testers tab shows. The README and `docs/index.md` use
+   <https://play.google.com/apps/testing/com.deutschdreamers.mensis>; check that the console shows the
+   same link.
+4. Joining the group, then opting in with the same Google account, makes someone a tester; they install
+   Mensis from Google Play. People who join count toward the 12 opted-in testers once they have opted in.
+
 ## Sources
 
+- Automatic protection: <https://support.google.com/googleplay/android-developer/answer/10183279>
 - Data safety: <https://support.google.com/googleplay/android-developer/answer/10787469>
 - Account deletion requirement: <https://support.google.com/googleplay/android-developer/answer/13327111>
 - User data and privacy policy: <https://support.google.com/googleplay/android-developer/answer/10144311>

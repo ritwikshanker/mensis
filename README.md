@@ -1,68 +1,116 @@
-# Mensis
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/icon.png" width="104" alt="Mensis app icon">
+</p>
 
-A private menstrual cycle tracker for Android. Your data stays on your phone, encrypted. No account,
-no analytics, no ads. Optional encrypted backup to your own Google Drive.
+<h1 align="center">Mensis</h1>
 
-## Download
+<p align="center">
+  <b>A cycle tracker that keeps your data on your phone.</b><br>
+  No account · no analytics · no ads · open source under the MIT licence
+</p>
 
-Mensis is distributed through Google Play (first release in preparation). The privacy policy is at
+<p align="center">
+  <a href="#join-the-test"><b>Join the test on Google Play</b></a> ·
+  <a href="https://ritwikshanker.github.io/mensis/privacy/">Privacy policy</a> ·
+  <a href="https://github.com/ritwikshanker/mensis/issues">Report a problem</a>
+</p>
+
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_today.png" width="200" alt="Today: cycle day 17, luteal phase, the cycle strip, and the next period and fertile window as date ranges">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_daily_log.png" width="200" alt="The daily log sheet over Today, with flow choices and the note that nothing is required">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_calendar.png" width="200" alt="Calendar for September with fertile days, ovulation, predicted period days and the selected day's log">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4_insights.png" width="200" alt="Insights: cycle length chart over eight cycles, period length, luteal phase and the waking temperature chart">
+</p>
+
+## What it does
+
+Mensis is a menstrual cycle tracker for Android that works entirely on your phone. You log what you
+want, when you want; Mensis turns it into ranges and charts without sending it anywhere.
+
+- **Log as much or as little as you like.** Period days and flow, symptoms, mood, sleep and notes. Add
+  waking temperature, cervical mucus and LH tests if you follow the sympto-thermal method, pregnancy
+  tests, and your contraception: pill, patch, ring, injection, implant or IUD. Nothing is ever required.
+- **Ranges, not guesses.** After one complete cycle Mensis estimates your next period as a date range
+  and tells you how many cycles that rests on. After three cycles it adds an estimated fertile window
+  and shows how much your cycles vary. A waking temperature shift marks ovulation after the fact;
+  without temperatures, ovulation is estimated from your cycle lengths and labelled as such.
+- **Understands hormonal methods.** With a cyclic pill, patch or ring Mensis counts your pack days and
+  predicts the withdrawal bleed; with methods that stop the cycle, such as a hormonal IUD or continuous
+  use, it pauses predictions.
+- **Insights.** Cycle and period lengths, luteal phase, temperature charts and symptoms that come back
+  in the same phase of your cycle.
+- **A report for your doctor.** A PDF with your cycle statistics and charts, created on the phone.
+- **Discreet reminders.** Period, fertile window, contraception and temperature reminders are scheduled
+  on the phone. Notifications say only "Reminder" unless you choose other wording.
+- **Pregnancy mode** with the estimated due date and week.
+- **Your data stays yours.** Export to JSON or CSV, with optional password encryption. Import from a
+  Mensis export, from drip. or from any CSV file; Clue import is experimental.
+- **Light and dark**, two colour schemes, and Material You colours on Android 12 and later.
+
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5_backup.png" width="200" alt="Backup screen: backed up yesterday, encrypted, weekly on Wi-Fi to the user's own Google Drive">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6_about.png" width="200" alt="About and privacy screen with the app icon, version, and what leaves this phone">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7_today_dark.png" width="200" alt="Today in dark mode on period day 2">
+</p>
+
+## Private by design
+
+- **Encrypted on the phone.** Everything you log is stored in an encrypted database. Its key is
+  protected by the phone's Android Keystore, so the database can only be read on that phone.
+- **No servers of ours.** There is no account and no Mensis server. Mensis sends your data nowhere
+  unless you turn on Google Drive backup.
+- **Backup only you can read.** The optional backup is encrypted on the phone with a password only you
+  know, then stored in a hidden app folder in your own Google Drive. Google cannot read it, and neither
+  can the developer. There is no password reset.
+- **Nothing to track you.** No analytics, crash reporting, ads or tracking libraries in the code. The
+  only Google libraries are the ones needed for sign-in and Drive.
+- **One thing Google adds.** The version on Google Play includes Google Play's automatic protection,
+  which Google adds to the app: it checks that Mensis was installed from Google Play, can occasionally
+  need a data connection for that, and shares anonymised environment and performance data with Google.
+  Builds from source do not contain it.
+- **Quiet on screen.** Optional app lock with your fingerprint, face or screen lock. Screenshots and the
+  preview in recent apps are blocked by default.
+
+The full threat model is in [PRIVACY.md](PRIVACY.md), the privacy policy at
 <https://ritwikshanker.github.io/mensis/privacy/>.
 
-## Privacy model
+## Join the test
 
-- All health data lives in a SQLCipher-encrypted database. The database key is 32 random bytes wrapped
-  by an AES-256-GCM key in the Android Keystore (StrongBox when the device has it), so the database is
-  readable only on this device.
-- The app never contacts a server unless you turn on Google Drive backup. Backups are encrypted on the
-  phone with a key derived from a password only you know (Argon2id, AES-256-GCM) and stored in Drive's
-  hidden app-data folder. Google sees ciphertext and a file size.
-- No analytics, crash reporting, ads or tracking SDKs. The only Google libraries are the ones needed for
-  sign-in and Drive. The app works fully without Google Play Services; only Drive backup is unavailable.
-- Android's own backup and device-to-device transfer are disabled. Screenshots and the Recents thumbnail
-  are blocked by default. Notifications say only "Reminder" unless you choose otherwise.
-- Predictions are statistics about your own history. Mensis is not a medical device and is not a method
-  of contraception.
+Mensis is being tested on Google Play before its public release, and you are welcome to join. You need
+an Android phone with Google Play and the same Google account in both steps:
 
-The threat model is described in [`PRIVACY.md`](PRIVACY.md). The export and import formats
-are documented in [`docs/export-format.md`](docs/export-format.md), with a JSON Schema in
-[`docs/mensis-export.schema.json`](docs/mensis-export.schema.json).
+1. Join the testers group: **<https://groups.google.com/g/mensis-testers>**. Members cannot see each
+   other's addresses, and the group is not used for messages.
+2. Open **<https://play.google.com/apps/testing/com.deutschdreamers.mensis>** and tap
+   *Become a tester*.
+3. Install Mensis from the Google Play link on that page. Updates come through Google Play like any
+   other app.
 
-## Building
+Good to know while testing:
 
-Requirements: JDK 17 or newer (the Gradle daemon runs on JDK 21, auto-provisioned by the toolchain resolver), Android SDK with
-platform 37. Then:
+- Your data stays on your phone. Uninstalling Mensis deletes it, so turn on backup or export your data
+  before you uninstall or switch phones.
+- Found a bug or have an idea? Open an [issue on GitHub](https://github.com/ritwikshanker/mensis/issues)
+  or use the contact e-mail on the Google Play page. Please do not include real cycle data in reports.
+
+## Important
+
+Predictions are statistics about your own history. Mensis is not a medical device and does not
+diagnose, treat, cure or prevent any medical condition. It is not a method of contraception. Please
+consult a healthcare professional about any question concerning your health.
+
+## Build it yourself
+
+Mensis is written in Kotlin with Jetpack Compose. With JDK 17 or newer and the Android SDK:
 
 ```
-./gradlew assembleDebug        # debug APK
-./gradlew check                # ktlint, detekt, lint, unit tests
-./gradlew connectedCheck       # instrumented tests on a connected device or emulator
+./gradlew assembleDebug
 ```
 
-Google Drive backup needs an OAuth web client ID from your own Google Cloud project, set as
-`mensis.googleWebClientId` in `~/.gradle/gradle.properties`; [`GOOGLE_CLOUD_SETUP.md`](GOOGLE_CLOUD_SETUP.md)
-walks through it. Without it the app builds and works, and the Backup screen says Drive backup is not
-configured in this build.
-
-The bundled fonts and Material Symbols icons are not kept in the repository: the first build downloads
-them from Google Fonts and google/material-design-icons, together with the Apache License 2.0 text shown
-in the app, into `app/build/generated/designAssets` (the `fetchDesignAssets` Gradle task), so the first
-build needs network access.
-
-## Releases
-
-Release bundles are built and signed locally and uploaded to Google Play. [`RELEASING.md`](RELEASING.md)
-has the checklist, [`PLAY_CONSOLE.md`](PLAY_CONSOLE.md) the Play Console declarations. Store texts and
-graphics live in `fastlane/metadata/android/en-US/`.
-
-## Project layout
-
-| Module | Purpose |
-|---|---|
-| `:domain` | Pure Kotlin: models, cycle derivation, prediction engine, insights. No Android imports. |
-| `:data` | Room + SQLCipher, key management, repositories, export/import. |
-| `:backup-drive` | Google sign-in, Drive client, backup scheduling and restore. The only module with network code. |
-| `:app` | Jetpack Compose UI, Navigation 3, theme, notifications, workers. |
+Builds from source work without Google Play services; only Drive backup is then unavailable.
+[CONTRIBUTING.md](CONTRIBUTING.md) covers building, tests, the project layout and how to contribute.
 
 ## Licence
 
-MIT, see `LICENSE`. Third-party notices (fonts, icons, libraries) are in `THIRD_PARTY_NOTICES.md`.
+MIT, see [LICENSE](LICENSE). Fonts, icons and libraries are listed with their licences in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

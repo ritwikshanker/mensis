@@ -5,7 +5,7 @@ permalink: /privacy/
 
 # Mensis privacy policy
 
-Effective 22 October 2026.
+Effective 23 October 2026.
 
 Mensis is a menstrual cycle tracker for Android, developed by Ritwik Shanker and published as open
 source at <https://github.com/ritwikshanker/mensis>. This policy covers the Mensis app published on
@@ -14,10 +14,12 @@ Google Play.
 ## In short
 
 - Everything you log stays on your phone, in an encrypted database.
-- Mensis has no account, no analytics, no crash reporting, no ads and no tracking.
+- Mensis has no account, and its code contains no analytics, crash reporting, ads or tracking.
 - The developer runs no server and receives no data from the app.
 - Data leaves your phone only when you choose it: an encrypted backup to your own Google Drive, a file
   you export, or a report you share.
+- The version on Google Play also contains Google Play's automatic protection, which Google adds to the
+  app and which shares anonymised environment and performance data with Google (see below).
 
 ## What Mensis stores on your phone
 
@@ -54,14 +56,31 @@ encrypted. Notes are left out unless you include them.
 **Links.** Opening the source code, this policy or the issue tracker from the app hands the address to
 your browser; the app itself sends nothing.
 
-Apart from Google sign-in and the Drive calls for backup and restore, Mensis makes no network
+Apart from Google sign-in and the Drive calls for backup and restore, Mensis's own code makes no network
 connections.
+
+## Google Play's automatic protection
+
+The Mensis version distributed on Google Play includes Google Play's automatic protection. Google adds
+it to the app when it prepares the app for distribution; it is not part of Mensis's source code.
+According to [Google's description](https://support.google.com/googleplay/android-developer/answer/10183279):
+
+- it checks that the app was installed from Google Play, and a copy installed from elsewhere asks you to
+  get Mensis from Google Play;
+- the check can occasionally need a data connection, when the Play Store app on the phone has been
+  offline for a long time;
+- it shares anonymised environment and performance data with Google.
+
+This processing is done by Google under [Google's privacy policy](https://policies.google.com/privacy).
+Builds made from the source code do not contain it.
 
 ## What the developer receives
 
-Nothing. There is no developer server, and the app contains no analytics, crash-reporting, advertising
-or tracking code. If you report a problem on GitHub, only what you write in the report is shared, under
-GitHub's terms.
+No data from the app. There is no developer server, and Mensis's code contains no analytics,
+crash-reporting, advertising or tracking code. Like for every app on Google Play, Play Console shows
+the developer statistics collected by Google Play, such as install numbers and crash reports from
+phones whose owners allow sharing usage and diagnostics data with Google. If you report a problem on
+GitHub, only what you write in the report is shared, under GitHub's terms.
 
 ## Permissions
 
