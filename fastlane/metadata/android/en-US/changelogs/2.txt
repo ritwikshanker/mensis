@@ -1,0 +1,5 @@
+Hormonal IUD
+• Periods and ovulation often continue with a hormonal IUD, so predictions now follow the periods you log instead of being paused.
+• Fertile window, luteal phase and temperature insights, the report statistics and period reminders work as they do without a method.
+• When no period comes, Today shows days since your last bleed instead of a late period.
+Predictions are estimates, not contraception.

@@ -12,7 +12,7 @@ Ranges, not guesses
 • After one complete cycle, Mensis estimates when your next period starts, as a date range with how many cycles it rests on.
 • After three cycles it adds an estimated fertile window and shows how much your cycles vary.
 • A waking temperature shift marks ovulation after the fact; without temperatures, ovulation is estimated from cycle lengths and labelled as such.
-• With a hormonal method, Mensis predicts the withdrawal bleed or pauses predictions, depending on the method.
+• With a hormonal method, Mensis predicts the withdrawal bleed, follows the periods you log (hormonal IUD) or pauses predictions, depending on the method.
 • Insights: cycle and period lengths, luteal phase, temperature charts and symptoms that come back in the same phase.
 • A PDF report for your doctor, created on the phone.
 
