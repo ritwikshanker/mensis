@@ -20,10 +20,10 @@ Private by design
 • Everything is stored in an encrypted database whose key is protected by the phone's Android Keystore.
 • Optional app lock with the phone's fingerprint, face or screen lock. Screenshots and the preview in recent apps are blocked by default.
 • Reminders are scheduled on the phone. Notifications say only "Reminder" unless you choose other wording.
-• Mensis sends your data nowhere unless you turn on Google Drive backup.
+• The app never contacts a server unless you turn on Google Drive backup.
 • Optional backup to your own Google Drive: the data is encrypted on the phone with a password only you know, then stored in Drive's hidden app folder. Google cannot read it, and neither can the developer. There is no password reset.
 • Export to JSON or CSV, with optional password encryption. Import from a Mensis export, from drip. or from any CSV file; Clue import is experimental.
-• Builds from the source code work without Google Play services; only Drive backup is then unavailable. This Google Play version includes Google Play's automatic protection (see the privacy policy).
+• Works without Google Play services; only Drive backup is then unavailable.
 
 Important
 Predictions are statistics about your own history. Mensis is not a medical device and does not diagnose, treat, cure or prevent any medical condition. It is not a method of contraception. Please consult a healthcare professional about any question concerning your health.

@@ -14,15 +14,6 @@ as upload key; RELEASING.md): the choice is final once a bundle has been uploade
   language English (United States), App, Free.
 - The create form offers "automatic protection": Play adds an installer check to the app's code, and
   users who got the app from another source are asked to get it from Google Play. It was left on.
-  Google's help page (Sources) adds that Play creates modified, re-signed APKs for it, that installer
-  checks "periodically require a data connection" when the Play Store app has been offline for a long
-  time, and that anonymised environment and performance data is shared with Google unless "Share app
-  telemetry with Google" is turned off (Test and release → App integrity → Automatic protection
-  settings). Both matter for the privacy statements in the README, PRIVACY.md and the privacy policy.
-  Decision (23 October 2026): protection and telemetry stay on; the README, PRIVACY.md, the privacy
-  policy, the store description and the app's About screen ("What leaves this phone", line "In the
-  version from Google Play") disclose it. The Data safety form declares the telemetry as Diagnostics
-  (see Data safety below).
 - Category **Health & Fitness** (Store settings). Contact e-mail: required, shown on the store page and
   named in the privacy policy as a contact. Website: <https://ritwikshanker.github.io/mensis/>.
 
@@ -96,34 +87,11 @@ before changing this. Keep the store listing and the privacy policy consistent w
 
 ### Data safety
 
-Mensis's own code collects nothing; the one declared item is the telemetry of Google Play's automatic
-protection (Create the app, above), which leaves the phone from the Play version of the app.
+Answer **No** to "Does your app collect or share any of the required user data types?" The form still has
+to be submitted. Reasoning, in Google's own terms:
 
-| Question | Answer |
-|---|---|
-| Does your app collect or share any of the required user data types? | Yes |
-| Is all of the user data collected by your app encrypted in transit? | Yes |
-| Account creation | My app does not allow users to create an account |
-| Do you provide a way for users to request that their data is deleted? | No |
-| Data types | App info and performance → Diagnostics (nothing else) |
-| Diagnostics: collected or shared | Collected, not shared |
-| Diagnostics: processed ephemerally | No |
-| Diagnostics: required or optional | Required (users cannot turn it off) |
-| Diagnostics: purposes | Fraud prevention, security, and compliance |
-
-Reasoning, in Google's own terms:
-
-- "Collect" means transmitting data "from your app off a user's device", including data sent by code in
-  the app that the developer did not write. Google describes the telemetry as "anonymized environment
-  and performance data"; the form exempts fully anonymised data only from sharing, not from collection,
-  so it is declared as collected and not shared. "Diagnostics" is "Information about the performance of
-  your app". Google does not say whether it is processed ephemerally, so the answer is No.
-- Encrypted in transit: Mensis disables cleartext traffic, and Google states that Play's data handling
-  for the Play Integrity API is encrypted; it does not say so for this telemetry specifically.
-- Deletion: the developer holds no data and cannot delete Google's telemetry. Everything Mensis stores
-  is deleted in the app (Settings → Delete all data, optionally including the Drive backups); a
-  data-deletion URL is required only for apps with accounts.
-- Everything Mensis records is processed only on the phone, which is exempt.
+- "Collect" means transmitting data off the device. Everything Mensis records is processed only on the
+  phone, which is exempt.
 - **Drive backup** is uploaded off the device, but encrypted on the phone with a key derived from the
   user's password (Argon2id, AES-256-GCM), so it is "unreadable by you or anyone other than the sender
   and recipient", including Google: the end-to-end encryption exemption. Google's FAQ also exempts
@@ -138,6 +106,9 @@ Reasoning, in Google's own terms:
   personal information, and they go to the user's own Drive, not to the developer; if you read the form
   differently for the phone model, declare it as collected (not shared), optional, for app
   functionality, encrypted in transit.
+- "Data encrypted in transit" and the deletion questions appear only after a Yes. A data-deletion URL is
+  required only for apps with accounts; Mensis has none. Deletion happens in the app (Settings → Delete
+  all data, optionally including the Drive backups).
 
 ### Health apps declaration
 

@@ -64,10 +64,6 @@ want, when you want; Mensis turns it into ranges and charts without sending it a
   can the developer. There is no password reset.
 - **Nothing to track you.** No analytics, crash reporting, ads or tracking libraries in the code. The
   only Google libraries are the ones needed for sign-in and Drive.
-- **One thing Google adds.** The version on Google Play includes Google Play's automatic protection,
-  which Google adds to the app: it checks that Mensis was installed from Google Play, can occasionally
-  need a data connection for that, and shares anonymised environment and performance data with Google.
-  Builds from source do not contain it.
 - **Quiet on screen.** Optional app lock with your fingerprint, face or screen lock. Screenshots and the
   preview in recent apps are blocked by default.
 
