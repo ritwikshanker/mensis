@@ -19,23 +19,27 @@ encrypted on the phone with a password only you know. The code is open source un
 ## Join the test
 
 Mensis is in a closed test on Google Play, and every tester counts: Google Play lets a new app go public
-only after at least 12 testers have stayed in its test for 14 days in a row. Joining takes two minutes.
-You need an Android phone (Android 8 or newer) with Google Play, and the same Google account in all
-three steps:
+only after at least 12 testers have stayed in its test for 14 days in a row. You need an Android phone
+(Android 8 or newer) with Google Play, and the same Google account in every step.
 
-1. **Join the testers group:** <https://groups.google.com/g/mensis-testers>, then *Join group*. Only
-   the developer can see members' addresses, and the group sends no messages.
-2. **Become a tester:** <https://play.google.com/apps/testing/com.deutschdreamers.mensis>, then
+**Invited by e-mail?** Your Google account is already on the test, so it takes two steps:
+
+1. **Become a tester:** <https://play.google.com/apps/testing/com.deutschdreamers.mensis>, then
    *Become a tester*.
-3. **Install Mensis:** <https://play.google.com/store/apps/details?id=com.deutschdreamers.mensis> (this
-   page only opens once you are a tester), or use the Google Play link on the page from step 2.
+2. **Install Mensis:** <https://play.google.com/store/apps/details?id=com.deutschdreamers.mensis> (this
+   page only opens once you are a tester), or use the Google Play link on the page from step 1.
+
+**Not invited?** Join the testers group first: <https://groups.google.com/g/mensis-testers>, then
+*Join group*. The group is only the sign-up list: the developer adds its members to the test by hand,
+usually within a day, and then the two steps above work. Only the developer can see members' addresses,
+and the group sends no messages.
 
 Then please **stay in the test for at least 14 days**, ideally with Mensis installed. Testers who leave
 earlier do not count towards the 12.
 
-If the test page says it is not available, check that it uses the Google account that joined the group
-(switch accounts with the profile picture) and wait a few minutes after joining. In the Play Store app,
-switch to the same account the same way.
+If the test page says it is not available, check that it uses the Google account you were invited with
+or that joined the group (switch accounts with the profile picture); after joining the group, try again
+the next day. In the Play Store app, switch to the same account the same way.
 
 Your data stays on your phone: uninstalling Mensis deletes it, so turn on backup or export first.
 Problems and ideas go to the [issue tracker](https://github.com/ritwikshanker/mensis/issues); please do

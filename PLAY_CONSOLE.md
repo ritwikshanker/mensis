@@ -144,22 +144,28 @@ Drive sign-in for testers outside the consent screen's test-user list needs the 
 published (GOOGLE_CLOUD_SETUP.md, step 5) and the release Android OAuth client with Play's app signing
 SHA-1.
 
-### Public enrollment for the closed test
+### Testers for the closed test
 
-The README and the project site invite anyone to join, so the closed test uses an open Google Group
-instead of an e-mail list:
+A track takes either e-mail lists or Google Groups, not both. The closed test uses e-mail lists, so
+invited testers only opt in and install. The README and the project site also let anyone ask to join
+through an open Google Group, which serves only as a sign-up list:
 
-1. Create the group `mensis-testers` with the Mensis Google account (<https://groups.google.com/>):
-   anyone can join; only managers can view members (testers' addresses stay private); only managers can
-   post; conversation history off.
-2. Play Console → Test and release → Testing → Closed testing → the track's Testers tab: choose
-   Google Groups and add `mensis-testers@googlegroups.com`. Set the feedback channel to the GitHub issues
-   page.
-3. Copy the opt-in link the Testers tab shows. The README and `docs/index.md` use
+1. The group `mensis-testers` (Mensis Google account, <https://groups.google.com/>): anyone can join;
+   only managers can view members (testers' addresses stay private); only managers can post;
+   conversation history off.
+2. Play Console → Test and release → Testing → Closed testing → the track's Testers tab: Email lists,
+   with *Friends*, *Internal Testers* and *Group sign-ups* ticked. Friends and Internal Testers also
+   feed the internal testing track, so people from the group go only into *Group sign-ups* (created
+   with the Mensis account as its first address; a list cannot be empty). Feedback channel: the GitHub
+   issues page. Changing which lists the track uses is a change that goes through review (Publishing
+   overview).
+3. Once a day, compare the group's members with *Group sign-ups* and add the new addresses (the arrow
+   next to the list on the Testers tab opens it). The README promises this usually within a day.
+4. Copy the opt-in link the Testers tab shows. The README and `docs/index.md` use
    <https://play.google.com/apps/testing/com.deutschdreamers.mensis>; check that the console shows the
    same link.
-4. Joining the group, then opting in with the same Google account, makes someone a tester; they install
-   Mensis from Google Play. People who join count toward the 12 opted-in testers once they have opted in.
+5. Someone on one of the lists who opts in with that Google account is a tester; they install Mensis
+   from Google Play. They count toward the 12 opted-in testers once they have opted in.
 
 ## Sources
 
