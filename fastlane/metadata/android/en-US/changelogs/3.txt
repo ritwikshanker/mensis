@@ -1,0 +1,7 @@
+First release.
+• Period, symptom, temperature and contraception logging
+• Next-period and fertile-window ranges, insights and a doctor report PDF
+• Encrypted database, app lock, discreet reminders
+• Optional encrypted backup to your own Google Drive
+• Export and import (Mensis, drip., CSV; Clue experimental)
+Predictions are estimates, not contraception.

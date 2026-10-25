@@ -142,8 +142,8 @@ android {
         minSdk = 26
         targetSdk = 37
         // Raised by hand for every Play upload (RELEASING.md); the changelog file is named after versionCode.
-        versionCode = 2
-        versionName = "0.1.1"
+        versionCode = 3
+        versionName = "0.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
