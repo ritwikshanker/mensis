@@ -38,6 +38,10 @@ object MethodLabels {
             MethodKind.COPPER ->
                 "No hormonal effect, so predictions work as usual. Periods may be heavier or longer; " +
                     "this is recorded, not flagged."
+            MethodKind.LOCAL_HORMONAL ->
+                "Ovulation and periods often continue with a hormonal IUD, so period and fertile-window " +
+                    "predictions follow the periods you log. Bleeding may become lighter, irregular or stop; " +
+                    "until a period comes, Today shows days since the last bleed."
             MethodKind.CYCLIC ->
                 "The break-week bleed is predicted instead of a period. Fertile window and ovulation are hidden " +
                     "because ovulation is suppressed. Temperature can still be logged but is not used to confirm " +

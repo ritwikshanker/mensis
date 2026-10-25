@@ -11,6 +11,7 @@ import com.deutschdreamers.mensis.domain.model.ContraceptionMethod
 import com.deutschdreamers.mensis.domain.model.ContraceptionPeriod
 import com.deutschdreamers.mensis.domain.model.DayEntry
 import com.deutschdreamers.mensis.domain.model.Flow
+import com.deutschdreamers.mensis.domain.model.MethodKind
 import com.deutschdreamers.mensis.domain.model.Mood
 import com.deutschdreamers.mensis.domain.model.PillState
 import com.deutschdreamers.mensis.domain.model.RingState
@@ -118,7 +119,7 @@ class DailyLogViewModel
                     LogUiState(
                         draft = draft,
                         dateLabel = Formats.weekdayDayMonth(request.date),
-                        subtitle = subtitle(model.state, model.numeral, model.phase),
+                        subtitle = subtitle(model.state, model.methodKind, model.numeral, model.phase),
                         trackingLevel = settings.trackingLevel,
                         temperatureUnit = settings.temperatureUnit,
                         weightUnit = settings.weightUnit,
@@ -193,13 +194,19 @@ class DailyLogViewModel
 
         private fun subtitle(
             todayState: TodayState,
+            methodKind: MethodKind,
             numeral: Int?,
             phase: CyclePhase?,
         ): String =
             when (todayState) {
                 TodayState.FIRST_LAUNCH -> "No cycle yet"
                 TodayState.PREGNANCY -> "Pregnancy mode"
-                TodayState.SUPPRESSED -> "Predictions paused"
+                TodayState.SUPPRESSED ->
+                    when {
+                        methodKind != MethodKind.LOCAL_HORMONAL -> "Predictions paused"
+                        numeral == null -> "No bleeding logged yet"
+                        else -> "${Formats.days(numeral)} since last bleed"
+                    }
                 TodayState.CYCLIC -> "Pack day $numeral"
                 else -> {
                     val phaseName =

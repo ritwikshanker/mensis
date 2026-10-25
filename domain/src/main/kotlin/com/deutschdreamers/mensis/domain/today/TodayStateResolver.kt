@@ -20,8 +20,9 @@ import com.deutschdreamers.mensis.domain.pregnancy.PregnancyCalculator
 import java.time.LocalDate
 
 /**
- * Turns raw entries and settings into the Today model. Precedence: pregnancy → first launch →
- * suppressing method → cyclic method → late → on period → fertile → normal.
+ * Turns raw entries and settings into the Today model. Precedence: pregnancy → suppressing method, or a
+ * hormonal IUD with no period to predict from → cyclic method → first launch → late → on period →
+ * fertile → normal.
  */
 object TodayStateResolver {
     fun resolve(input: PredictionInput): TodayModel {
@@ -30,12 +31,13 @@ object TodayStateResolver {
         val kind = method?.kind ?: MethodKind.NONE
         val prediction = PredictionEngine.predict(input.copy(entries = entries))
         val lmp = input.settings.pregnancyLmp
+        val noPeriodToPredict = prediction.currentCycle == null || prediction.isLate
         return when {
             input.settings.mode == TrackerMode.PREGNANCY && lmp != null -> pregnancy(input.today, lmp, method, kind)
-            prediction.currentCycle == null && kind != MethodKind.SUPPRESS && kind != MethodKind.CYCLIC ->
-                firstLaunch(input.today, prediction, method, kind)
-            kind == MethodKind.SUPPRESS -> suppressed(input.today, entries, prediction, requireNotNull(method))
+            kind == MethodKind.SUPPRESS || (kind == MethodKind.LOCAL_HORMONAL && noPeriodToPredict) ->
+                suppressed(input.today, entries, prediction, requireNotNull(method))
             kind == MethodKind.CYCLIC -> cyclic(input.today, entries, prediction, requireNotNull(method))
+            prediction.currentCycle == null -> firstLaunch(input.today, prediction, method, kind)
             else -> natural(input, entries, prediction, method, kind)
         }
     }
@@ -96,17 +98,29 @@ object TodayStateResolver {
         val n = PredictionConstants.STRIP_MIN_DAYS
         val byDate = entries.associateBy { it.date }
         val firstDay = today.minusDays((n - 1).toLong())
+        // A hormonal IUD often keeps the cycle going, so a logged period stays a period on its strip.
+        val periodsKept = method.kind == MethodKind.LOCAL_HORMONAL
         val cells =
             (1..n).map { day ->
                 val flow = byDate[firstDay.plusDays((day - 1).toLong())]?.flow
-                StripCell(day, if (flow?.isBleeding == true) StripCellKind.SPOTTING else StripCellKind.NONE)
+                val kind =
+                    when {
+                        periodsKept && flow?.isMenstrual == true -> StripCellKind.PERIOD
+                        flow?.isBleeding == true -> StripCellKind.SPOTTING
+                        else -> StripCellKind.NONE
+                    }
+                StripCell(day, kind)
             }
         val lanes =
-            listOf(
-                StripLane(StripLaneKind.LAST_DAYS, 1, SUPPRESSED_LANE_SPLIT_DAY),
-                StripLane(StripLaneKind.SPOTTING, SUPPRESSED_LANE_SPLIT_DAY + 1, n),
-            )
-        return empty(TodayState.SUPPRESSED, today, method, MethodKind.SUPPRESS).copy(
+            if (periodsKept) {
+                listOf(StripLane(StripLaneKind.LAST_DAYS, 1, n))
+            } else {
+                listOf(
+                    StripLane(StripLaneKind.LAST_DAYS, 1, SUPPRESSED_LANE_SPLIT_DAY),
+                    StripLane(StripLaneKind.SPOTTING, SUPPRESSED_LANE_SPLIT_DAY + 1, n),
+                )
+            }
+        return empty(TodayState.SUPPRESSED, today, method, method.kind).copy(
             numeral = summary.daysSinceLastBleed,
             strip = CycleStrip(n, n, cells, lanes),
             prediction = prediction,

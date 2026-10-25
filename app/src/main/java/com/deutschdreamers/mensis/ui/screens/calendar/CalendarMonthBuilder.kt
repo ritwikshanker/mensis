@@ -193,7 +193,7 @@ object CalendarMonthBuilder {
                 when (kind) {
                     MethodKind.CYCLIC -> withdrawalBleed?.let { predicted += it }
                     MethodKind.SUPPRESS -> Unit
-                    MethodKind.NONE, MethodKind.COPPER -> {
+                    MethodKind.NONE, MethodKind.COPPER, MethodKind.LOCAL_HORMONAL -> {
                         if (!prediction.isLate) prediction.nextPeriod?.let { predicted += it.range }
                         for (past in prediction.confirmedOvulations) {
                             val window =

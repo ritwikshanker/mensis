@@ -186,6 +186,7 @@ class LogToTodayFlowTest {
             logViewModel.open(LogRequest(today))
             val iudLog = logViewModel.uiState.first { it != null && it.method.item != MethodItem.PILL }
             assertEquals(MethodItem.LARC, iudLog?.method?.item)
+            assertEquals("No bleeding logged yet", iudLog?.subtitle)
             assertEquals(false, iudLog?.method?.showEmergencyContraception)
         }
 }

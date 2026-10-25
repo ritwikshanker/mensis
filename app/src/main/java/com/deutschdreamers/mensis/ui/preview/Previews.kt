@@ -97,6 +97,10 @@ private fun TodaySuppressedPreview() = TodayPreview(FakeData.suppressed())
 
 @PreviewLightDark
 @Composable
+private fun TodayHormonalIudWithoutPeriodPreview() = TodayPreview(FakeData.hormonalIudWithoutPeriod())
+
+@PreviewLightDark
+@Composable
 private fun TodayPregnancyPreview() = TodayPreview(FakeData.pregnancy())
 
 @Composable

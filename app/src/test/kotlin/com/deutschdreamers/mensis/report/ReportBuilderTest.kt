@@ -215,6 +215,21 @@ class ReportBuilderTest {
     }
 
     @Test
+    fun `a hormonal IUD keeps the ovulation rows and temperature shifts`() {
+        val iud = ContraceptionPeriod(ContraceptionMethod.HORMONAL_IUD, startDate = LocalDate.of(2025, 12, 1))
+        val withIud = build(contraception = listOf(iud), sections = allSections)
+        val without = build(sections = allSections)
+        assertNotNull(withIud.summaryValue("Luteal phase, mean"))
+        assertEquals(without.summaryValue("Luteal phase, mean"), withIud.summaryValue("Luteal phase, mean"))
+        assertEquals(
+            without.summaryValue("Ovulation confirmed by BBT"),
+            withIud.summaryValue("Ovulation confirmed by BBT"),
+        )
+        val shifts = requireNotNull(withIud.temperatures).charts.map { it.chart.shiftDays }
+        assertEquals(requireNotNull(without.temperatures).charts.map { it.chart.shiftDays }, shifts)
+    }
+
+    @Test
     fun `medication lists the method history and what the log recorded`() {
         val switch = LocalDate.of(2026, 6, 1)
         val methods =

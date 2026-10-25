@@ -75,7 +75,15 @@ class TodayScreenContentTest {
     fun suppressedState_showsMethodCard() {
         show(FakeData.suppressed())
         compose.onNodeWithText("Predictions paused").assertIsDisplayed()
-        compose.onNodeWithText("Hormonal IUD").assertIsDisplayed()
+        compose.onNodeWithText("Implant").assertIsDisplayed()
         compose.onNodeWithText("Method settings").assertIsDisplayed()
+    }
+
+    @Test
+    fun hormonalIudWithoutPeriod_showsDaysSinceLastBleedInsteadOfLate() {
+        show(FakeData.hormonalIudWithoutPeriod())
+        compose.onNodeWithText("Predictions resume when you log a period").assertIsDisplayed()
+        compose.onNodeWithText("Hormonal IUD").assertIsDisplayed()
+        compose.onNodeWithText("later than expected", substring = true).assertDoesNotExist()
     }
 }

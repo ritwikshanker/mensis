@@ -6,6 +6,7 @@ import com.deutschdreamers.mensis.domain.model.ContraceptionMethod
 import com.deutschdreamers.mensis.domain.model.ContraceptionPeriod
 import com.deutschdreamers.mensis.domain.model.DayEntry
 import com.deutschdreamers.mensis.domain.model.Flow
+import com.deutschdreamers.mensis.domain.model.MethodKind
 import com.deutschdreamers.mensis.domain.model.Regimen
 import com.deutschdreamers.mensis.domain.model.TrackerMode
 import com.deutschdreamers.mensis.domain.model.TrackerSettings
@@ -168,10 +169,10 @@ class TodayStateResolverTest {
     @Test
     fun `suppressing method shows days since the last bleed and spotting cells`() {
         val today = LocalDate.of(2026, 10, 21)
-        val iud = ContraceptionPeriod(ContraceptionMethod.HORMONAL_IUD, LocalDate.of(2026, 3, 12))
+        val implant = ContraceptionPeriod(ContraceptionMethod.IMPLANT, LocalDate.of(2026, 3, 12))
         val entries =
             listOf(DayEntry(today.minusDays(5), flow = Flow.SPOTTING), DayEntry(today.minusDays(47), flow = Flow.LIGHT))
-        val model = resolve(entries, today, contraception = listOf(iud))
+        val model = resolve(entries, today, contraception = listOf(implant))
         assertEquals(TodayState.SUPPRESSED, model.state)
         assertEquals(5, model.numeral)
         assertEquals(32, model.strip.lengthDays)
@@ -180,6 +181,47 @@ class TodayStateResolverTest {
         assertEquals(StripCellKind.NONE, model.strip.kindOf(32))
         assertEquals(2, model.suppressed?.bleedingDaysInWindow)
         assertNull(model.nextPeriod)
+    }
+
+    @Test
+    fun `hormonal IUD predicts from logged periods like no method`() {
+        val iud = ContraceptionPeriod(ContraceptionMethod.HORMONAL_IUD, Synthetic.day1.minusDays(30))
+        val model = resolve(history, last.plusDays(16), contraception = listOf(iud))
+        val natural = resolve(history, last.plusDays(16))
+        assertEquals(TodayState.NORMAL, model.state)
+        assertEquals(MethodKind.LOCAL_HORMONAL, model.methodKind)
+        assertEquals(natural.nextPeriod, model.nextPeriod)
+        assertEquals(natural.fertileWindowCard, model.fertileWindowCard)
+        assertEquals(natural.strip, model.strip)
+    }
+
+    @Test
+    fun `hormonal IUD shows days since the last bleed instead of a late period`() {
+        val iud = ContraceptionPeriod(ContraceptionMethod.HORMONAL_IUD, Synthetic.day1.minusDays(30))
+        val short = Synthetic.regularCycles(cycleLength = 21)
+        val shortLast = Synthetic.lastStart(short)
+        val today = shortLast.plusDays(29)
+        assertEquals(TodayState.LATE, resolve(short, today).state)
+        val entries = short + DayEntry(today.minusDays(1), flow = Flow.SPOTTING)
+        val model = resolve(entries, today, contraception = listOf(iud))
+        assertEquals(TodayState.SUPPRESSED, model.state)
+        assertEquals(MethodKind.LOCAL_HORMONAL, model.methodKind)
+        assertEquals(1, model.numeral)
+        assertEquals(0, model.lateByDays)
+        assertNull(model.nextPeriod)
+        assertEquals(StripCellKind.NONE, model.strip.kindOf(2))
+        assertEquals(StripCellKind.PERIOD, model.strip.kindOf(3))
+        assertEquals(StripCellKind.PERIOD, model.strip.kindOf(7))
+        assertEquals(StripCellKind.SPOTTING, model.strip.kindOf(31))
+        assertEquals(listOf(StripLaneKind.LAST_DAYS), model.strip.lanes.map { it.kind })
+    }
+
+    @Test
+    fun `hormonal IUD with nothing logged shows days since the last bleed`() {
+        val iud = ContraceptionPeriod(ContraceptionMethod.HORMONAL_IUD, Synthetic.day1)
+        val model = resolve(emptyList(), Synthetic.day1.plusDays(10), contraception = listOf(iud))
+        assertEquals(TodayState.SUPPRESSED, model.state)
+        assertNull(model.numeral)
     }
 
     @Test

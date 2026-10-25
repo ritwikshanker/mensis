@@ -29,7 +29,9 @@ object ReminderCatalog {
         val kind = method?.kind ?: MethodKind.NONE
         return buildList {
             if (kind != MethodKind.SUPPRESS) add(ReminderType.PERIOD)
-            if (kind == MethodKind.NONE || kind == MethodKind.COPPER) add(ReminderType.FERTILE)
+            if (kind == MethodKind.NONE || kind == MethodKind.COPPER || kind == MethodKind.LOCAL_HORMONAL) {
+                add(ReminderType.FERTILE)
+            }
             methodType(method?.method)?.let(::add)
             if (trackingLevel.showsTemperature) add(ReminderType.TEMPERATURE)
         }

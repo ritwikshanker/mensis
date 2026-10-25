@@ -12,7 +12,7 @@ enum class ReminderType {
     /** "Period expected", or "Withdrawal bleed expected" for cyclic methods. Hidden for suppressing methods. */
     PERIOD,
 
-    /** Only without a hormonal method (none or barrier, copper IUD). */
+    /** Only when ovulation is not suppressed: none or barrier, copper or hormonal IUD. */
     FERTILE,
 
     /** Combined and progestin-only pill. */

@@ -32,7 +32,7 @@ class ContraceptionTest {
         "PROGESTIN_ONLY_PILL, , SUPPRESS",
         "INJECTION, , SUPPRESS",
         "IMPLANT, , SUPPRESS",
-        "HORMONAL_IUD, , SUPPRESS",
+        "HORMONAL_IUD, , LOCAL_HORMONAL",
     )
     fun `method kind follows the handoff table`(
         method: ContraceptionMethod,

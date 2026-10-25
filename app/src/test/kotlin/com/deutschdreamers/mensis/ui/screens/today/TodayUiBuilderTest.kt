@@ -117,14 +117,41 @@ class TodayUiBuilderTest {
         assertEquals("Predictions paused", state.phase)
         assertTrue(state.cards.isEmpty())
         val card = requireNotNull(state.methodCard)
-        assertEquals("Hormonal IUD", card.title)
+        assertEquals("Implant", card.title)
         assertEquals("Replace by", card.nextLabel)
-        assertEquals("Mar 2031", card.next)
+        assertEquals("Mar 2029", card.next)
         assertEquals(
             "Bleeding you log stays on the strip. Last 90 days: 3 days of spotting, no full period.",
             card.body,
         )
         assertEquals("Last 32 days", state.laneLabels[StripLaneKind.LAST_DAYS])
+    }
+
+    @Test
+    fun `hormonal IUD predicts from logged periods like no method`() {
+        val state = FakeData.hormonalIud()
+        assertEquals(TodayState.NORMAL, state.state)
+        assertEquals("Cycle day", state.numeralLabel)
+        assertEquals("17", state.numeral)
+        assertEquals("Luteal phase", state.phase)
+        assertEquals(listOf("Next period", "Fertile window"), state.cards.map { it.title })
+        assertNull(state.methodCard)
+    }
+
+    @Test
+    fun `hormonal IUD shows days since the last bleed instead of a late period`() {
+        val state = FakeData.hormonalIudWithoutPeriod()
+        assertEquals(TodayState.SUPPRESSED, state.state)
+        assertEquals("Days since last bleed", state.numeralLabel)
+        assertEquals("43", state.numeral)
+        assertEquals("Predictions resume when you log a period", state.phase)
+        assertTrue(state.supporting.startsWith("Bleeding often becomes lighter"), state.supporting)
+        assertNull(state.lateCard)
+        assertTrue(state.cards.isEmpty())
+        val card = requireNotNull(state.methodCard)
+        assertEquals("Hormonal IUD", card.title)
+        assertEquals("Dec 2030", card.next)
+        assertEquals(listOf(StripLaneKind.LAST_DAYS), state.strip?.lanes?.map { it.kind })
     }
 
     @Test
@@ -193,6 +220,8 @@ class TodayUiBuilderTest {
                 FakeData.late(),
                 FakeData.cyclic(),
                 FakeData.suppressed(),
+                FakeData.hormonalIud(),
+                FakeData.hormonalIudWithoutPeriod(),
             )
         val banned =
             listOf("safe day", "safe days", "protected from pregnancy", "cannot get pregnant", "reliable contraception")

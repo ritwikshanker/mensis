@@ -6,7 +6,10 @@ import com.deutschdreamers.mensis.domain.model.daysUntil
 import com.deutschdreamers.mensis.domain.prediction.PredictionConstants
 import java.time.LocalDate
 
-/** What Today shows for a suppressing method: predictions are paused, bleeding is kept as spotting. */
+/**
+ * What Today shows for a suppressing method (predictions paused, bleeding kept as spotting) and for a
+ * hormonal IUD while no period can be predicted.
+ */
 data class SuppressedSummary(
     val lastBleedDate: LocalDate?,
     val daysSinceLastBleed: Int?,

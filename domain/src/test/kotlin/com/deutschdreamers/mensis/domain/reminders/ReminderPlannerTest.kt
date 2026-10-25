@@ -62,7 +62,7 @@ class ReminderPlannerTest {
         "RING, CYCLIC, SYMPTOMS, PERIOD RING",
         "INJECTION, , SYMPTOMS, INJECTION",
         "IMPLANT, , SYMPTOMS, REPLACEMENT",
-        "HORMONAL_IUD, , FULL, REPLACEMENT TEMPERATURE",
+        "HORMONAL_IUD, , FULL, PERIOD FERTILE REPLACEMENT TEMPERATURE",
     )
     fun `the rows follow method kind and tracking level`(
         method: ContraceptionMethod,

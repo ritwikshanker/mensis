@@ -236,6 +236,15 @@ class InsightsUiBuilderTest {
     }
 
     @Test
+    fun `a hormonal IUD keeps the luteal and temperature cards`() {
+        val iud = ContraceptionPeriod(ContraceptionMethod.HORMONAL_IUD, FakeData.firstStart.minusDays(30))
+        val state = FakeData.insights(contraception = listOf(iud))
+        assertNotNull(state.luteal)
+        assertNotNull(state.temperature)
+        assertEquals(FakeData.insights().luteal, state.luteal)
+    }
+
+    @Test
     fun `pregnancy mode hides this cycle's temperature chart`() {
         val settings = FakeData.settings.copy(mode = TrackerMode.PREGNANCY, pregnancyLmp = FakeData.insightsToday)
         val state = InsightsUiBuilder.build(FakeData.data(FakeData.insightsHistory(), settings), FakeData.insightsToday)

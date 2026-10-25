@@ -22,8 +22,8 @@ data class PredictionInput(
 )
 
 /**
- * Everything the engine derives for the natural (none / copper IUD) case. Hormonal methods are handled
- * by the contraception package; the Today resolver decides which to show.
+ * Everything the engine derives for the natural case (none, copper or hormonal IUD). Other hormonal
+ * methods are handled by the contraception package; the Today resolver decides which to show.
  */
 data class CyclePrediction(
     val today: LocalDate,

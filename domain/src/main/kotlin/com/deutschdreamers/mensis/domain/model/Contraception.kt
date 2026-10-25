@@ -11,10 +11,17 @@ enum class MethodKind {
     /** Copper IUD: no hormonal effect, predictions unchanged. */
     COPPER,
 
+    /**
+     * Hormonal IUD: acts mainly in the uterus, so periods and ovulation often continue. Predictions
+     * follow the logged periods; while none can be predicted (none logged, or the expected one has not
+     * come), Today shows days since the last bleed instead of a late period.
+     */
+    LOCAL_HORMONAL,
+
     /** Combined pill 21+7, patch, ring: withdrawal bleed predicted in the break week; fertile lane hidden. */
     CYCLIC,
 
-    /** Progestin-only pill, continuous regimen, injection, implant, hormonal IUD: predictions paused. */
+    /** Progestin-only pill, continuous regimen, injection, implant: predictions paused. */
     SUPPRESS,
 }
 
@@ -30,7 +37,7 @@ enum class ContraceptionMethod(
     RING(MethodKind.CYCLIC),
     INJECTION(MethodKind.SUPPRESS, isLongActing = true),
     IMPLANT(MethodKind.SUPPRESS, isLongActing = true),
-    HORMONAL_IUD(MethodKind.SUPPRESS, isLongActing = true),
+    HORMONAL_IUD(MethodKind.LOCAL_HORMONAL, isLongActing = true),
     COPPER_IUD(MethodKind.COPPER, isLongActing = true),
 }
 

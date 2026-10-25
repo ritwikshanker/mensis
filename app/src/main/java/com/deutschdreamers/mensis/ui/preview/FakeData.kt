@@ -96,11 +96,26 @@ object FakeData {
 
     fun suppressed(): TodayUiState {
         val inserted = LocalDate.of(2026, 3, 12)
-        val iud = ContraceptionPeriod(ContraceptionMethod.HORMONAL_IUD, inserted)
+        val implant = ContraceptionPeriod(ContraceptionMethod.IMPLANT, inserted)
         val today = inserted.plusDays(200)
         val spotting = listOf(47L, 48L, 60L).map { DayEntry(today.minusDays(it), flow = Flow.SPOTTING) }
-        return today(data(spotting, contraception = listOf(iud)), today)
+        return today(data(spotting, contraception = listOf(implant)), today)
     }
+
+    /** Hormonal IUD inserted before the history starts: day 17, predicted from the logged periods. */
+    fun hormonalIud(): TodayUiState =
+        today(data(regularHistory(), contraception = listOf(hormonalIudPeriod)), lastStart.plusDays(16))
+
+    /** Hormonal IUD on day 48 of the open cycle: the expected period has not come. */
+    fun hormonalIudWithoutPeriod(): TodayUiState =
+        today(data(regularHistory(), contraception = listOf(hormonalIudPeriod)), lastStart.plusDays(47))
+
+    private val hormonalIudPeriod =
+        ContraceptionPeriod(
+            ContraceptionMethod.HORMONAL_IUD,
+            firstStart.minusDays(30),
+            replaceByDate = LocalDate.of(2030, 12, 1),
+        )
 
     fun pregnancy(): TodayUiState {
         val lmp = LocalDate.of(2026, 8, 17)

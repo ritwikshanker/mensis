@@ -7,6 +7,7 @@ import com.deutschdreamers.mensis.domain.contraception.MethodSchedule
 import com.deutschdreamers.mensis.domain.model.ContraceptionMethod
 import com.deutschdreamers.mensis.domain.model.ContraceptionPeriod
 import com.deutschdreamers.mensis.domain.model.DayEntry
+import com.deutschdreamers.mensis.domain.model.MethodKind
 import com.deutschdreamers.mensis.domain.model.TrackerSettings
 import com.deutschdreamers.mensis.domain.model.TrackingLevel
 import com.deutschdreamers.mensis.domain.prediction.Confidence
@@ -170,13 +171,19 @@ object TodayUiBuilder {
                         "${summary.fullPeriodsInWindow} full period${if (summary.fullPeriodsInWindow == 1) "" else "s"}"
             }
         val (nextLabel, next) = methodNext(method, entries)
+        val hormonalIud = model.methodKind == MethodKind.LOCAL_HORMONAL
         return base.copy(
             numeral = summary.daysSinceLastBleed?.toString() ?: NO_VALUE,
             numeralLabel = "Days since last bleed",
-            phase = "Predictions paused",
+            phase = if (hormonalIud) "Predictions resume when you log a period" else "Predictions paused",
             supporting =
-                "Bleeding usually becomes light, irregular or stops on this method. " +
-                    "That is expected; anything you log is kept.",
+                if (hormonalIud) {
+                    "Bleeding often becomes lighter, irregular or stops with a hormonal IUD. " +
+                        "That is expected; anything you log is kept."
+                } else {
+                    "Bleeding usually becomes light, irregular or stops on this method. " +
+                        "That is expected; anything you log is kept."
+                },
             methodCard =
                 MethodCardUi(
                     title = MethodLabels.name(method.method),

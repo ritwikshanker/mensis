@@ -72,7 +72,8 @@ want, when you want; Mensis turns it into ranges and charts without sending it a
   and shows how much your cycles vary. A waking temperature shift marks ovulation after the fact;
   without temperatures, ovulation is estimated from your cycle lengths and labelled as such.
 - **Understands hormonal methods.** With a cyclic pill, patch or ring Mensis counts your pack days and
-  predicts the withdrawal bleed; with methods that stop the cycle, such as a hormonal IUD or continuous
+  predicts the withdrawal bleed. With a hormonal IUD, periods and ovulation often continue, so predictions
+  follow the periods you log. With methods that usually stop the cycle, such as the implant or continuous
   use, it pauses predictions.
 - **Insights.** Cycle and period lengths, luteal phase, temperature charts and symptoms that come back
   in the same phase of your cycle.
