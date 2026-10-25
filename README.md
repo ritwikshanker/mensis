@@ -22,6 +22,43 @@
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4_insights.png" width="200" alt="Insights: cycle length chart over eight cycles, period length, luteal phase and the waking temperature chart">
 </p>
 
+## Join the test
+
+Mensis is in a closed test on Google Play, and every tester counts: Google Play lets a new app go public
+only after at least 12 testers have stayed in its test for 14 days in a row. Joining takes two minutes.
+You need an Android phone (Android 8 or newer) with Google Play, and the same Google account in all
+three steps:
+
+1. **Join the testers group:** <https://groups.google.com/g/mensis-testers>, then *Join group*. Only
+   the developer can see members' addresses, and the group sends no messages.
+2. **Become a tester:** <https://play.google.com/apps/testing/com.deutschdreamers.mensis>, then
+   *Become a tester*.
+3. **Install Mensis:** <https://play.google.com/store/apps/details?id=com.deutschdreamers.mensis> (this
+   page only opens once you are a tester), or use the Google Play link on the page from step 2. Updates
+   arrive through Google Play like any other app.
+
+Then please **stay in the test for at least 14 days**, ideally with Mensis installed. Testers who leave
+earlier do not count towards the 12.
+
+If something does not work:
+
+- *The page says the test is not available, or there is no Become a tester button:* check that the
+  page uses the Google account that joined the group (switch accounts with the profile picture at the
+  top right), and wait a few minutes after joining the group.
+- *The Play Store says Mensis is not available:* in the Play Store app, tap your profile picture and
+  switch to the account that joined the test.
+
+Know someone with an Android phone who might like Mensis? Send them
+<https://ritwikshanker.github.io/mensis/#join-the-test>.
+
+Good to know while testing:
+
+- Your data stays on your phone. Uninstalling Mensis deletes it, so turn on backup or export your data
+  before you uninstall or switch phones.
+- Found a bug or have an idea? Open an [issue on GitHub](https://github.com/ritwikshanker/mensis/issues)
+  or use the contact e-mail on the Google Play page. Please do not include real cycle data in reports.
+- You can leave the test at any time on the page from step 2.
+
 ## What it does
 
 Mensis is a menstrual cycle tracker for Android that works entirely on your phone. You log what you
@@ -69,25 +106,6 @@ want, when you want; Mensis turns it into ranges and charts without sending it a
 
 The full threat model is in [PRIVACY.md](PRIVACY.md), the privacy policy at
 <https://ritwikshanker.github.io/mensis/privacy/>.
-
-## Join the test
-
-Mensis is being tested on Google Play before its public release, and you are welcome to join. You need
-an Android phone with Google Play and the same Google account in both steps:
-
-1. Join the testers group: **<https://groups.google.com/g/mensis-testers>**. Members cannot see each
-   other's addresses, and the group is not used for messages.
-2. Open **<https://play.google.com/apps/testing/com.deutschdreamers.mensis>** and tap
-   *Become a tester*.
-3. Install Mensis from the Google Play link on that page. Updates come through Google Play like any
-   other app.
-
-Good to know while testing:
-
-- Your data stays on your phone. Uninstalling Mensis deletes it, so turn on backup or export your data
-  before you uninstall or switch phones.
-- Found a bug or have an idea? Open an [issue on GitHub](https://github.com/ritwikshanker/mensis/issues)
-  or use the contact e-mail on the Google Play page. Please do not include real cycle data in reports.
 
 ## Important
 

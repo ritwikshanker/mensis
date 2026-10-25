@@ -16,6 +16,31 @@ encrypted on the phone with a password only you know. The code is open source un
   <img src="https://raw.githubusercontent.com/ritwikshanker/mensis/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4_insights.png" width="180" alt="Insights: cycle length chart, period length, luteal phase and temperature chart">
 </p>
 
+## Join the test
+
+Mensis is in a closed test on Google Play, and every tester counts: Google Play lets a new app go public
+only after at least 12 testers have stayed in its test for 14 days in a row. Joining takes two minutes.
+You need an Android phone (Android 8 or newer) with Google Play, and the same Google account in all
+three steps:
+
+1. **Join the testers group:** <https://groups.google.com/g/mensis-testers>, then *Join group*. Only
+   the developer can see members' addresses, and the group sends no messages.
+2. **Become a tester:** <https://play.google.com/apps/testing/com.deutschdreamers.mensis>, then
+   *Become a tester*.
+3. **Install Mensis:** <https://play.google.com/store/apps/details?id=com.deutschdreamers.mensis> (this
+   page only opens once you are a tester), or use the Google Play link on the page from step 2.
+
+Then please **stay in the test for at least 14 days**, ideally with Mensis installed. Testers who leave
+earlier do not count towards the 12.
+
+If the test page says it is not available, check that it uses the Google account that joined the group
+(switch accounts with the profile picture) and wait a few minutes after joining. In the Play Store app,
+switch to the same account the same way.
+
+Your data stays on your phone: uninstalling Mensis deletes it, so turn on backup or export first.
+Problems and ideas go to the [issue tracker](https://github.com/ritwikshanker/mensis/issues); please do
+not include real cycle data.
+
 ## What it does
 
 - Log period days and flow, symptoms, mood, sleep and notes; waking temperature, cervical mucus and LH
@@ -23,17 +48,6 @@ encrypted on the phone with a password only you know. The code is open source un
 - Next period and fertile window as date ranges, with how many cycles they rest on.
 - Insights, a PDF report for your doctor, discreet reminders and a pregnancy mode.
 - Export and import (JSON, CSV, drip.), and an optional encrypted backup to your own Google Drive.
-
-## Join the test
-
-Mensis is being tested on Google Play before its public release. With the same Google account in both
-steps:
-
-1. Join the testers group: <https://groups.google.com/g/mensis-testers>
-2. Open <https://play.google.com/apps/testing/com.deutschdreamers.mensis>, tap *Become a tester*, then
-   install Mensis from Google Play.
-
-Your data stays on your phone: uninstalling Mensis deletes it, so turn on backup or export first.
 
 ## Links
 
