@@ -47,6 +47,7 @@ class OnboardingContentTest {
                     onSkip = {},
                     onNext = {},
                     onRestore = {},
+                    onImport = {},
                 )
             }
         }

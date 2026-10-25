@@ -36,6 +36,9 @@ class SettingsRepository
 
         suspend fun tracker(): TrackerSettings = dao.get()?.toDomain() ?: TrackerSettings()
 
+        /** Whether a settings row exists: not before onboarding finishes, unless an import brought one. */
+        fun observeStored(): Flow<Boolean> = dao.observe().map { it != null }
+
         suspend fun updateTracker(transform: (TrackerSettings) -> TrackerSettings) =
             writes.withLock {
                 val now = Instant.now(clock).toString()

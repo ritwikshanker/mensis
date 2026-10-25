@@ -30,6 +30,7 @@
     <string name="onboarding_get_started">Get started</string>
     <string name="onboarding_allow_notifications">Allow notifications</string>
     <string name="onboarding_restore">Restore from backup</string>
+    <string name="onboarding_import">Import from a file</string>
     <string name="onboarding_welcome_subtitle">A cycle tracker that keeps your data on your phone.</string>
     <string name="onboarding_feature_private">No account, no analytics</string>
     <string name="onboarding_feature_private_body">The app never contacts a server unless you turn on Drive backup.</string>

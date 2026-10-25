@@ -41,6 +41,7 @@ fun MensisNavDisplay(startAtOnboarding: Boolean) {
                     OnboardingScreen(
                         onFinished = { navigator.replaceAll(Main) },
                         onRestore = { navigator.push(Restore(fromOnboarding = true)) },
+                        onImport = { navigator.push(Import) },
                     )
                 }
                 entry<Main> {

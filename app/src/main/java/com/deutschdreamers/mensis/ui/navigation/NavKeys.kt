@@ -30,7 +30,7 @@ data object Reminders : MensisNavKey
 @Serializable
 data object Export : MensisNavKey
 
-/** Settings → Import data and Today's "Import history" (design §14). */
+/** Settings → Import data, Today's "Import history" and onboarding step 1 (design §14). */
 @Serializable
 data object Import : MensisNavKey
 

@@ -181,8 +181,10 @@ plain = gzip.decompress(AESGCM(key).decrypt(nonce, data[47:], data[:35]))
 
 ## Importing
 
-Settings → Import data (or "Import history" on a new install) reads a file on the phone. Nothing is
-uploaded.
+Settings → Import data (on a new install also "Import from a file" on the first onboarding screen, or
+"Import history" on Today) reads a file on the phone. Nothing is uploaded. Imported from onboarding, a
+Mensis JSON export's settings and method history are taken whatever the strategy, and onboarding then
+skips the questions they answer; any file with days skips "When did your last period start?".
 
 1. **Source**: CSV spreadsheet, Mensis export, drip. export or Clue export. A Mensis JSON export and a
    drip. CSV are recognised from their content whichever source is chosen. An encrypted Mensis file

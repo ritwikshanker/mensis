@@ -7,10 +7,8 @@ import com.deutschdreamers.mensis.backup.auth.BackupAvailability
 import com.deutschdreamers.mensis.backup.auth.GoogleAccountGateway
 import com.deutschdreamers.mensis.data.repo.DayEntryRepository
 import com.deutschdreamers.mensis.data.repo.SettingsRepository
-import com.deutschdreamers.mensis.domain.model.Flow
 import com.deutschdreamers.mensis.domain.model.Goal
 import com.deutschdreamers.mensis.domain.model.TrackerSettings
-import com.deutschdreamers.mensis.domain.reminders.ReminderType
 import com.deutschdreamers.mensis.lock.AppLockManager
 import com.deutschdreamers.mensis.ui.screens.backup.ConnectProblem
 import com.deutschdreamers.mensis.ui.screens.backup.ConnectResult
@@ -18,6 +16,7 @@ import com.deutschdreamers.mensis.ui.screens.export.ExportUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
@@ -41,11 +40,30 @@ data class OnboardingDraft(
     val backupProblem: ConnectProblem? = null,
     val backupPassword: String = "",
     val backupRepeat: String = "",
+    /** Days already on the phone: during onboarding only an import from step 1 puts them there. */
+    val hasHistory: Boolean = false,
+    /** Settings already stored: only a Mensis export imported from step 1 brings them. */
+    val hasSettings: Boolean = false,
     val finishing: Boolean = false,
     val finished: Boolean = false,
 ) {
     val isFirst: Boolean get() = step == 0
     val isLast: Boolean get() = step == LAST_STEP
+
+    /**
+     * A step an import already answered: imported settings answer steps 2–5 (with them come the user's
+     * own cycles), imported days answer "When did your last period start?".
+     */
+    fun isAnswered(step: Int): Boolean =
+        when {
+            hasSettings -> step in HOW_IT_WORKS_STEP..GOAL_STEP
+            hasHistory -> step == LAST_PERIOD_STEP
+            else -> false
+        }
+
+    fun nextStep(): Int = (step + 1..LAST_STEP).first { !isAnswered(it) }
+
+    fun previousStep(): Int = (step - 1 downTo 0).firstOrNull { !isAnswered(it) } ?: step
 
     /** Design: Skip appears from step 3 (0-based 2) on; on the last step it reads "Not now". */
     val skippable: Boolean get() = step >= FIRST_SKIPPABLE_STEP
@@ -70,6 +88,10 @@ data class OnboardingDraft(
         const val STEP_COUNT: Int = 9
         const val LAST_STEP: Int = STEP_COUNT - 1
         const val FIRST_SKIPPABLE_STEP: Int = 2
+        const val HOW_IT_WORKS_STEP: Int = 1
+        const val LAST_PERIOD_STEP: Int = 2
+        const val GOAL_STEP: Int = 4
+        const val LOCK_STEP: Int = 5
         const val BACKUP_STEP: Int = 6
         const val PASSWORD_STEP: Int = 7
     }
@@ -80,7 +102,8 @@ class OnboardingViewModel
     @Inject
     constructor(
         private val settings: SettingsRepository,
-        private val dayEntries: DayEntryRepository,
+        dayEntries: DayEntryRepository,
+        private val answers: OnboardingAnswers,
         private val backup: BackupController,
         val accounts: GoogleAccountGateway,
         val lock: AppLockManager,
@@ -98,6 +121,19 @@ class OnboardingViewModel
             )
         val draft: StateFlow<OnboardingDraft> = state
 
+        /** Set when step 1 opens the import; coming back with imported data moves past what it answered. */
+        private var importOpened = false
+
+        init {
+            viewModelScope.launch {
+                combine(
+                    settings.observeStored(),
+                    dayEntries.observeAll(),
+                ) { stored, days -> stored to days.isNotEmpty() }
+                    .collect { (stored, days) -> state.update { it.copy(hasSettings = stored, hasHistory = days) } }
+            }
+        }
+
         val today: LocalDate get() = LocalDate.now(clock)
 
         fun update(transform: (OnboardingDraft) -> OnboardingDraft) = state.update(transform)
@@ -111,8 +147,20 @@ class OnboardingViewModel
                 // Without backup there is no password to choose.
                 current.step == OnboardingDraft.BACKUP_STEP && !current.backupReadyToAsk() ->
                     state.update { it.copy(step = OnboardingDraft.LAST_STEP, backupEnabled = false) }
-                else -> state.update { it.copy(step = it.step + 1) }
+                else -> state.update { it.copy(step = it.nextStep()) }
             }
+        }
+
+        fun onImportOpened() {
+            importOpened = true
+        }
+
+        /** Onboarding is on screen again; after an import that brought data, step 1 moves on by itself. */
+        fun onShown() {
+            if (!importOpened) return
+            importOpened = false
+            val current = state.value
+            if (current.isFirst && (current.hasHistory || current.hasSettings)) next()
         }
 
         fun back() =
@@ -122,7 +170,7 @@ class OnboardingViewModel
                         it.copy(
                             step = OnboardingDraft.BACKUP_STEP,
                         )
-                    it.step > 0 -> it.copy(step = it.step - 1)
+                    it.step > 0 -> it.copy(step = it.previousStep())
                     else -> it
                 }
             }
@@ -150,23 +198,15 @@ class OnboardingViewModel
         }
 
         /**
-         * Writes the draft, turns backup on when it was set up, marks onboarding complete and reports
-         * back through [OnboardingDraft.finished]. When notifications were allowed on the last step, the
-         * period reminder is switched on with its defaults (2 days before, 09:00).
+         * Writes the answers ([OnboardingAnswers]), turns backup on when it was set up, marks onboarding
+         * complete and reports back through [OnboardingDraft.finished].
          */
         fun finish(remindersAllowed: Boolean) {
             val current = state.value
             if (current.finishing) return
             state.update { it.copy(finishing = true) }
             viewModelScope.launch {
-                current.lastPeriodStart?.let { dayEntries.setFlow(it, Flow.MEDIUM) }
-                settings.updateTracker {
-                    it.copy(
-                        typicalCycleLength = current.cycleLength,
-                        typicalPeriodLength = current.periodLength,
-                        goal = current.goal,
-                    )
-                }
+                answers.save(current, remindersAllowed)
                 val email = current.backupEmail
                 if (current.backupReady && email != null) {
                     val password = current.backupPassword.toCharArray()
@@ -175,9 +215,6 @@ class OnboardingViewModel
                     } finally {
                         password.fill('\u0000')
                     }
-                }
-                if (remindersAllowed) {
-                    settings.updateReminders { it.update(ReminderType.PERIOD) { s -> s.copy(enabled = true) } }
                 }
                 settings.updateUiPrefs {
                     it.copy(

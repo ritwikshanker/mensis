@@ -141,6 +141,7 @@ private fun OnboardingWelcomePreview() {
             onSkip = {},
             onNext = {},
             onRestore = {},
+            onImport = {},
         )
     }
 }
@@ -157,6 +158,7 @@ private fun OnboardingLengthsLargeTextPreview() {
             onSkip = {},
             onNext = {},
             onRestore = {},
+            onImport = {},
         )
     }
 }

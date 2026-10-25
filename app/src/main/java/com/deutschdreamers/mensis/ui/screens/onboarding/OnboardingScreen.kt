@@ -67,10 +67,13 @@ import java.time.LocalDate
 fun OnboardingScreen(
     onFinished: () -> Unit,
     onRestore: () -> Unit,
+    onImport: () -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val draft by viewModel.draft.collectAsStateWithLifecycle()
     LaunchedEffect(draft.finished) { if (draft.finished) onFinished() }
+    // Runs again whenever onboarding comes back on screen, e.g. from the import it opened.
+    LaunchedEffect(Unit) { viewModel.onShown() }
     val connect = rememberGoogleConnect(viewModel.accounts, viewModel.lock, viewModel::onBackupConnect)
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -95,10 +98,17 @@ fun OnboardingScreen(
             }
         },
         onRestore = onRestore,
+        onImport = {
+            viewModel.onImportOpened()
+            onImport()
+        },
     )
 }
 
-/** Design §1, nine steps. Stateless so tests and previews can show any step. */
+/**
+ * Design §1, nine steps, plus "Import from a file" on step 1; steps an import answered are skipped.
+ * Stateless so tests and previews can show any step.
+ */
 @Composable
 fun OnboardingContent(
     draft: OnboardingDraft,
@@ -108,11 +118,12 @@ fun OnboardingContent(
     onSkip: () -> Unit,
     onNext: () -> Unit,
     onRestore: () -> Unit,
+    onImport: () -> Unit,
 ) {
     if (!draft.isFirst) BackHandler(onBack = onBack)
     // A Surface, not a background modifier: it also sets the content colour, which is black otherwise.
     Surface(modifier = Modifier.fillMaxSize()) {
-        OnboardingLayout(draft, today, onUpdate, onBack, onSkip, onNext, onRestore)
+        OnboardingLayout(draft, today, onUpdate, onBack, onSkip, onNext, onRestore, onImport)
     }
 }
 
@@ -125,6 +136,7 @@ private fun OnboardingLayout(
     onSkip: () -> Unit,
     onNext: () -> Unit,
     onRestore: () -> Unit,
+    onImport: () -> Unit,
 ) {
     Column(
         modifier =
@@ -178,6 +190,9 @@ private fun OnboardingLayout(
             if (draft.isFirst) {
                 OutlinedButton(onClick = onRestore, modifier = Modifier.fillMaxWidth().height(48.dp)) {
                     Text(stringResource(R.string.onboarding_restore))
+                }
+                TextButton(onClick = onImport, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                    Text(stringResource(R.string.onboarding_import))
                 }
             }
         }
