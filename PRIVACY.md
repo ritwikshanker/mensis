@@ -77,8 +77,9 @@ the file is sealed in the same container as Drive backups (below).
 
 The PDF report is drawn on the phone and kept in memory until you save it with the system file picker
 or hand it to an app through the share sheet. It is not encrypted. Free-text notes are left out unless
-you tick them. A shared copy sits in the app's private cache, readable only by the app you shared it
-with, until Mensis next starts.
+you tick them. To show the pages in the preview, Android's PDF renderer needs a file: Mensis writes one
+to its private cache and deletes it as soon as the renderer has opened it. A shared copy sits in the
+app's private cache, readable only by the app you shared it with, until Mensis next starts.
 
 ### Google Drive backup (optional)
 

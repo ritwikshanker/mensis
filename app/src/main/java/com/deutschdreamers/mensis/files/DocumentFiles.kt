@@ -82,6 +82,9 @@ class DocumentFiles
                 FileProvider.getUriForFile(context, "${context.packageName}$AUTHORITY_SUFFIX", file)
             }
 
+        /** For short-lived private files, such as the one the report preview opens and deletes at once. */
+        val scratchDir: File get() = sharedDir
+
         fun clearShared() {
             sharedDir.listFiles()?.forEach { it.delete() }
         }

@@ -3,18 +3,27 @@ package com.deutschdreamers.mensis.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.deutschdreamers.mensis.report.PdfPages
 import com.deutschdreamers.mensis.report.ReportBuilder
 import com.deutschdreamers.mensis.report.ReportOptions
+import com.deutschdreamers.mensis.report.ReportPdfWriter
 import com.deutschdreamers.mensis.report.ReportRange
 import com.deutschdreamers.mensis.report.ReportSection
 import com.deutschdreamers.mensis.ui.preview.FakeData
@@ -24,10 +33,12 @@ import com.deutschdreamers.mensis.ui.screens.report.ReportPreview
 import com.deutschdreamers.mensis.ui.screens.report.ReportStep
 import com.deutschdreamers.mensis.ui.screens.report.ReportUiState
 import com.deutschdreamers.mensis.ui.theme.MensisTheme
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class ReportContentTest {
@@ -67,6 +78,26 @@ class ReportContentTest {
         )
 
     private fun show() = compose.setContent { MensisTheme { ReportContent(state, actions) } }
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val directory = File(context.cacheDir, "report-content-test")
+    private val opened = mutableListOf<PdfPages>()
+
+    @After
+    fun tearDown() {
+        opened.forEach { it.close() }
+        directory.deleteRecursively()
+    }
+
+    /** Pixels of the node described as [description] that are clearly darker than paper. */
+    private fun darkPixels(description: String): Int {
+        val pixels = compose.onNodeWithContentDescription(description).captureToImage().toPixelMap()
+        var count = 0
+        for (x in 0 until pixels.width) {
+            for (y in 0 until pixels.height) if (pixels[x, y].luminance() < DARK) count++
+        }
+        return count
+    }
 
     private fun preview(range: ReportRange = ReportRange.TWELVE_MONTHS): ReportPreview {
         val model =
@@ -120,29 +151,56 @@ class ReportContentTest {
     }
 
     @Test
-    fun preview_showsThePaperCardWithTheDesignNumbers() {
+    fun preview_showsEveryPageOfThePdf_andOpensOneFullScreen() {
+        val model = preview().model
+        val pdf = ReportPdfWriter(context).write(model)
+        val pages = PdfPages.open(pdf.bytes, directory).also { opened += it }
+        val count = pdf.pageCount
         state =
-            ReportUiState(step = ReportStep.PREVIEW, hasEntries = true, preview = preview(ReportRange.LAST_6_CYCLES))
+            ReportUiState(
+                step = ReportStep.PREVIEW,
+                hasEntries = true,
+                preview = ReportPreview(model, count, pdf.bytes.size.toLong(), "", pages),
+            )
         show()
-        compose.onNodeWithText("Cycle report").assertExists()
-        compose.onNodeWithText("Prepared 21 Oct 2026").assertExists()
-        compose.onNodeWithText("Apr – Oct 2026 · Logged with Mensis 1.0.0 · Not a medical diagnosis").assertExists()
-        compose.onNodeWithText("Cycles logged").assertExists()
-        compose.onNodeWithText("29.2 d (27–32)").assertExists()
-        compose.onNodeWithText("Contraception").assertExists()
-        compose.onNodeWithText("None recorded").assertExists()
-        compose
-            .onNode(
-                hasContentDescription("Cycle lengths, oldest first: 28, 30, 27, 32, 29, 29 days.", substring = true),
-            ).assertExists()
-        compose
-            .onNodeWithText("Cramps (days 1–2) 6/6 · Headache (pre-menstrual) 5/6 · Fatigue (late luteal) 3/6")
-            .performScrollTo()
-            .assertExists()
-        compose.onNodeWithText("Page 1 of 3 · BBT charts on pages 2–3").performScrollTo().assertExists()
-        compose.onNodeWithText("Create PDF").performScrollTo().performClick()
+        compose.onNodeWithText("Tap a page to see it full size.").assertExists()
+        compose.onNodeWithText("Page 1 of $count").assertExists()
+        // The first page is drawn from the PDF itself: dark text on the white sheet.
+        compose.waitUntil(timeoutMillis = 5_000) { darkPixels("Page 1 of $count") > 500 }
+        compose.onNode(hasScrollAction()).performScrollToNode(hasContentDescription("Page $count of $count"))
+        compose.onNodeWithContentDescription("Page $count of $count").assertExists()
+
+        compose.onNodeWithContentDescription("Page 2 of $count").performClick()
+        compose.onNodeWithContentDescription("Close").assertExists()
+        // Only the full-screen page is visible to accessibility services while it is open.
+        compose.onNodeWithText("Page 2 of $count").assertExists()
+        compose.onNodeWithText("Create PDF").assertDoesNotExist()
+        compose.waitUntil(timeoutMillis = 5_000) { darkPixels("Page 2 of $count") > 500 }
+        compose.onNodeWithContentDescription("Close").performClick()
+        compose.onNodeWithContentDescription("Close").assertDoesNotExist()
+
+        compose.onNodeWithText("Create PDF").performClick()
         compose.onNodeWithText("Edit").performClick()
         assertEquals(listOf("create", "edit"), calls)
+    }
+
+    @Test
+    fun preview_withoutPages_saysSo_andStillOffersCreate() {
+        state = ReportUiState(step = ReportStep.PREVIEW, hasEntries = true, preview = preview())
+        show()
+        compose
+            .onNodeWithText("The pages can't be shown here. Create the PDF to open it in another app.")
+            .assertExists()
+        compose.onNodeWithText("Create PDF").performClick()
+        assertEquals(listOf("create"), calls)
+    }
+
+    @Test
+    fun preview_whileBuilding_showsProgressWithoutButtons() {
+        state = ReportUiState(step = ReportStep.PREVIEW, hasEntries = true)
+        show()
+        compose.onNodeWithText("Building the report…").assertExists()
+        compose.onNodeWithText("Create PDF").assertDoesNotExist()
     }
 
     @Test
@@ -161,5 +219,9 @@ class ReportContentTest {
 
         state = state.copy(savedName = "mensis-report-2026-10-21.pdf")
         compose.onNodeWithText("Saved as mensis-report-2026-10-21.pdf.").assertExists()
+    }
+
+    private companion object {
+        const val DARK = 0.5f
     }
 }

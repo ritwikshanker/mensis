@@ -5,16 +5,20 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
@@ -23,15 +27,20 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -106,7 +115,10 @@ class ReportActions(
     val onDiscard: () -> Unit,
 )
 
-/** Design §15: set up, preview, then "PDF ready". Stateless for tests and previews. */
+/**
+ * Design §15: set up, preview, then "PDF ready". The preview shows the PDF's own pages rather than the
+ * design's page-1 card; a tapped page opens full screen. Stateless for tests and previews.
+ */
 @Composable
 fun ReportContent(
     state: ReportUiState,
@@ -116,7 +128,26 @@ fun ReportContent(
     BackHandler(enabled = state.step != ReportStep.SETUP) {
         if (state.step == ReportStep.READY) actions.onDiscard() else actions.onEdit()
     }
+    val pages = state.preview?.pages?.takeIf { state.step == ReportStep.PREVIEW }
+    var opened by remember(pages) { mutableStateOf<Int?>(null) }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // While a page is open full screen, the screen underneath is hidden from accessibility services.
+        val behind = if (opened != null) Modifier.clearAndSetSemantics {} else Modifier
+        ReportScaffold(state, actions, behind) { opened = it }
+        val index = opened
+        if (pages != null && index != null) PdfPageViewer(pages, index, onClose = { opened = null })
+    }
+}
+
+@Composable
+private fun ReportScaffold(
+    state: ReportUiState,
+    actions: ReportActions,
+    modifier: Modifier,
+    onOpenPage: (Int) -> Unit,
+) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             MensisTopBar(
                 title = stringResource(R.string.settings_report),
@@ -128,7 +159,12 @@ fun ReportContent(
                     },
             )
         },
+        bottomBar = { if (state.step == ReportStep.PREVIEW && state.preview != null) PreviewButtons(actions) },
     ) { padding ->
+        if (state.step == ReportStep.PREVIEW) {
+            PreviewStep(state, Modifier.padding(padding), onOpenPage)
+            return@Scaffold
+        }
         Column(
             modifier =
                 Modifier
@@ -138,11 +174,7 @@ fun ReportContent(
                     .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            when (state.step) {
-                ReportStep.SETUP -> SetupStep(state, actions)
-                ReportStep.PREVIEW -> PreviewStep(state, actions)
-                ReportStep.READY -> ReadyStep(state, actions)
-            }
+            if (state.step == ReportStep.SETUP) SetupStep(state, actions) else ReadyStep(state, actions)
         }
     }
 }
@@ -205,25 +237,57 @@ private fun ColumnScope.SetupStep(
     }
 }
 
+/** The PDF's pages, drawn only while they are on screen so a long report does not fill the memory. */
 @Composable
-private fun ColumnScope.PreviewStep(
+private fun PreviewStep(
     state: ReportUiState,
-    actions: ReportActions,
+    modifier: Modifier,
+    onOpenPage: (Int) -> Unit,
 ) {
     val preview = state.preview
     if (preview == null) {
-        WorkingIndicator(text = stringResource(R.string.report_building), modifier = Modifier.padding(top = 120.dp))
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            WorkingIndicator(text = stringResource(R.string.report_building), modifier = Modifier.padding(top = 120.dp))
+        }
         return
     }
-    ReportPreviewCard(preview)
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedButton(onClick = actions.onEdit, modifier = Modifier.weight(1f).height(48.dp)) {
-            Text(stringResource(R.string.action_edit))
+    val pages = preview.pages
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        if (pages == null) {
+            item { InfoBanner(text = stringResource(R.string.report_pages_failed)) }
+        } else {
+            item {
+                Text(
+                    text = stringResource(R.string.report_pages_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            items(pages.pageCount) { index -> PdfPageCard(pages, index, onOpen = { onOpenPage(index) }) }
         }
-        Button(onClick = actions.onCreate, modifier = Modifier.weight(1f).height(48.dp)) {
-            MsIcon(resId = R.drawable.ms_picture_as_pdf, contentDescription = null, size = 20.dp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.report_create))
+    }
+}
+
+/** Edit and Create PDF stay in reach however long the report is. */
+@Composable
+private fun PreviewButtons(actions: ReportActions) {
+    Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
+        Row(
+            modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            OutlinedButton(onClick = actions.onEdit, modifier = Modifier.weight(1f).height(48.dp)) {
+                Text(stringResource(R.string.action_edit))
+            }
+            Button(onClick = actions.onCreate, modifier = Modifier.weight(1f).height(48.dp)) {
+                MsIcon(resId = R.drawable.ms_picture_as_pdf, contentDescription = null, size = 20.dp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(stringResource(R.string.report_create))
+            }
         }
     }
 }

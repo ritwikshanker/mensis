@@ -414,6 +414,11 @@
     <string name="report_preview">Preview</string>
     <string name="report_building">Building the report…</string>
     <string name="report_create">Create PDF</string>
+    <string name="report_pages_hint">Tap a page to see it full size.</string>
+    <string name="report_page">Page %1$d of %2$d</string>
+    <string name="report_page_open">Open full size</string>
+    <string name="report_page_close">Close</string>
+    <string name="report_pages_failed">The pages can\'t be shown here. Create the PDF to open it in another app.</string>
     <string name="report_ready">PDF ready</string>
     <string name="report_share">Share</string>
     <string name="report_save">Save to Files</string>

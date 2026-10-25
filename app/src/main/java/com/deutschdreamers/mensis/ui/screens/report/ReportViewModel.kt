@@ -7,6 +7,7 @@ import com.deutschdreamers.mensis.BuildConfig
 import com.deutschdreamers.mensis.data.repo.TrackerDataRepository
 import com.deutschdreamers.mensis.files.DocumentFiles
 import com.deutschdreamers.mensis.lock.AppLockManager
+import com.deutschdreamers.mensis.report.PdfPages
 import com.deutschdreamers.mensis.report.ReportBuilder
 import com.deutschdreamers.mensis.report.ReportModel
 import com.deutschdreamers.mensis.report.ReportOptions
@@ -17,6 +18,7 @@ import com.deutschdreamers.mensis.report.ReportTexts
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -47,13 +50,15 @@ data class ReportUiState(
     val canPreview: Boolean get() = hasEntries == true && options.sections.isNotEmpty()
 }
 
-/** The built report: what the preview card shows and the facts the "PDF ready" line needs. */
+/** The built report: its pages for the preview and the facts the "PDF ready" line needs. */
 data class ReportPreview(
     val model: ReportModel,
     val pageCount: Int,
     val bytes: Long,
     /** "Page 1 of 2 · BBT chart on page 2" */
     val footer: String,
+    /** The PDF's own pages, drawn on the phone; null when they could not be opened. */
+    val pages: PdfPages? = null,
 )
 
 @HiltViewModel
@@ -112,10 +117,11 @@ class ReportViewModel
                 )
             }
 
-        /** Design §15 step 2: builds the PDF in memory so the preview shows its real page count. */
+        /** Design §15 step 2: builds the PDF in memory and opens its pages for the preview. */
         fun preview() {
             if (!state.value.canPreview) return
             val options = state.value.options
+            closePages()
             state.update { it.copy(step = ReportStep.PREVIEW, preview = null, savedName = null, failed = false) }
             building?.cancel()
             building =
@@ -127,23 +133,47 @@ class ReportViewModel
                             val model = ReportBuilder.build(data, options, today, BuildConfig.VERSION_NAME)
                             model to writer.write(model)
                         }
+                    // Not cancellable: an Edit during the open must still let the pages be closed below.
+                    val pages = withContext(NonCancellable + Dispatchers.IO) { openPages(report.bytes) }
+                    if (!isActive) {
+                        pages?.close()
+                        return@launch
+                    }
                     pdf = report.bytes
                     val footer = ReportTexts.footer(1, report.pageCount, report.temperaturePages)
-                    state.update {
-                        it.copy(preview = ReportPreview(model, report.pageCount, report.bytes.size.toLong(), footer))
-                    }
+                    val preview = ReportPreview(model, report.pageCount, report.bytes.size.toLong(), footer, pages)
+                    state.update { it.copy(preview = preview) }
                 }
+        }
+
+        private fun openPages(bytes: ByteArray): PdfPages? =
+            try {
+                PdfPages.open(bytes, files.scratchDir)
+            } catch (expected: IOException) {
+                null
+            } catch (expected: SecurityException) {
+                null
+            }
+
+        /** The pages are needed only on the preview step. */
+        private fun closePages() {
+            state.value.preview
+                ?.pages
+                ?.close()
         }
 
         /** "Edit": back to the set-up step with the same choices. */
         fun edit() {
             building?.cancel()
+            closePages()
             pdf = null
             state.update { it.copy(step = ReportStep.SETUP, preview = null) }
         }
 
         fun create() {
-            if (state.value.preview != null) state.update { it.copy(step = ReportStep.READY) }
+            if (state.value.preview == null) return
+            closePages()
+            state.update { it.copy(step = ReportStep.READY) }
         }
 
         /** The system picker is about to open; returning from it must not trigger the app lock. */
@@ -183,11 +213,13 @@ class ReportViewModel
          */
         fun discard() {
             building?.cancel()
+            closePages()
             pdf = null
             state.update { it.copy(step = ReportStep.SETUP, preview = null, savedName = null) }
         }
 
         override fun onCleared() {
+            closePages()
             pdf = null
         }
     }
